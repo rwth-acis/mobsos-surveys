@@ -1,0 +1,6 @@
+<las2peerNode>
+	<organization>Advanced Community Information Systems (ACIS) Group, RWTH Aachen University</organization>
+	<adminName>Dominik Renzel</adminName>
+	<adminEmail>renzel@dbis.rwth-aachen.de</adminEmail>
+	<description>A simple LAS2peer node hosting the new RESTful version of the original MobSOS Survey Service.</description>
+</las2peerNode>
