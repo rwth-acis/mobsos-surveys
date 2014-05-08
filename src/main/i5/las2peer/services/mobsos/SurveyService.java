@@ -369,7 +369,6 @@ public class SurveyService extends Service {
 		rs.next();
 
 		String owner = rs.getString(1);
-		System.out.println("Survey Owner: " + owner + " Active Agent: " + this.getActiveAgent().getId());
 
 		if(!owner.equals(""+this.getActiveAgent().getId())){
 			return 0;
@@ -404,8 +403,8 @@ public class SurveyService extends Service {
 			String d_start = dateFormat.format(new Date(ts_start));
 			String d_end = dateFormat.format(new Date(ts_end));
 
-			System.out.println(ts_start + " -> " + d_start);
-			System.out.println(ts_end + " -> " + d_end);
+			//System.out.println(ts_start + " -> " + d_start);
+			//System.out.println(ts_end + " -> " + d_end);
 
 			o.put("start",d_start);
 			o.put("end",d_end);

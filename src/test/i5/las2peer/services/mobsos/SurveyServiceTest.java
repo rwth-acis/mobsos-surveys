@@ -177,7 +177,7 @@ public class SurveyServiceTest {
 			assertTrue(jo.keySet().contains("url"));
 			String urlStr = (String) jo.get("url");
 			URL url = new URL(urlStr);
-			System.out.println(jo.toJSONString());
+			//System.out.println(jo.toJSONString());
 
 		} catch (ParseException e){
 			e.printStackTrace();
@@ -249,7 +249,7 @@ public class SurveyServiceTest {
 			assertTrue(jo.get("surveys") != null);
 			o = jo.get("surveys");
 			assertTrue(o instanceof JSONArray);
-			System.out.println(jo.toJSONString());
+			//System.out.println(jo.toJSONString());
 
 		} catch (ParseException e) {
 			fail("Could not parse service response to JSON Object!");
@@ -273,7 +273,6 @@ public class SurveyServiceTest {
 			URL u = new URL(fullurl);
 			u.getPath();
 			String pathonly = u.getPath();
-			System.out.println("Using Path: " + pathonly);
 
 			// now check if survey retrieval works properly
 			ClientResponse result=c.sendRequest("GET", pathonly,"");
@@ -285,13 +284,15 @@ public class SurveyServiceTest {
 			// check if all fields are contained in result
 			assertTrue(rjo.keySet().contains("id"));
 			assertTrue(rjo.keySet().contains("name"));
+			assertTrue(rjo.keySet().contains("organization"));
+			assertTrue(rjo.keySet().contains("logo"));
 			assertTrue(rjo.keySet().contains("description"));
 			assertTrue(rjo.keySet().contains("owner"));
 			assertTrue(rjo.keySet().contains("resource"));
 			assertTrue(rjo.keySet().contains("start"));
 			assertTrue(rjo.keySet().contains("end"));
 
-			System.out.println(rjo.toJSONString());
+		
 		} catch (ParseException e) {
 			e.printStackTrace();
 			fail("Could not parse service response to JSON Object!");
@@ -351,7 +352,6 @@ public class SurveyServiceTest {
 			URL u = new URL(fullurl);
 			u.getPath();
 			String pathonly = u.getPath();
-			System.out.println("Using Path: " + pathonly);
 
 			// check if deletion of particular surveys works
 			ClientResponse delete=c.sendRequest("DELETE", u.getPath(),"");
