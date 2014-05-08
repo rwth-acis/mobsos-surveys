@@ -36,6 +36,9 @@ create fulltext index idx_s_desc on survey(description);
 -- -----------------------------------------------------
 create table questionnaire (
 	id mediumint not null auto_increment,
+	owner varchar(128) not null,
+	organization varchar(128) not null,
+	logo varchar(512) not null,
 	name varchar(128) not null,
 	description varchar(512) not null,
 	form mediumtext not null,
