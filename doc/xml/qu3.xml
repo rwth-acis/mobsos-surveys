@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<qu:Questionnaire xmlns="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
+		  xmlns:qu="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Introduction" 
+	      xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Questionnaire 1 - Instructions
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Outer Appearance" 
+	      qid="B.3.1"
+	      minval="0"
+	      maxval="100"
+	      defval="5"
+	      maxlabel="superhot" 
+	      minlabel="ugly" 
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Please rate the outer appearance of Fran Drescher on a scale from 0 to 10.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Coolness" 
+	      qid="B.3.2"
+	      minval="0" 
+	      maxval="10"
+	      defval="3"
+	      minlabel="low" 
+	      maxlabel="high" 
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Please rate the coolness of Fran Drescher on a scale from 0 to 10.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Favorite Nanny Episode" 
+	      qid="B.3.3"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Please write down your favorite episode of the nanny.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>
+
+<!-- This document was validated with xmllint -->

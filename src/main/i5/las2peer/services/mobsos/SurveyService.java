@@ -402,7 +402,6 @@ public class SurveyService extends Service {
 			try{
 				o = parseQuestionnaire(content);
 			} catch (IllegalArgumentException | ParseException e){
-				e.printStackTrace();
 				HttpResponse result = new HttpResponse(e.getMessage());
 				result.setStatus(400);
 				return result;

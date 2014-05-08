@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<qu:Questionnaire xmlns="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
+		  xmlns:qu="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Estimated Expenditure of Time " 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>The estimated expenditure of time you will need to fill in this questionnaire is 8-10 minutes.</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality (SQ)" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>The upcoming section presents a set of question items on technical properties of ${SERVICE.NAME}.</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Convenience of Access" 
+		 qid="SQ.1.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="inconvenient" 
+		 maxlabel="convenient" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How convenient is the access to service ${SERVICE.NAME}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Intuitiveness" 
+		 qid="SQ.2.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not intuitive" 
+		 maxlabel="intuitive" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How intuitive is service usage?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Responsiveness" 
+		 qid="SQ.3.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="slow response" 
+		 maxlabel="quick response" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>A crucial prerequisite for services is to be highly responsive. Are requests responded quickly?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Reliability" 
+		 qid="SQ.5.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="always failed" 
+		 maxlabel="always succeeded" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Adding, removal, editing and the retrieval of managed information are central basic service features. How often did these operations fail for you?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usefulness of Features - Community" 
+		 qid="SQ.6.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="pointless" 
+		 maxlabel="useful" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How useful are provided features with special regard to your community ${COMMUNITY}? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usefulness of Features - General" 
+		 qid="SQ.6.2"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="pointless" 
+		 maxlabel="useful" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are features provided by ${SERVICE.NAME} useful in general?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Completeness of Features" 
+		 qid="SQ.7.1"
+		 defval="0"
+		 minlabel="yes" 
+		 maxlabel="no" 
+		 xsi:type="qu:DichotomousQuestionPageType">
+		<qu:Instructions>Is any crucial feature missing?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Integration - Genericity" 
+		 qid="SQ.8.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="very specific" 
+		 maxlabel="widely applicable" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are provided service features widely applicable or rather constrained to specific usage scenarios? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Innovativeness" 
+		 qid="SQ.9.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="pointless" 
+		 maxlabel="innovative" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How innovative are currently supported service features?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Multimedia Quality of Service - General" 
+		 qid="SQ.10.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="poor" 
+		 maxlabel="high" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>During your evaluation you have accessed ${MEDIA.DISTINCT_URLS} distinct media of ${MEDIA.DISTINCT_FORMATS} formats. How do you rate the quality of service regarding multimedia content access?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Multimedia Quality of Service - Perceived Media Quality" 
+		 qid="SQ.10.2"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="poor" 
+		 maxlabel="high" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How is the technical quality of the accessed multimedia content with regard to flaws like jitter, compression artifacts, etc.?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Multimedia Quality of Service - Adaptive Media Quality" 
+		 qid="SQ.10.3"
+		 defval="0"
+		 minlabel="no" 
+		 maxlabel="yes" 
+		 xsi:type="qu:DichotomousQuestionPageType">
+		<qu:Instructions>During service evaluation you have accessed media from ${MONITORING.DISTINCT_PLATFORMS} distinct platforms. Is an appropriate trade-off found between media quality and respective device capabilities?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Mobile Context Awareness" 
+		 qid="SQ.11.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not  at all" 
+		 maxlabel="completely realized" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>To what degree is information about your current surrounding (e.g. your current GPS position) integrated into service features? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Security - General" 
+		 qid="SQ.12.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="insecure" 
+		 maxlabel="secure" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How secure is the usage of ${SERVICE.NAME}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Security - Personal Privacy" 
+		 qid="SQ.12.2"
+		 minval="0"
+		 maxval="10"
+		 defval="5"
+		 minlabel="no access control" 
+		 maxlabel="appropriate access control" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>To what degree could you control access to your personal information managed by the service?</qu:Instructions>
+	</qu:Page>
+	
+	
+	<qu:Page name="Information Quality (IQ)" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>The upcoming section will present a set of question items on the quality of the information managed and presented by ${SERVICE.NAME}.</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usefulness" 
+		 qid="IQ.1.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="pointless" 
+		 maxlabel="useful" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How useful is information presented by ${SERVICE.NAME}? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Understandability" 
+		 qid="IQ.2.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not understandable at all" 
+		 maxlabel="easily understandable" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Is the presented information understandable? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Conciseness" 
+		 qid="IQ.3.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="overloaded" 
+		 maxlabel="concise" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Is a minimal amount of concise information presented or was the information overloaded with irrelevant details?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Completeness" 
+		 qid="IQ.4.1"
+		 defval="0"
+		 minlabel="no" 
+		 maxlabel="yes" 
+		 xsi:type="qu:DichotomousQuestionPageType">
+		<qu:Instructions>Is the information presented by ${SERVICE.NAME} complete?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Timeliness" 
+		 qid="IQ.6.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="outdated" 
+		 maxlabel="up-to-date" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Is presented information rather outdated or up-to-date?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Uniqueness" 
+		 qid="IQ.7.1"
+		 defval="0"
+		 minlabel="seen before" 
+		 maxlabel="seen first time" 
+		 xsi:type="qu:DichotomousQuestionPageType">
+		<qu:Instructions>Have you seen similar forms of the presented information before?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Appropriateness of Format" 
+		 qid="IQ.8.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not appropriate" 
+		 maxlabel="appropriate" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Is the information well structured and reflected by an appropriate presentation format?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="User Satisfaction (US)" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			The upcoming section will present a set of question items on your personal satisfaction with ${SERVICE.NAME}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Satisfaction" 
+		 qid="US.1.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="unsatisfied" 
+		 maxlabel="satisfied" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are you satisfied with the technical realization of ${SERVICE.NAME}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Satisfaction" 
+		 qid="US.2.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="unsatisfied" 
+		 maxlabel="satisfied" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are you satisfied with the information presented to you?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Multimedia Content Satisfaction" 
+		 qid="US.3.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="unsatisfied" 
+		 maxlabel="satisfied" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are you satisfied with multimedia content presented to you while using ${SERVICE.NAME}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Enjoyment" 
+		 qid="US.5.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="bored" 
+		 maxlabel="excited" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How do you rate your personal level of enjoyment when using ${SERVICE.NAME}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact (II)" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>The upcoming section presents a set of question items on how and to what degree ${SERVICE.NAME} impacted you personally.</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Improved Learning" 
+		 qid="II.1.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="no improvement" 
+		 maxlabel="significant improvement" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>To what degree does service usage improve your personal learning process?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Improved Personal Productivity" 
+		 qid="II.3.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="no improvement" 
+		 maxlabel="high improvement" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does service usage improve your personal productivity?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Contribution to Personal Goal Achievement" 
+		 qid="II.4.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="no contribution" 
+		 maxlabel="significant contribution" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does service usage contribute to achieving your personal goals?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Influence within Community" 
+		 qid="II.5.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="no influence" 
+		 maxlabel="significant influence " 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does usage of ${SERVICE.NAME} influence your position among members of ${COMMUNITY}? </qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Community Impact (CI)" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>The upcoming section presents a set of question items on how and to what degree ${SERVICE.NAME} impacts your community ${COMMUNITY}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Community Evolution - Attraction of Members" 
+		 qid="CI.1.1"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not at all" 
+		 maxlabel="totally" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does ${SERVICE.NAME} attract new members to your community ${COMMUNITY}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Community Evolution -  Community Building" 
+		 qid="CI.1.2"
+		 minval="0" 
+		 maxval="10"
+		 defval="5"
+		 minlabel="not at all" 
+		 maxlabel="totally" 
+		 xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does service usage motivate or support the evolution of new communities/subcommunities?</qu:Instructions>
+	</qu:Page>
+
+	<qu:Page name="Improved Community Productivity" 
+		qid="CI.4.1"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="no improvement" 
+		maxlabel="significant improvement" 
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does ${SERVICE.NAME} improve the productivity of your community ${COMMUNITY}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Contribution to Community Goal Achievement" 
+		qid="CI.5.1"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="no contribution" 
+		maxlabel="significant contribution" 
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does the service contribute to achieving goals defined by your community ${COMMUNITY}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Motivation for Collaboration" 
+		qid="CI.6.1"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="no motivation" 
+		maxlabel="high motivation" 
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does ${SERVICE.NAME} motivate collaboration between you and members of ${COMMUNITY}?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Encouragement of Innovation" 
+		qid="CI.7.1"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="no encouragement" 
+		maxlabel="high encouragement" 
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Does the service encourage development of new innovative services/applications in your community?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Community Awareness" 
+		qid="CI.8.1"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="not aware" 
+		maxlabel="totally aware" 
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>Are you aware of activities of other ${COMMUNITY} members using the service?</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Service Success" 
+		qid="OS"
+		minval="0" 
+		maxval="10"
+		defval="5"
+		minlabel="doomed to fail" 
+		maxlabel="predestined to succeed"
+		required="true"
+		xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>How successful do you expect ${SERVICE.NAME} to be in future? Please note that an answer to this question is mandatory!</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Final Comments" 
+		qid="FC"
+		xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>Finally we would like to ask you to provide any additional comments, e.g. possible improvements for ${SERVICE.NAME}, remarks about this questionnaire, etc.</qu:Instructions>
+	</qu:Page>
+
+</qu:Questionnaire>
+
+<!-- This document was validated with xmllint -->

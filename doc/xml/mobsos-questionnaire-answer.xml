@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<QuestionnaireAnswer xmlns="http://multimedia-metadata.info/mobsos/questionnaire.xsd">
+	<Question qid="1.1"></Question>
+	<Question qid="1.2"></Question>
+	<Question qid="1.3"></Question>
+</QuestionnaireAnswer>
+
+<!-- This document was validated with xmllint -schema mobsos-questionnaire.xsd mobsos-questionnaire-answer.xml -->
