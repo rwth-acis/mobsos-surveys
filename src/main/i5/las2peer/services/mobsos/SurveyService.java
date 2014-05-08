@@ -33,6 +33,7 @@ package i5.las2peer.services.mobsos;
 
 import i5.las2peer.api.Service;
 import i5.las2peer.restMapper.HttpResponse;
+import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
 import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
@@ -44,6 +45,8 @@ import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Version;
 import i5.las2peer.security.UserAgent;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -150,7 +153,7 @@ public class SurveyService extends Service {
 	{
 		try {
 			JSONObject o;
-			
+
 			try{
 				o = parseSurvey(content);
 			} catch (IllegalArgumentException | ParseException e){
@@ -158,11 +161,11 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
-			
+
 			int sid = storeNewSurvey(o);
-			
-			
-			
+
+
+
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/surveys/" + sid);
 			HttpResponse result = new HttpResponse(r.toJSONString());
@@ -262,7 +265,7 @@ public class SurveyService extends Service {
 			}
 
 			// if survey exists and active agent is owner, proceed.
-			
+
 			JSONObject o;
 			// parse and validate content. If invalid, return 400 (bad request)
 			try{
@@ -272,13 +275,16 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
+
 			surveyUpdateStatement.clearParameters();
-			surveyUpdateStatement.setString(1, (String) o.get("name") );
-			surveyUpdateStatement.setString(2, (String) o.get("description") );
-			surveyUpdateStatement.setString(3, (String) o.get("resource") );
-			surveyUpdateStatement.setTimestamp(4, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
-			surveyUpdateStatement.setTimestamp(5, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
-			surveyUpdateStatement.setInt(6, id);
+			surveyUpdateStatement.setString(1, (String) o.get("organization") );
+			surveyUpdateStatement.setString(2, (String) o.get("logo") );
+			surveyUpdateStatement.setString(3, (String) o.get("name") );
+			surveyUpdateStatement.setString(4, (String) o.get("description") );
+			surveyUpdateStatement.setString(5, (String) o.get("resource") );
+			surveyUpdateStatement.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
+			surveyUpdateStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
+			surveyUpdateStatement.setInt(8, id);
 
 			surveyUpdateStatement.executeUpdate();
 			connection.commit();
@@ -385,6 +391,8 @@ public class SurveyService extends Service {
 			o.put("name",rs.getString("name"));
 			o.put("description",rs.getString("description"));
 			o.put("owner",rs.getString("owner"));
+			o.put("organization", rs.getString("organization"));
+			o.put("logo", rs.getString("logo"));
 			o.put("resource",rs.getString("resource"));
 
 			long ts_start = rs.getTimestamp("start").getTime();
@@ -420,7 +428,7 @@ public class SurveyService extends Service {
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
 
 		// check result for unknown illegal fields. If so, parsing fails.
-		String[] fields = {"id","owner","name","description","resource","start","end"};
+		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end"};
 		for (Object key: o.keySet()){
 			if(!Arrays.asList(fields).contains(key)){
 
@@ -433,13 +441,38 @@ public class SurveyService extends Service {
 				else if(key.equals("description") && !(o.get(key) instanceof String)){
 					throw new IllegalArgumentException("Illegal value for survey field 'description'. Should be a string.");
 				}
-				else if(key.equals("resource")){
+				else if(key.equals("organization") && !(o.get(key) instanceof String)){
+					throw new IllegalArgumentException("Illegal value for survey field 'organization'. Should be a string.");
+				}
+				else if(key.equals("logo")){
 					try {
-						new URL((String) o.get(key));
+						URL u = new URL((String) o.get(key));
+						HttpURLConnection con = (HttpURLConnection) u.openConnection();
+						if(404 == con.getResponseCode()){
+							throw new IllegalArgumentException("Illegal value for survey field logo. Should be a valid URL to an image resource.");
+						}
+						if(!con.getContentType().matches("image/.*")){
+							throw new IllegalArgumentException("Illegal value for survey field logo. Should be a valid URL to an image resource.");
+						}
 					} catch (MalformedURLException e) {
-						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
+						throw new IllegalArgumentException("Illegal value for survey field 'logo'. Should be a valid URL to an image resource.");
+					} catch (IOException e) {
+						throw new IllegalArgumentException("Illegal value for survey field 'logo'. Should be a valid URL to an image resource.");
 					}
 				} 
+				else if(key.equals("resource")){
+					try {
+						URL u = new URL((String) o.get(key));
+						HttpURLConnection con = (HttpURLConnection) u.openConnection();
+						if(404 == con.getResponseCode()){
+							throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
+						}
+					} catch (MalformedURLException e) {
+						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
+					} catch (IOException e) {
+						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
+					}
+				}
 				else if(key.equals("start")){
 					try{
 						DatatypeConverter.parseDateTime((String)o.get("start"));
@@ -459,44 +492,48 @@ public class SurveyService extends Service {
 
 		// check if all necessary fields are specified.
 		if(	o.get("name") == null || 
+				o.get("organization") == null ||
+				o.get("logo") == null ||
 				o.get("description") == null || 
 				o.get("resource") == null || 
 				o.get("start") == null ||
 				o.get("end") == null){
-			throw new IllegalArgumentException("Survey data incomplete! All fields name, description, resource, start, and end must be defined!");
+			throw new IllegalArgumentException("Survey data incomplete! All fields name, organization, logo, description, resource, start, and end must be defined!");
 		}
-		
+
 		// finally check time integrity constraint: start must be before end (possibly not enforced by database; mySQL does not support this check)
 		long d_start = DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis();
 		long d_end = DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis();
-		
+
 		if(d_start >= d_end){
 			throw new IllegalArgumentException("Survey data invalid! Start time must be before end time!");
 		}
-		
+
 		return o;
 	}
 
 	private int storeNewSurvey(JSONObject o) throws IllegalArgumentException, SQLException{
 
-			surveyInsertStatement.clearParameters();
-			surveyInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
-			surveyInsertStatement.setString(2, (String) o.get("name"));
-			surveyInsertStatement.setString(3, (String) o.get("description"));
-			surveyInsertStatement.setString(4, (String) o.get("resource"));
-			surveyInsertStatement.setTimestamp(5, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
-			surveyInsertStatement.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
+		surveyInsertStatement.clearParameters();
+		surveyInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
+		surveyInsertStatement.setString(2, (String) o.get("organization"));
+		surveyInsertStatement.setString(3, (String) o.get("logo"));
+		surveyInsertStatement.setString(4, (String) o.get("name"));
+		surveyInsertStatement.setString(5, (String) o.get("description"));
+		surveyInsertStatement.setString(6, (String) o.get("resource"));
+		surveyInsertStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
+		surveyInsertStatement.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
 
-			surveyInsertStatement.executeUpdate();
-			ResultSet rs = surveyInsertStatement.getGeneratedKeys();
+		surveyInsertStatement.executeUpdate();
+		ResultSet rs = surveyInsertStatement.getGeneratedKeys();
 
-			connection.commit();
+		connection.commit();
 
-			if (rs.next()) {
-				return rs.getInt(1);
-			} else {
-				throw new NoSuchElementException("No new id was created");
-			}
+		if (rs.next()) {
+			return rs.getInt(1);
+		} else {
+			throw new NoSuchElementException("No new id was created");
+		}
 	}
 
 	private void initDatabaseConnection() throws ClassNotFoundException, SQLException{
@@ -505,13 +542,13 @@ public class SurveyService extends Service {
 		connection = DriverManager.getConnection(jdbcUrl+jdbcSchema,jdbcLogin, jdbcPass);
 		connection.setAutoCommit(false);
 
-		surveyInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey(owner, name, description, resource, start, end ) values (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		surveyInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end ) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 		surveysQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".survey");
 		surveysDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey");
 
 		surveyQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
 		surveyCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".survey where id = ?");
-		surveyUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set name=?, description=?, resource=?, start=?, end=? where id = ?");
+		surveyUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 	}

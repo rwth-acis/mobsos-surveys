@@ -15,6 +15,8 @@ drop table if exists survey_structure;
 create table survey (
 	id mediumint not null auto_increment,
 	owner varchar(128) not null,
+	organization varchar(128) not null,
+	logo varchar(512) not null,
 	name varchar(128) not null,
 	description varchar(512) not null,
 	resource varchar(512) not null,

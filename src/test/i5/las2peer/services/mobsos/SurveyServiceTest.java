@@ -193,22 +193,50 @@ public class SurveyServiceTest {
 	{
 		JSONObject invalidSurvey = generateSurveyJSON(); // until now, survey JSON is ok. Introduce problems now...
 		invalidSurvey.put("name", new Integer(2)); // name must be string
-		
+
 		ClientResponse result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
-		
+
 		invalidSurvey.put("name", "Alcoholics Standard Survey"); //make valid again and introduce other problem
 		invalidSurvey.put("start", "20144-33-44T1000"); //introduce wrong time
-		
+
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
-		
+
 		invalidSurvey.put("start", "2014-05-08T12:00:00Z"); //make valid again and introduce other problem
 		invalidSurvey.put("end", "2014-04-01T00:00:00Z"); // end time before start time
+
+		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+		assertEquals(400, result.getHttpCode());
+
+		invalidSurvey.put("end", "2014-06-08T00:00:00Z"); // make valid again and introduce other problem
+		invalidSurvey.put("logo","dbis"); // malformed logo URL
+
+		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+		assertEquals(400, result.getHttpCode());
+
+		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
+
+		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+		assertEquals(400, result.getHttpCode());
+
+		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
+
+		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+		assertEquals(400, result.getHttpCode());
+		
+		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg"); // make valid again and introduce other problem
+		invalidSurvey.put("resource","shitonashingle"); // malformed resource URL
 		
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
 		
+		invalidSurvey.put("resource","http://dbis.rwth-aachen.de/nonexistingresource"); // non-existing resource URL
+		
+		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+		assertEquals(400, result.getHttpCode());
+		
+
 	}
 
 	@Test
@@ -342,7 +370,7 @@ public class SurveyServiceTest {
 			fail("Detected invalid survey URL! " + e.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testDeleteNonExistingSurvey(){
 		// check if deletion of non-existing surveys works.
@@ -372,8 +400,8 @@ public class SurveyServiceTest {
 			JSONObject survey = (JSONObject) JSONValue.parse(result.getResponse());
 
 			// change some fields in survey
-			survey.put("name","Cuntsucking Asslicker Survey");
-			survey.put("description", "This survey is for all those who like to suck cunt, lick ass and to do Cleveland steaming.");
+			survey.put("name","Beerdrinker Survey");
+			survey.put("description", "This survey is for all those who like to drink beer.");
 
 			// then call service to update existing survey
 			ClientResponse updateresult=c.sendRequest("POST", u.getPath(),survey.toJSONString());
@@ -382,7 +410,7 @@ public class SurveyServiceTest {
 			ClientResponse updated=c.sendRequest("GET", u.getPath(),"");
 			assertEquals(200,updated.getHttpCode()); // survey should exist
 			JSONObject updatedSurvey = (JSONObject) JSONValue.parse(updated.getResponse());
-			
+
 			assertEquals(survey,updatedSurvey);
 
 		} catch (ParseException e) {
@@ -399,6 +427,8 @@ public class SurveyServiceTest {
 
 		JSONObject obj = new JSONObject(); 
 		obj.put("name","Wikipedia Survey " + (new Date()).getTime());
+		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
+		obj.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description","A sample survey on Wikipedia.");
 		obj.put("resource", "http://wikipedia.org"); 
 		obj.put("start","2014-06-06T00:00:00Z");
