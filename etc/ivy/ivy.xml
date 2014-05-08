@@ -5,7 +5,8 @@
         <dependency org="i5" name="i5-WebConnector" rev="0.0.6"/>
 		
 		<!-- Third-party library dependencies -->
-        <dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1" />
+        <dependency org="junit" name="junit" rev="4.11"/>
+		<dependency org="com.googlecode.json-simple" name="json-simple" rev="1.1" />
 		<dependency org="mysql" name="mysql-connector-java" rev="5.1.6" />
 		
     </dependencies>
