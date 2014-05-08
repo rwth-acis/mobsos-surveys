@@ -235,7 +235,6 @@ public class SurveyServiceTest {
 		
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
-		
 
 	}
 
