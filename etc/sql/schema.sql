@@ -41,7 +41,7 @@ create table questionnaire (
 	logo varchar(512) not null,
 	name varchar(128) not null,
 	description varchar(512) not null,
-	form mediumtext not null,
+	form mediumtext,
 	constraint questionnaire_pk primary key (id),
 	constraint questionnaire_uk unique key (name)
 );

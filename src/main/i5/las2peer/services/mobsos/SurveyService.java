@@ -35,6 +35,7 @@ import i5.las2peer.api.Service;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
+import i5.las2peer.restMapper.annotations.Consumes;
 import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
 import i5.las2peer.restMapper.annotations.GET;
@@ -45,6 +46,8 @@ import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Version;
 import i5.las2peer.security.UserAgent;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -63,12 +66,22 @@ import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.TimeZone;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -89,9 +102,12 @@ public class SurveyService extends Service {
 	private PreparedStatement surveyQueryStatement, surveyCheckOwnerStatement, surveyDeleteStatement, surveyUpdateStatement;
 
 	private PreparedStatement questionnaireInsertStatement, questionnairesQueryStatement, questionnairesDeleteStatement;
-	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement;
+	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement, questionnaireUploadFormStatement;
 
-	private String epUrl;
+	private DocumentBuilder parser;
+	private Validator validator;
+
+	private String epUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName;
 	private String jdbcUrl, jdbcSchema;
 	private String jdbcLogin, jdbcPass;
@@ -104,16 +120,21 @@ public class SurveyService extends Service {
 
 		try {
 			initDatabaseConnection();
+			initXMLInfrastructure();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
 
 		// print out REST mapping for this service
 		//System.out.println(getRESTMapping());
 	}
-	
+
 	/**
 	 * Retrieves a list of all surveys.
 	 * @return
@@ -250,7 +271,7 @@ public class SurveyService extends Service {
 	 * @param id
 	 * @return
 	 */
-	@POST
+	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy.
 	@Path("surveys/{id}")
 	public HttpResponse updateSurvey(@PathParam("id") int id, @ContentParam String content){
 
@@ -540,7 +561,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	/**
 	 * Deletes a questionnaire with a given id. The respective questionnaire may only be deleted, if the active agent is the questionnaire's owner.
 	 * 
@@ -586,7 +607,64 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
+
 	
+	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy
+	@Path("questionnaires/{id}/form")
+	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
+		try {
+			int exown = checkExistenceOwnership(id,1);
+
+			// check if questionnaire exists; if not, return 404.
+			if(exown == -1){
+				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+				result.setStatus(404);
+				return result;
+			} 
+			// if questionnaire exists, check if active agent is owner. if not, return 401.
+			else if (exown == 0){
+				HttpResponse result = new HttpResponse("Form for questionnaire " + id + "  may only be uploaded by its owner.");
+				result.setStatus(401);
+				return result;
+			}
+
+			// before storing to database validate questionnaire form
+			try{
+				validateQuestionnaireData(formXml);
+			} catch(IOException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+				result.setStatus(500);
+				return result;
+				
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+			
+			// if form XML is valid, then store it to database
+			questionnaireUploadFormStatement.clearParameters();
+			questionnaireUploadFormStatement.setString(1, formXml);
+			questionnaireUploadFormStatement.setInt(2, id);
+			
+			questionnaireUploadFormStatement.executeUpdate();
+			connection.commit();
+			
+			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
+			result.setStatus(200);
+			return result;
+			
+		} catch(Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+	}
+
+
 	// ---------------------------- private helper methods -----------------------
 
 	/**
@@ -628,6 +706,9 @@ public class SurveyService extends Service {
 
 	}
 
+	/**
+	 * Marshals survey data in a result set from the MobSOS database to a JSON representation.
+	 */
 	private JSONObject readSurveyFromResultSet(ResultSet rs) throws SQLException{
 		if(rs == null){
 			return null; 
@@ -666,6 +747,9 @@ public class SurveyService extends Service {
 		}
 	}
 
+	/**
+	 * Marshals questionnaire data in a result set from the MobSOS database to a JSON representation.
+	 */
 	private JSONObject readQuestionnaireFromResultSet(ResultSet rs) throws SQLException{
 		if(rs == null){
 			return null; 
@@ -689,12 +773,7 @@ public class SurveyService extends Service {
 	}
 
 	/**
-	 * Parses incoming content to a survey JSON Object including checks for completeness, illegal fields and values.
-	 * 
-	 * @param content
-	 * @return
-	 * @throws ParseException
-	 * @throws IllegalArgumentException
+	 * Parses incoming content to a survey JSON representation including checks for completeness, illegal fields and values.
 	 */
 	private JSONObject parseSurvey(String content) throws ParseException, IllegalArgumentException {
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
@@ -785,15 +864,10 @@ public class SurveyService extends Service {
 	}
 
 	/**
-	 * Parses incoming content to a questionnaire JSON Object including checks for completeness, illegal fields and values.
-	 * 
-	 * @param content
-	 * @return
-	 * @throws ParseException
-	 * @throws IllegalArgumentException
+	 * Parses incoming content to a questionnaire JSON representation including checks for completeness, illegal fields and values.
 	 */
 	private JSONObject parseQuestionnaire(String content) throws ParseException, IllegalArgumentException {
-		
+
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
 
 		// check result for unknown illegal fields. If so, parsing fails.
@@ -844,17 +918,21 @@ public class SurveyService extends Service {
 		return o;
 	}
 
-	private int storeNewSurvey(JSONObject o) throws IllegalArgumentException, SQLException{
+	/**
+	 * Stores a new survey described with JSON into the MobSOS database.
+	 * The MobSOS database thereby generates a new id returned by this method.
+	 */
+	private int storeNewSurvey(JSONObject survey) throws IllegalArgumentException, SQLException{
 
 		surveyInsertStatement.clearParameters();
 		surveyInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
-		surveyInsertStatement.setString(2, (String) o.get("organization"));
-		surveyInsertStatement.setString(3, (String) o.get("logo"));
-		surveyInsertStatement.setString(4, (String) o.get("name"));
-		surveyInsertStatement.setString(5, (String) o.get("description"));
-		surveyInsertStatement.setString(6, (String) o.get("resource"));
-		surveyInsertStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
-		surveyInsertStatement.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
+		surveyInsertStatement.setString(2, (String) survey.get("organization"));
+		surveyInsertStatement.setString(3, (String) survey.get("logo"));
+		surveyInsertStatement.setString(4, (String) survey.get("name"));
+		surveyInsertStatement.setString(5, (String) survey.get("description"));
+		surveyInsertStatement.setString(6, (String) survey.get("resource"));
+		surveyInsertStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("start")).getTimeInMillis()));
+		surveyInsertStatement.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("end")).getTimeInMillis()));
 
 		surveyInsertStatement.executeUpdate();
 		ResultSet rs = surveyInsertStatement.getGeneratedKeys();
@@ -868,14 +946,18 @@ public class SurveyService extends Service {
 		}
 	}
 
-	private int storeNewQuestionnaire(JSONObject o) throws IllegalArgumentException, SQLException{
+	/**
+	 * Stores a new questionnaire described with JSON into the MobSOS database.
+	 * The MobSOS database thereby generates a new id returned by this method.
+	 */
+	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException{
 
 		questionnaireInsertStatement.clearParameters();
 		questionnaireInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
-		questionnaireInsertStatement.setString(2, (String) o.get("organization"));
-		questionnaireInsertStatement.setString(3, (String) o.get("logo"));
-		questionnaireInsertStatement.setString(4, (String) o.get("name"));
-		questionnaireInsertStatement.setString(5, (String) o.get("description"));
+		questionnaireInsertStatement.setString(2, (String) questionnaire.get("organization"));
+		questionnaireInsertStatement.setString(3, (String) questionnaire.get("logo"));
+		questionnaireInsertStatement.setString(4, (String) questionnaire.get("name"));
+		questionnaireInsertStatement.setString(5, (String) questionnaire.get("description"));
 
 		questionnaireInsertStatement.executeUpdate();
 		ResultSet rs = questionnaireInsertStatement.getGeneratedKeys();
@@ -889,6 +971,9 @@ public class SurveyService extends Service {
 		}
 	}
 
+	/**
+	 * Initializes the connection to the MobSOS database and all prepared statements used in service methods.
+	 */
 	private void initDatabaseConnection() throws ClassNotFoundException, SQLException{
 
 		Class.forName(jdbcDriverClassName);
@@ -912,7 +997,40 @@ public class SurveyService extends Service {
 		questionnaireCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".questionnaire where id = ?");
 		questionnaireUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=? where id = ?");
 		questionnaireDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire where id = ?");
+		questionnaireUploadFormStatement = connection.prepareStatement("update "+ jdbcSchema + ".questionnaire set form=? where id = ?");
+	}
 
+	/**
+	 * Initialize XML parser and validator for questionnaire forms and answers
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 */
+	private void initXMLInfrastructure() throws SAXException, ParserConfigurationException{
+		SchemaFactory factory =
+				SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		Schema schema = factory.newSchema(new File(questionnaireSchemaPath));
+		validator = schema.newValidator();
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setSchema(schema);
+		dbf.setNamespaceAware(true);
+		dbf.setValidating(false);
+
+		parser = dbf.newDocumentBuilder();
+	}
+
+	/**
+	 * Validates questionnaire forms and answers against the MobSOS Questionnaire XML Schema.
+	 * 
+	 * @param data
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	private void validateQuestionnaireData(String data) throws SAXException, IOException{
+		// parse and validate. 
+		ByteArrayInputStream stringIS = new ByteArrayInputStream(data.getBytes());
+		Document doc = parser.parse(stringIS);
+		validator.validate(new DOMSource(doc));
 	}
 
 	/**

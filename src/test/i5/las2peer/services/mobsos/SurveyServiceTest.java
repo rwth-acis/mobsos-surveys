@@ -31,10 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package i5.las2peer.services.mobsos;
 
-import static org.junit.Assert.*;
+
 import i5.las2peer.p2p.LocalNode;
-import i5.las2peer.restMapper.MediaType;
-import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.ServiceAgent;
 import i5.las2peer.security.UserAgent;
 import i5.las2peer.testing.MockAgentFactory;
@@ -43,6 +41,8 @@ import i5.las2peer.webConnector.client.ClientResponse;
 import i5.las2peer.webConnector.client.MiniClient;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,6 +55,9 @@ import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.Assert;
+import static org.junit.Assert.*;
+
 
 /**
  * JUnit Test Class for MobSOS Survey Service
@@ -184,7 +187,7 @@ public class SurveyServiceTest {
 			fail("Service should return a valid URL to the new survey's resource");
 		}
 	}
-	
+
 	/**
 	 * Test the creation of new questionnaires.
 	 */
@@ -252,20 +255,20 @@ public class SurveyServiceTest {
 
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
-		
+
 		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg"); // make valid again and introduce other problem
 		invalidSurvey.put("resource","shitonashingle"); // malformed resource URL
-		
+
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
-		
+
 		invalidSurvey.put("resource","http://dbis.rwth-aachen.de/nonexistingresource"); // non-existing resource URL
-		
+
 		result=c.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
 		assertEquals(400, result.getHttpCode());
 
 	}
-	
+
 	/**
 	 * Test the creation of new surveys with invalid data.
 	 */
@@ -317,7 +320,7 @@ public class SurveyServiceTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Test the retrieval of questionnaire lists.
 	 */
@@ -378,7 +381,7 @@ public class SurveyServiceTest {
 			assertTrue(rjo.keySet().contains("start"));
 			assertTrue(rjo.keySet().contains("end"));
 
-		
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 			fail("Could not parse service response to JSON Object!");
@@ -422,7 +425,7 @@ public class SurveyServiceTest {
 			assertTrue(rjo.keySet().contains("logo"));
 			assertTrue(rjo.keySet().contains("description"));
 			assertTrue(rjo.keySet().contains("owner"));
-		
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 			fail("Could not parse service response to JSON Object!");
@@ -431,7 +434,7 @@ public class SurveyServiceTest {
 			fail("Detected invalid questionnaire URL! " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Test the deletion of all surveys at once.
 	 */
@@ -466,7 +469,7 @@ public class SurveyServiceTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Test the deletion of all questionnaires at once.
 	 */
@@ -535,7 +538,7 @@ public class SurveyServiceTest {
 			fail("Detected invalid survey URL! " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Test the deletion of an individual existing questionnaire.
 	 */
@@ -553,7 +556,7 @@ public class SurveyServiceTest {
 
 			// check if first questionnaire URL is a valid URL, then extract path
 			URL u = new URL(fullurl);
-			
+
 			System.out.println("Path: " + u.getPath());
 
 			// check if deletion of particular questionnaires works
@@ -582,7 +585,7 @@ public class SurveyServiceTest {
 		ClientResponse delete=c.sendRequest("DELETE","/mobsos/surveys/-1","");
 		assertEquals(404,delete.getHttpCode());
 	}
-	
+
 	/**
 	 * Test the deletion of a non-existing questionnaire.
 	 */
@@ -639,7 +642,7 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		}
 	}
-	
+
 	/**
 	 * Test the updating of an existing questionnaire.
 	 */
@@ -662,7 +665,7 @@ public class SurveyServiceTest {
 			// use path to get the questionnaire
 			ClientResponse result=c.sendRequest("GET", u.getPath(),"");
 			assertEquals(200,result.getHttpCode()); // questionnaire should exist
-			
+
 			JSONObject questionnaire = (JSONObject) JSONValue.parse(result.getResponse());
 
 			// change some fields in questionnaire
@@ -688,6 +691,35 @@ public class SurveyServiceTest {
 		}
 	}
 
+	@Test
+	public void testUploadQuestionnaireForm(){
+		// first add a new questionnaire
+		ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+
+		try{
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+
+			URL u = new URL((String) o.get("url"));
+			
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu1.xml"));
+			
+			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
+			assertEquals(200, result.getHttpCode());
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+
+	}
+
 	/**
 	 * Generates a valid survey JSON representation.
 	 */
@@ -705,7 +737,7 @@ public class SurveyServiceTest {
 
 		return obj;
 	}
-	
+
 	/**
 	 * Generates a valid questionnaire JSON representation.
 	 */
