@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<qu:Questionnaire xmlns="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
-		  xmlns:qu="http://multimedia-metadata.info/mobsos/questionnaire.xsd"
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
+		  xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
 	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<qu:Page name="Introduction" 
@@ -12,11 +12,12 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Homsexuality" 
+	<qu:Page name="Homosexuality" 
 	      qid="A.2.1"
 	      defval="0"
 	      maxlabel="yes" 
-	      minlabel="no" 
+	      minlabel="no"
+		  required="true"
 	      xsi:type="qu:DichotomousQuestionPageType">
 		<qu:Instructions>
 			Do you think Antonio Banderas is a homosexual?
@@ -29,7 +30,8 @@
 	      maxval="10" 
 	      defval="5"
 	      minlabel="low" 
-	      maxlabel="high" 
+	      maxlabel="high"
+		  required="true"		  
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Please rate the coolness of Antonio Banderas on a scale from 0 to 10.
@@ -38,6 +40,7 @@
 	
 	<qu:Page name="Favorite Movie" 
 	      qid="A.2.3"
+		  required="true"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
 			Please write down your favorite movie with Antonio Banderas.

@@ -693,19 +693,22 @@ public class SurveyServiceTest {
 
 	@Test
 	public void testUploadQuestionnaireForm(){
-		// first add a new questionnaire
-		ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-
 		try{
+			// first add a new questionnaire
+			ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 
 			URL u = new URL((String) o.get("url"));
-			
+
 			// read content from example questionnaire XML file
 			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu1.xml"));
-			
+
 			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
 			assertEquals(200, result.getHttpCode());
+
+			ClientResponse downl = c.sendRequest("GET", u.getPath() + "/form", "");
+			assertEquals(200, downl.getHttpCode());
 
 		} catch (MalformedURLException e){
 			e.printStackTrace();
@@ -717,7 +720,74 @@ public class SurveyServiceTest {
 			e.printStackTrace();
 			fail("Service returned invalid JSON! " + e.getMessage());
 		} 
+	}
 
+	@Test
+	public void testSubmitQuestionnaireAnswer(){
+		try{
+			// first add a new questionnaire
+			ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+
+			// upload questionnaire XML content
+			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
+			assertEquals(200, result.getHttpCode());
+
+			// read content from example questionnaire answer XML file
+			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares=c.sendRequest("POST", u.getPath() + "/answer",qanswer);
+			assertEquals(200, ares.getHttpCode());
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+	}
+	
+	@Test
+	public void testSubmitInvalidQuestionnaireAnswer(){
+		try{
+			// first add a new questionnaire
+			ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+
+			// upload questionnaire XML content
+			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
+			assertEquals(200, result.getHttpCode());
+
+			// read content from example questionnaire answer XML file
+			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-mandatory-question.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares=c.sendRequest("POST", u.getPath() + "/answer",qanswer);
+			
+			System.out.println("Response: " + ares.getResponse());
+			System.out.println("Status: " + ares.getHttpCode());
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
 	}
 
 	/**

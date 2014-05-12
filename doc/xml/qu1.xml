@@ -25,7 +25,7 @@
 	      maxlabel="yes" 
 	      xsi:type="qu:DichotomousQuestionPageType">
 		<qu:Instructions>
-			Do you think service ${SERVICE.NAME} stable in general?	
+			${RESOURCE} is stable.	
 		</qu:Instructions>
 	</qu:Page>
 	

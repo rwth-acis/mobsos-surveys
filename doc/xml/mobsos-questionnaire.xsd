@@ -22,11 +22,12 @@
 			<xsd:field xpath="@qid"/>
 		</xsd:key>
 	</xsd:element>
+	
 	<!-- Definition of "QuestionnaireType" -->
 	<xsd:complexType name="QuestionnaireType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models a questionnaire. A questionnaire consists of asequence of pages, which can be either
+				This type models a questionnaire. A questionnaire consists of a sequence of pages, which can be either
 				information or question pages. In this prototype version of the MobSOS questionnaire schema three types 
 				of question pages are available. These are in particular DichotomousQuestionPageType, OrdinalScaleQuestionPageType 
 				and FreeTextQuestionPageType. 
@@ -35,6 +36,7 @@
 		<xsd:sequence>
 			<xsd:element name="Page" type="qu:PageType" maxOccurs="unbounded"/>
 		</xsd:sequence>
+		<xsd:attribute name="url" type="xsd:anyURI" use="optional"/>
 	</xsd:complexType>
 	<!-- Pages -->
 	<!-- Definition of "PageType" -->
