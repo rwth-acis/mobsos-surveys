@@ -6,7 +6,8 @@
     <property name="startup" location="etc/startup" />
 	
     <property name="service_agent.path" value="${startup}/agent-service-${service.name}.xml" />
-    <property name="user_agent.path" value="${startup}/agent-user-${las2peer_user.name}.xml" />
+    <property name="user_agent1.path" value="${startup}/agent-user-${las2peer_user1.name}.xml" />
+	<property name="user_agent2.path" value="${startup}/agent-user-${las2peer_user2.name}.xml" />
 	<property name="passphrases.path" value="${startup}/passphrases.txt" />
 	
     <presetdef name="javac">
@@ -203,7 +204,7 @@
 	
     <!-- XML Agent Generation (Builds Jar first so that Generator is available)-->
     <target name="generate_service_agent" depends="jar">
-        <echo message="Writing Service Agent xml to ${service_agent.path}"/>
+        <echo message="Writing Service Agent XML to ${service_agent.path}"/>
         <java classname="i5.las2peer.tools.ServiceAgentGenerator"
             classpathref="libraries"
             failonerror="true"
@@ -215,20 +216,30 @@
     </target>
 	
     <target name="generate_user_agent" depends="jar">
-        <echo message="Writing User Agent xml to ${user_agent.path}"/>
+        <echo message="Writing User Agent 1 XML to ${user_agent1.path}"/>
         <java classname="i5.las2peer.tools.UserAgentGenerator"
             classpathref="libraries"
             failonerror="true"
             fork="true"
-            output="${user_agent.path}"
+            output="${user_agent1.path}"
             >
-            <arg line="'${las2peer_user.password}' '${las2peer_user.name}' '${las2peer_user.email}'"/>
+            <arg line="'${las2peer_user1.password}' '${las2peer_user1.name}' '${las2peer_user1.email}'"/>
+        </java>
+		<echo message="Writing User Agent 2 XML to ${user_agent2.path}"/>
+        <java classname="i5.las2peer.tools.UserAgentGenerator"
+            classpathref="libraries"
+            failonerror="true"
+            fork="true"
+            output="${user_agent2.path}"
+            >
+            <arg line="'${las2peer_user2.password}' '${las2peer_user2.name}' '${las2peer_user2.email}'"/>
         </java>
     </target>
 	
     <target name="generate_configs" depends="generate_service_agent, generate_user_agent">
 <echo file="${passphrases.path}" append="false">agent-service-${service.name}.xml;${service.password}
-agent-user-${las2peer_user.name}.xml;${las2peer_user.password}
+agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}
+agent-user-${las2peer_user2.name}.xml;${las2peer_user2.password}
 </echo>
     </target>
 	

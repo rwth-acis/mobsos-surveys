@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<QuestionnaireAnswer xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd">
+	<Question qid="A.2.1">1</Question>
+	<Question qid="A.2.2">2</Question>
+	<Question qid="Z.8.9">This question was not defined in questionnaire.</Question>
+	<Question qid="A.2.3">From Dusk til Dawn</Question>
+	<Question qid="Z.9.9">This question was not defined in questionnaire.</Question>
+</QuestionnaireAnswer>

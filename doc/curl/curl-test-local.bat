@@ -1,9 +1,26 @@
-REM ACDSense - get disco set for given test as CSV (written to file testdataset.csv)
-curl -v -X GET http://localhost:8080/mobsos/surveys/3 --user -5021131362343084485:adamspass
+echo IMPORTANT: the following curl tests require valid credentials. Run 'ant all' to generate a LAS2peer test user agent 'UserA'. The agent's login can be extracted from the file ./etc/startup/agent-user-UserA.xml. It is the numeric value contained in the id-element. The agent's password is set to a default value "userAPass". Whenever you rerun 'ant all', new public/private keys and a new id are generated for the test user agent. Do not forget to adapt credentials in curl calls!
+
+set endpoint=http://localhost:8080/mobsos
+set credentials=4442538330439435920:userAPass
+
+echo "list all surveys"
+curl -X GET %endpoint%/surveys --user %credentials%
 pause
 
-REM ACDSense - delete full dataset by deleting all tests
-REM curl -v -X "DELETE" http://localhost:8080/mobsos/surveys --user -7862164820900576677:dspgtud
+echo "delete all surveys"
+curl -v -X "DELETE" %endpoint%/surveys --user %credentials%
+pause
+
+echo "create new survey"
+curl -v -X POST %endpoint%/surveys --user %credentials% -H "Content-Type: application/json" -d "{\"name\":\"Antonio Banderas Success Survey\",\"description\":\"A survey to find out which facets of Antonio Banderas make him so successful.\",\"resource\":\"http://www.imdb.com/name/nm0000104/\",\"organization\":\"ACIS Group\",\"logo\":\"http://dbis.rwth-aachen.de/cms/images/logo.jpg\",\"start\":\"2014-05-20T00:00:00Z\",\"end\":\"2014-06-20T23:59:59Z\"}"
+pause
+
+echo "list all surveys"
+curl -v -X GET %endpoint%/surveys --user %credentials%
+pause
+
+echo "retrieve survey information"
+
 REM pause
 
 REM curl -v -X "DELETE" http://localhost:8080/tests/s100r1JSO --user -7862164820900576677:dspgtud

@@ -33,6 +33,8 @@ package i5.las2peer.services.mobsos;
 
 
 import i5.las2peer.p2p.LocalNode;
+import i5.las2peer.security.Agent;
+import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.ServiceAgent;
 import i5.las2peer.security.UserAgent;
 import i5.las2peer.testing.MockAgentFactory;
@@ -56,6 +58,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.Assert;
+
 import static org.junit.Assert.*;
 
 
@@ -72,10 +75,12 @@ public class SurveyServiceTest {
 
 	private static LocalNode node;
 	private static WebConnector connector;
-	private static MiniClient c;
+	private static MiniClient c, c2;
 	private static ByteArrayOutputStream logStream;
 
-	private static UserAgent testAgent;
+	private static UserAgent user1, user2, user3;
+	private static GroupAgent group1, group2;
+
 	private static final String testPass = "adamspass";
 
 	private static final String testServiceClass = "i5.las2peer.services.mobsos.SurveyService";
@@ -94,8 +99,25 @@ public class SurveyServiceTest {
 		//start node
 		node = LocalNode.newNode();
 
-		testAgent = MockAgentFactory.getAdam();
-		node.storeAgent(testAgent);
+		user1 = MockAgentFactory.getAdam();
+		user2 = MockAgentFactory.getAbel();
+		user3 = MockAgentFactory.getEve();
+
+		Agent[] as;
+
+		as = new Agent[]{user1,user2};
+		group1 = GroupAgent.createGroupAgent(as);
+
+		as = new Agent[]{user2,user3};
+		group2 = GroupAgent.createGroupAgent(as);
+
+		node.storeAgent(user1);
+		node.storeAgent(user2);
+		node.storeAgent(user3);
+
+		node.storeAgent(group1);
+		node.storeAgent(group2);
+
 		node.launch();
 
 		ServiceAgent testService = ServiceAgent.generateNewAgent(testServiceClass, "a pass");
@@ -120,7 +142,11 @@ public class SurveyServiceTest {
 
 		c = new MiniClient();
 		c.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c.setLogin(Long.toString(testAgent.getId()), testPass);
+		c.setLogin(Long.toString(user1.getId()), testPass);
+
+		c2 = new MiniClient();
+		c2.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
+		c2.setLogin(Long.toString(user2.getId()), "abelspass");
 
 		//avoid timing errors: wait for the repository manager to get all services before continuing
 		/*
@@ -754,7 +780,7 @@ public class SurveyServiceTest {
 			fail("Service returned invalid JSON! " + e.getMessage());
 		} 
 	}
-	
+
 	@Test
 	public void testSubmitInvalidQuestionnaireAnswer(){
 		try{
@@ -770,13 +796,45 @@ public class SurveyServiceTest {
 			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
 			assertEquals(200, result.getHttpCode());
 
-			// read content from example questionnaire answer XML file
-			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-mandatory-question.xml"));
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer1 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-mandatory-question.xml"));
 			// submit questionnaire answer XML content
-			ClientResponse ares=c.sendRequest("POST", u.getPath() + "/answer",qanswer);
-			
-			System.out.println("Response: " + ares.getResponse());
-			System.out.println("Status: " + ares.getHttpCode());
+			ClientResponse ares1=c.sendRequest("POST", u.getPath() + "/answer",qanswer1);
+
+			assertEquals(400, ares1.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares1.getResponse().contains("The mandatory question A.2.3 was not answered!"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer2 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-wrong-answertype.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares2=c.sendRequest("POST", u.getPath() + "/answer",qanswer2);
+
+			assertEquals(400, ares2.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares2.getResponse().contains("is expected to be parseable as an integer!"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer3 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-undefined-question.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares3=c.sendRequest("POST", u.getPath() + "/answer",qanswer3);
+
+			assertEquals(400, ares3.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares3.getResponse().contains("some string in error message"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer4 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-question-answertime.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares4=c.sendRequest("POST", u.getPath() + "/answer",qanswer4);
+
+			assertEquals(400, ares4.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares4.getResponse().contains("some string in error message"));
 
 		} catch (MalformedURLException e){
 			e.printStackTrace();
@@ -788,6 +846,19 @@ public class SurveyServiceTest {
 			e.printStackTrace();
 			fail("Service returned invalid JSON! " + e.getMessage());
 		} 
+	}
+
+	@Test
+	public void testAgentExperiments(){
+		// test with user agent
+		ClientResponse result=c.sendRequest("GET", "mobsos/agents/"+user1.getId(),"");
+		assertEquals(200,result.getHttpCode());
+		System.out.println(result.getResponse());
+
+		// test with group agent
+		result=c.sendRequest("GET", "mobsos/agents/"+group1.getId(),"");
+		assertEquals(200,result.getHttpCode());
+		System.out.println(result.getResponse());
 	}
 
 	/**

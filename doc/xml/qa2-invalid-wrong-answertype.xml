@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<QuestionnaireAnswer xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd">
+	<Question qid="A.2.1">1</Question>
+	<Question qid="A.2.2">This question should be answered with a number!</Question>
+	<Question qid="A.2.3">From Dusk til Dawn</Question>
+</QuestionnaireAnswer>

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 import i5.las2peer.api.Service;
+import i5.las2peer.p2p.AgentNotKnownException;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
@@ -44,7 +45,10 @@ import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
 import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Version;
+import i5.las2peer.security.Agent;
+import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
+import i5.las2peer.tools.GroupAgentGenerator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -108,7 +112,7 @@ public class SurveyService extends Service {
 
 	private Connection connection;
 	private PreparedStatement surveyInsertStatement, surveysQueryStatement, surveysDeleteStatement;
-	private PreparedStatement surveyQueryStatement, surveyCheckOwnerStatement, surveyDeleteStatement, surveyUpdateStatement;
+	private PreparedStatement surveyQueryStatement, surveyCheckOwnerStatement, surveyDeleteStatement, surveyUpdateStatement, surveySetQuestionnaireStatement;
 
 	private PreparedStatement questionnaireInsertStatement, questionnairesQueryStatement, questionnairesDeleteStatement;
 	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement;
@@ -143,6 +147,48 @@ public class SurveyService extends Service {
 
 		// print out REST mapping for this service
 		//System.out.println(getRESTMapping());
+	}
+
+	@GET
+	@Path("agents/{id}")
+	public HttpResponse getAgentInformation(@PathParam("id") long id){
+		try{
+			try {
+				Agent a = this.getActiveNode().getAgent(id);
+
+
+				JSONObject uo = new JSONObject();
+				uo.put("id",id);
+
+				if(a instanceof UserAgent){
+					uo.put("type", "user");
+
+					UserAgent ua = (UserAgent) a;
+					uo.put("login", ua.getLoginName());
+					uo.put("mail", ua.getEmail());
+
+				} else if (a instanceof GroupAgent) {
+					uo.put("type", "group");
+					GroupAgent ga = (GroupAgent) a;
+					uo.put("size", ga.getSize());
+					uo.put("member", ga.isMember(this.getActiveAgent()));
+				}
+
+				HttpResponse result = new HttpResponse(uo.toJSONString());
+				result.setStatus(200);
+				return result;
+			} catch (AgentNotKnownException e) {
+				HttpResponse result = new HttpResponse("Agent "+ id + " not found.");
+				result.setStatus(404);
+				return result;
+			}
+
+		} catch (Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("");
+			result.setStatus(500);
+			return result;
+		}
 	}
 
 	/**
@@ -195,14 +241,13 @@ public class SurveyService extends Service {
 			try{
 				o = parseSurvey(content);
 			} catch (IllegalArgumentException | ParseException e){
+				e.printStackTrace();
 				HttpResponse result = new HttpResponse(e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
 
 			int sid = storeNewSurvey(o);
-
-
 
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/surveys/" + sid);
@@ -315,11 +360,11 @@ public class SurveyService extends Service {
 			}
 
 			surveyUpdateStatement.clearParameters();
-			surveyUpdateStatement.setString(1, (String) o.get("organization") );
-			surveyUpdateStatement.setString(2, (String) o.get("logo") );
-			surveyUpdateStatement.setString(3, (String) o.get("name") );
-			surveyUpdateStatement.setString(4, (String) o.get("description") );
-			surveyUpdateStatement.setString(5, (String) o.get("resource") );
+			surveyUpdateStatement.setString(1, (String) o.get("organization"));
+			surveyUpdateStatement.setString(2, (String) o.get("logo"));
+			surveyUpdateStatement.setString(3, (String) o.get("name"));
+			surveyUpdateStatement.setString(4, (String) o.get("description"));
+			surveyUpdateStatement.setString(5, (String) o.get("resource"));
 			surveyUpdateStatement.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
 			surveyUpdateStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
 			surveyUpdateStatement.setInt(8, id);
@@ -328,6 +373,66 @@ public class SurveyService extends Service {
 			connection.commit();
 
 			HttpResponse result = new HttpResponse("Survey " + id + " updated.");
+			result.setStatus(200);
+			return result;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal Error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+	}
+	
+	@POST
+	@Path("surveys/{id}/questionnaire")
+	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
+		
+		try {
+			int exown;
+			exown = checkExistenceOwnership(id,0);
+
+			// check if survey exists; if not, return 404.
+			if(exown == -1){
+				HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
+				result.setStatus(404);
+				return result;
+			} 
+			// if survey exists, check if active agent is owner. if not, return 401.
+			else if (exown == 0){
+				HttpResponse result = new HttpResponse("Survey " + id + " may only be managed by its owner.");
+				result.setStatus(401);
+				return result;
+			}
+
+			// if survey exists and active agent is owner, proceed.
+
+			JSONObject o;
+			
+			// parse and validate content. If invalid, return 400 (bad request)
+			try{
+				o = (JSONObject) JSONValue.parseWithException(content);
+			} catch (ParseException e){
+				HttpResponse result = new HttpResponse(e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+			
+			if(!(o.size() == 1 && o.keySet().contains("qid"))) {
+				HttpResponse result = new HttpResponse("Invalid JSON for setting questionnaire! Must only contain one field qid!");
+				result.setStatus(400);
+				return result;
+			}
+
+			surveySetQuestionnaireStatement.clearParameters();
+			surveySetQuestionnaireStatement.setString(1, (String) o.get("qid"));
+			surveySetQuestionnaireStatement.executeUpdate();
+			
+			connection.commit();
+
+			// TODO: at this point we need to check, if answers were already provided. If so, these answers must be deleted.
+			
+			HttpResponse result = new HttpResponse("Questionnaire for survey " + id + " set.");
 			result.setStatus(200);
 			return result;
 
@@ -672,6 +777,97 @@ public class SurveyService extends Service {
 		}
 	}
 
+	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy
+	@Path("questionnaires/{id}/form")
+	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
+		try {
+			int exown = checkExistenceOwnership(id,1);
+
+			// check if questionnaire exists; if not, return 404.
+			if(exown == -1){
+				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+				result.setStatus(404);
+				return result;
+			} 
+			// if questionnaire exists, check if active agent is owner. if not, return 401.
+			else if (exown == 0){
+				HttpResponse result = new HttpResponse("Form for questionnaire " + id + "  may only be uploaded by its owner.");
+				result.setStatus(401);
+				return result;
+			}
+
+			Document form;
+			// before storing to database validate questionnaire form
+			try{
+				form = validateQuestionnaireData(formXml);
+			} catch(IOException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+				result.setStatus(500);
+				return result;
+
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			// if form XML is valid, then store it to database
+			questionnaireUploadFormStatement.clearParameters();
+			questionnaireUploadFormStatement.setString(1, formXml);
+			questionnaireUploadFormStatement.setInt(2, id);
+
+			questionnaireUploadFormStatement.executeUpdate();
+			connection.commit();
+
+
+
+			// create relational schema for result table
+			JSONObject questions = extractQuestionInformation(form);
+			String sql = "create table " + jdbcSchema + ".q"+ id + "(\n";
+			sql += "  id mediumint not null auto_increment, \n";
+			sql += "  uid varchar(128) not null\n";
+
+			Iterator<String> it = questions.keySet().iterator();
+
+			while(it.hasNext()){
+				String key = it.next();
+
+				JSONObject def = (JSONObject) questions.get(key);
+				//System.out.println("Def: " + def);
+				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
+					sql += "  " + key + " varchar(256)";
+				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
+						"qu:OrdinalScaleQuestionPageType".equals(def.get("type"))){
+					sql += "  " + key + " smallint";
+				}
+				if((int)def.get("required") == 1){
+					sql += " not null";
+				}
+				if(it.hasNext()){
+					sql += ",\n";
+				} else {
+					sql += "\n";
+				}
+			}
+			sql += ");";
+			System.out.println("SQL: \n" + sql);
+
+			// furthermore, prepare a relational table for storing results
+
+			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
+			result.setStatus(200);
+			return result;
+
+		} catch(Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+	}
+
 	@POST
 	@Path("questionnaires/{id}/answer")
 	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @ContentParam String answerXml){
@@ -713,7 +909,6 @@ public class SurveyService extends Service {
 					return result;
 
 				} catch (IllegalArgumentException e){
-					e.printStackTrace();
 					HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
 					result.setStatus(400);
 					return result;
@@ -727,137 +922,6 @@ public class SurveyService extends Service {
 		}
 	}
 
-	private void validateAnswer(Document form, Document answer){
-		JSONObject questions = extractQuestionInformation(form);
-
-		System.out.println(questions.toJSONString());
-		// then iterate over all question items in the submitted answer and check, if 
-		// they fulfill all constraints.
-		NodeList qs = answer.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
-
-		//NodeList qs = answer.getDocumentElement().getElementsByTagName("Question");
-		System.out.println("Question Elements found: " + qs.getLength());
-		for (int i = 0; i < qs.getLength(); i++) {
-			Element q = (Element) qs.item(i);
-			//System.out.println("Submitted Question ID: "+q.getAttribute("qid"));
-			String qid = q.getAttribute("qid");
-			// if question provided in answer is not contained in questionnaire, the answer does not match the questionnaire.
-			if(!questions.keySet().contains(qid)){
-				throw new IllegalArgumentException("Questionnaire answer does not match form! Question ID "+qid+" is not defined in questionnaire.");
-			}
-
-			// if question provided in answer is contained in questionnaire, check further properties...
-			JSONObject question = (JSONObject) questions.get(qid);
-
-			// for each type check further constraints
-			String type = (String) question.get("type");
-			System.out.println("Type: " + question.get("type"));
-			if(type.equals("qu:DichotomousQuestionPageType")){
-				String qval = q.getTextContent().trim();
-				// for dichotomous questions the only two possible answers are 0 and 1.
-				if(!qval.equals("0") && !qval.equals("1")){
-					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be either 0 or 1, but was "+qval+"!");
-				}
-				else{
-					// everything is ok with this question answer.
-					// remove entry from hashtable
-					questions.remove(qid);
-				}
-			}
-			else if(type.equals("qu:OrdinalScaleQuestionPageType")){
-				// for ordinal scale questions the answer must be parseable as an integer,
-				// which is 
-				try{
-					int qval = Integer.parseInt(q.getTextContent());
-
-					if(qval > (int) question.get("maxval") ||  qval < (int) question.get("minval")){
-						throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be between "+question.get("minval")+" and " + question.get("maxval") +", but was "+qval+"!");
-					}
-					else{
-						// everything is ok with this question answer.
-						// remove entry from hashtable
-						questions.remove(qid);
-					}
-				}catch(NumberFormatException e){
-					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be parseable as an integer!");
-				}
-
-			}
-			else if(type.equals("qu:FreeTextQuestionPageType")){
-				// nothing to check for freetext question pages. Any text can be entered.
-				System.out.println("Before: " + questions.toJSONString());
-				questions.remove(qid);
-				System.out.println("After: " + questions.toJSONString());
-			}
-
-		}
-
-		Iterator<String> remainingqids = questions.keySet().iterator();
-		while (remainingqids.hasNext()) {
-			String qid = (String) remainingqids.next();
-			int requireds = (int) ((JSONObject) questions.get(qid)).get("required");
-			if(requireds == 1){
-				throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The mandatory question "+qid+" was not answered!");
-			}
-		}
-
-
-	}
-
-	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy
-	@Path("questionnaires/{id}/form")
-	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
-		try {
-			int exown = checkExistenceOwnership(id,1);
-
-			// check if questionnaire exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-			// if questionnaire exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Form for questionnaire " + id + "  may only be uploaded by its owner.");
-				result.setStatus(401);
-				return result;
-			}
-
-			// before storing to database validate questionnaire form
-			try{
-				validateQuestionnaireData(formXml);
-			} catch(IOException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-				result.setStatus(500);
-				return result;
-
-			} catch (SAXException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
-
-			// if form XML is valid, then store it to database
-			questionnaireUploadFormStatement.clearParameters();
-			questionnaireUploadFormStatement.setString(1, formXml);
-			questionnaireUploadFormStatement.setInt(2, id);
-
-			questionnaireUploadFormStatement.executeUpdate();
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
-			result.setStatus(200);
-			return result;
-
-		} catch(Exception e){
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
-		}
-	}
 
 
 	// ---------------------------- private helper methods -----------------------
@@ -1032,7 +1096,7 @@ public class SurveyService extends Service {
 					} catch (IllegalArgumentException e){
 						throw new IllegalArgumentException("Illegal value for survey field 'start'. Should be an ISO-8601 formatted time string.");
 					}
-				}
+				} 
 			}
 		}
 
@@ -1182,6 +1246,7 @@ public class SurveyService extends Service {
 		surveyQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
 		surveyCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".survey where id = ?");
 		surveyUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
+		surveySetQuestionnaireStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set qid=? where id = ?");
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
@@ -1231,6 +1296,76 @@ public class SurveyService extends Service {
 		Document doc = parser.parse(stringIS);
 		validator.validate(new DOMSource(doc));
 		return doc;
+	}
+
+	private void validateAnswer(Document form, Document answer){
+		JSONObject questions = extractQuestionInformation(form);
+
+		// then iterate over all question items in the submitted answer and check, if 
+		// they fulfill all constraints.
+		NodeList qs = answer.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
+
+		//NodeList qs = answer.getDocumentElement().getElementsByTagName("Question");
+		for (int i = 0; i < qs.getLength(); i++) {
+			Element q = (Element) qs.item(i);
+			//System.out.println("Submitted Question ID: "+q.getAttribute("qid"));
+			String qid = q.getAttribute("qid");
+			// if question provided in answer is not contained in questionnaire, the answer does not match the questionnaire.
+			if(!questions.keySet().contains(qid)){
+				throw new IllegalArgumentException("Questionnaire answer does not match form! Question ID "+qid+" is not defined in questionnaire.");
+			}
+
+			// if question provided in answer is contained in questionnaire, check further properties...
+			JSONObject question = (JSONObject) questions.get(qid);
+
+			// for each type check further constraints
+			String type = (String) question.get("type");
+			if(type.equals("qu:DichotomousQuestionPageType")){
+				String qval = q.getTextContent().trim();
+				// for dichotomous questions the only two possible answers are 0 and 1.
+				if(!qval.equals("0") && !qval.equals("1")){
+					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be either 0 or 1, but was "+qval+"!");
+				}
+				else{
+					// everything is ok with this question answer.
+					// remove entry from hashtable
+					questions.remove(qid);
+				}
+			}
+			else if(type.equals("qu:OrdinalScaleQuestionPageType")){
+				// for ordinal scale questions the answer must be parseable as an integer,
+				// which is 
+				try{
+					int qval = Integer.parseInt(q.getTextContent());
+
+					if(qval > (int) question.get("maxval") ||  qval < (int) question.get("minval")){
+						throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be between "+question.get("minval")+" and " + question.get("maxval") +", but was "+qval+"!");
+					}
+					else{
+						// everything is ok with this question answer.
+						// remove entry from hashtable
+						questions.remove(qid);
+					}
+				}catch(NumberFormatException e){
+					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be parseable as an integer!");
+				}
+
+			}
+			else if(type.equals("qu:FreeTextQuestionPageType")){
+				// nothing to check for freetext question pages. Any text can be entered.
+				questions.remove(qid);
+			}
+
+		}
+
+		Iterator<String> remainingqids = questions.keySet().iterator();
+		while (remainingqids.hasNext()) {
+			String qid = (String) remainingqids.next();
+			int requireds = (int) ((JSONObject) questions.get(qid)).get("required");
+			if(requireds == 1){
+				throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The mandatory question "+qid+" was not answered!");
+			}
+		}
 	}
 
 	/**
