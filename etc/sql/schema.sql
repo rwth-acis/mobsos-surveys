@@ -5,10 +5,6 @@ use mobsos;
 grant usage on *.* to acdsense@localhost identified by 'dito'; 
 grant all privileges on mobsos.* to acdsense@localhost;
 
-drop table if exists questionnaire;
-drop table if exists survey;
-drop table if exists survey_context;
-
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
 -- -----------------------------------------------------
@@ -70,4 +66,16 @@ create table survey_context (
 		on delete cascade
 		on update no action 
 );
+
+create table survey_result (
+	id bigint not null auto_increment,
+	uid varchar(128) not null,
+	cid varchar(128) not null,
+	sid mediumint not null,
+	qkey varchar(32) not null,
+	qval varchar(512) not null,
+	constraint res_pk primary key(id),
+	constraint res_uk unique key(uid,cid,sid,qkey),
+	constraint res_fk foreign key (sid) references survey(id)
+);	
 

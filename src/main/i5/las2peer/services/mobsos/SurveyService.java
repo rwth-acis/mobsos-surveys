@@ -94,7 +94,6 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
-
 /**
  * 
  * MobSOS Survey Service
@@ -118,6 +117,8 @@ public class SurveyService extends Service {
 	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement;
 	private PreparedStatement questionnaireUploadFormStatement, questionnaireDownloadFormStatement;
 
+	private PreparedStatement submitQuestionAnswerStatement;
+
 	private DocumentBuilder parser;
 	private Validator validator;
 
@@ -125,6 +126,8 @@ public class SurveyService extends Service {
 	private String jdbcDriverClassName;
 	private String jdbcUrl, jdbcSchema;
 	private String jdbcLogin, jdbcPass;
+
+	private PreparedStatement surveyGetQuestionnaireIdStatement;
 
 	public SurveyService(){
 		// set values from configuration file
@@ -383,11 +386,11 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	@POST
 	@Path("surveys/{id}/questionnaire")
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
-		
+
 		try {
 			int exown;
 			exown = checkExistenceOwnership(id,0);
@@ -408,7 +411,7 @@ public class SurveyService extends Service {
 			// if survey exists and active agent is owner, proceed.
 
 			JSONObject o;
-			
+
 			// parse and validate content. If invalid, return 400 (bad request)
 			try{
 				o = (JSONObject) JSONValue.parseWithException(content);
@@ -417,21 +420,34 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
-			
+
 			if(!(o.size() == 1 && o.keySet().contains("qid"))) {
 				HttpResponse result = new HttpResponse("Invalid JSON for setting questionnaire! Must only contain one field qid!");
 				result.setStatus(400);
 				return result;
 			}
 
+			// now check if questionnaire really exists
+			int qid = Integer.parseInt(o.get("qid")+"");
+			HttpResponse qresp = getQuestionnaire(qid);
+
+			if(qresp.getStatus()!=200){
+				return qresp;
+			}
+
+
+
 			surveySetQuestionnaireStatement.clearParameters();
-			surveySetQuestionnaireStatement.setString(1, (String) o.get("qid"));
+			surveySetQuestionnaireStatement.setInt(1, qid);
+			surveySetQuestionnaireStatement.setInt(2, id);
 			surveySetQuestionnaireStatement.executeUpdate();
-			
+
 			connection.commit();
 
+			// furthermore, prepare a relational table for storing results
+
 			// TODO: at this point we need to check, if answers were already provided. If so, these answers must be deleted.
-			
+
 			HttpResponse result = new HttpResponse("Questionnaire for survey " + id + " set.");
 			result.setStatus(200);
 			return result;
@@ -819,14 +835,14 @@ public class SurveyService extends Service {
 			questionnaireUploadFormStatement.setInt(2, id);
 
 			questionnaireUploadFormStatement.executeUpdate();
-			connection.commit();
-
-
 
 			// create relational schema for result table
 			JSONObject questions = extractQuestionInformation(form);
 			String sql = "create table " + jdbcSchema + ".q"+ id + "(\n";
 			sql += "  id mediumint not null auto_increment, \n";
+			sql += "  sid mediumint not null, \n";
+			sql += "  qid mediumint not null, \n";
+			sql += "  cid varchar(128), \n"; // add optional community id
 			sql += "  uid varchar(128) not null\n";
 
 			Iterator<String> it = questions.keySet().iterator();
@@ -835,7 +851,6 @@ public class SurveyService extends Service {
 				String key = it.next();
 
 				JSONObject def = (JSONObject) questions.get(key);
-				//System.out.println("Def: " + def);
 				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
 					sql += "  " + key + " varchar(256)";
 				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
@@ -854,7 +869,7 @@ public class SurveyService extends Service {
 			sql += ");";
 			System.out.println("SQL: \n" + sql);
 
-			// furthermore, prepare a relational table for storing results
+			connection.commit();
 
 			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
 			result.setStatus(200);
@@ -868,57 +883,132 @@ public class SurveyService extends Service {
 		}
 	}
 
+	/*
 	@POST
-	@Path("questionnaires/{id}/answer")
+	@Path("surveys/{id}/answer")
 	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @ContentParam String answerXml){
+	 */
+
+	@POST
+	@Path("surveys/{id}/answer/{cid}")
+	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @PathParam("cid") long cid, @ContentParam String answerXml){
 		try{
-			HttpResponse r = downloadQuestionnaireForm(id); 
+
+			System.out.println(new Date() + " starting to submit answer");
+			// retrieve survey id;
+			int qid = getQuestionnaireIdForSurvey(id);
+
+			// retrieve questionnaire form for survey to do answer validation
+			HttpResponse r = downloadQuestionnaireForm(qid); 
+			System.out.println(new Date() + " downloaded form ");
+
 			if(200 != r.getStatus()){
+				// if questionnaire form does not exist, pass on response containing error status
 				return r;
-			} else {
-				Document form;
-				Document answer;
-				JSONObject questionInformation;
-
-				// parse form to XML document incl. validation
-				try{
-					form = validateQuestionnaireData(r.getResult());
-				} catch (SAXException e){
-					e.printStackTrace();
-					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-					result.setStatus(400);
-					return result;
-				}
-
-				// parse answer to XML document incl. validation
-				try{
-					answer = validateQuestionnaireData(answerXml);
-				} catch (SAXException e){
-					e.printStackTrace();
-					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-					result.setStatus(400);
-					return result;
-				}
-
-				// validate of answer matches form.
-				try{
-					validateAnswer(form,answer);
-
-					HttpResponse result = new HttpResponse("Answer to questionnaire " + id + " submitted successfully.");
-					result.setStatus(200);
-					return result;
-
-				} catch (IllegalArgumentException e){
-					HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
-					result.setStatus(400);
-					return result;
-				}
 			}
+
+			try{
+				this.getActiveNode().getAgent(cid);
+				
+			} catch (AgentNotKnownException e){
+				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+
+			Document form;
+			Document answer;
+
+			// parse form to XML document incl. validation
+			try{
+				form = validateQuestionnaireData(r.getResult());
+				System.out.println(new Date() + " validated form ");
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			// parse answer to XML document incl. validation
+			try{
+				answer = validateQuestionnaireData(answerXml);
+				System.out.println(new Date() + " validated answer ");
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			JSONObject answerFieldTable;
+
+			// validate if answer matches form.
+			try{
+				answerFieldTable = validateAnswer(form,answer);
+				System.out.println(new Date() + " validated match between form and answer");
+			} catch (IllegalArgumentException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			int surveyId = id;
+			long communityId = cid;
+			long userId = this.getActiveAgent().getId();
+
+			System.out.println("User ID: " + userId);
+			System.out.println("Community ID: " + communityId);
+			System.out.println("Survey ID: "+ surveyId);
+			System.out.println("Answer Field Table: " + answerFieldTable.toJSONString());
+
+			Iterator<String> it = answerFieldTable.keySet().iterator();
+			while(it.hasNext()){
+
+				String qkey = it.next();
+				String qval = ""+answerFieldTable.get(qkey);
+
+				submitQuestionAnswerStatement.clearParameters();
+				submitQuestionAnswerStatement.setLong(1, userId);
+				submitQuestionAnswerStatement.setLong(2, communityId);
+				submitQuestionAnswerStatement.setInt(3,surveyId);
+				submitQuestionAnswerStatement.setString(4, qkey);
+				submitQuestionAnswerStatement.setString(5, qval);
+				submitQuestionAnswerStatement.addBatch();
+
+				System.out.println(new Date() + " written answer for key " + qkey);
+
+			}
+			submitQuestionAnswerStatement.executeBatch();
+
+			connection.commit();
+
+			// at this point, we are sure, that submitted answer matches questionnaire.
+			// write answer to database now.
+
+			HttpResponse result = new HttpResponse("Questionnaire answer stored successfully.");
+			result.setStatus(200);
+			return result;
+
 		} catch(Exception e){
 			e.printStackTrace();
 			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
 			result.setStatus(500);
 			return result;
+		}
+	}
+
+	private int getQuestionnaireIdForSurvey(int sid) throws SQLException{
+		surveyGetQuestionnaireIdStatement.clearParameters();
+		surveyGetQuestionnaireIdStatement.setInt(1, sid);
+
+		ResultSet rs = surveyGetQuestionnaireIdStatement.executeQuery();
+		if(!rs.isBeforeFirst()){
+			return -1;
+		} else {
+			rs.next();
+			return rs.getInt("qid");
 		}
 	}
 
@@ -1246,7 +1336,7 @@ public class SurveyService extends Service {
 		surveyQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
 		surveyCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".survey where id = ?");
 		surveyUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
-		surveySetQuestionnaireStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set qid=? where id = ?");
+		surveySetQuestionnaireStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set qid=? where id =?");
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
@@ -1260,6 +1350,9 @@ public class SurveyService extends Service {
 
 		questionnaireUploadFormStatement = connection.prepareStatement("update "+ jdbcSchema + ".questionnaire set form=? where id = ?");
 		questionnaireDownloadFormStatement = connection.prepareStatement("select form from " + jdbcSchema + ".questionnaire where id = ?");
+
+		surveyGetQuestionnaireIdStatement = connection.prepareStatement("select qid from " + jdbcSchema + ".survey where id = ?");
+		submitQuestionAnswerStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey_result(uid,cid,sid,qkey,qval) values (?,?,?,?,?)");
 	}
 
 	/**
@@ -1298,14 +1391,15 @@ public class SurveyService extends Service {
 		return doc;
 	}
 
-	private void validateAnswer(Document form, Document answer){
+	private JSONObject validateAnswer(Document form, Document answer){
+		JSONObject result = new JSONObject();
+
 		JSONObject questions = extractQuestionInformation(form);
 
 		// then iterate over all question items in the submitted answer and check, if 
 		// they fulfill all constraints.
 		NodeList qs = answer.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
 
-		//NodeList qs = answer.getDocumentElement().getElementsByTagName("Question");
 		for (int i = 0; i < qs.getLength(); i++) {
 			Element q = (Element) qs.item(i);
 			//System.out.println("Submitted Question ID: "+q.getAttribute("qid"));
@@ -1328,8 +1422,9 @@ public class SurveyService extends Service {
 				}
 				else{
 					// everything is ok with this question answer.
-					// remove entry from hashtable
+					// remove entry from hashtable, write entry to result object
 					questions.remove(qid);
+					result.put(qid, qval);
 				}
 			}
 			else if(type.equals("qu:OrdinalScaleQuestionPageType")){
@@ -1345,6 +1440,7 @@ public class SurveyService extends Service {
 						// everything is ok with this question answer.
 						// remove entry from hashtable
 						questions.remove(qid);
+						result.put(qid, qval);
 					}
 				}catch(NumberFormatException e){
 					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be parseable as an integer!");
@@ -1354,6 +1450,7 @@ public class SurveyService extends Service {
 			else if(type.equals("qu:FreeTextQuestionPageType")){
 				// nothing to check for freetext question pages. Any text can be entered.
 				questions.remove(qid);
+				result.put(qid, q.getTextContent());
 			}
 
 		}
@@ -1366,6 +1463,7 @@ public class SurveyService extends Service {
 				throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The mandatory question "+qid+" was not answered!");
 			}
 		}
+		return result;
 	}
 
 	/**
