@@ -64,6 +64,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -836,39 +837,6 @@ public class SurveyService extends Service {
 
 			questionnaireUploadFormStatement.executeUpdate();
 
-			// create relational schema for result table
-			JSONObject questions = extractQuestionInformation(form);
-			String sql = "create table " + jdbcSchema + ".q"+ id + "(\n";
-			sql += "  id mediumint not null auto_increment, \n";
-			sql += "  sid mediumint not null, \n";
-			sql += "  qid mediumint not null, \n";
-			sql += "  cid varchar(128), \n"; // add optional community id
-			sql += "  uid varchar(128) not null\n";
-
-			Iterator<String> it = questions.keySet().iterator();
-
-			while(it.hasNext()){
-				String key = it.next();
-
-				JSONObject def = (JSONObject) questions.get(key);
-				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
-					sql += "  " + key + " varchar(256)";
-				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
-						"qu:OrdinalScaleQuestionPageType".equals(def.get("type"))){
-					sql += "  " + key + " smallint";
-				}
-				if((int)def.get("required") == 1){
-					sql += " not null";
-				}
-				if(it.hasNext()){
-					sql += ",\n";
-				} else {
-					sql += "\n";
-				}
-			}
-			sql += ");";
-			System.out.println("SQL: \n" + sql);
-
 			connection.commit();
 
 			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
@@ -889,31 +857,212 @@ public class SurveyService extends Service {
 	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @ContentParam String answerXml){
 	 */
 
-	@POST
-	@Path("surveys/{id}/answer/{cid}")
-	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @PathParam("cid") long cid, @ContentParam String answerXml){
+	@GET
+	@Path("surveys/{id}/answers/{cid}")
+	public HttpResponse retrieveQuestionnaireAnswer(@PathParam("id") int id, @PathParam("cid") long cid){
 		try{
+			int exown = checkExistenceOwnership(id,0);
 
-			System.out.println(new Date() + " starting to submit answer");
+			GroupAgent community;
+			
+			// if community not found, return 404
+			try{
+			 community = (GroupAgent) this.getActiveNode().getAgent(cid);
+			} catch (AgentNotKnownException e){
+				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			} catch (ClassCastException e){
+				HttpResponse result = new HttpResponse("Agent " + cid + " is not a community!");
+				result.setStatus(400);
+				return result;
+			}
+			
+			// allow access to answer data only, if current user is either survey owner or member of given community
+			if(exown == -1 || !community.isMember(this.getActiveAgent())){
+				HttpResponse result = new HttpResponse("Access to answer information only for owner of survey " + id + " and members of community " + cid);
+				result.setStatus(401);
+				return result;
+			}
+
 			// retrieve survey id;
 			int qid = getQuestionnaireIdForSurvey(id);
 
+			if(qid == -1){
+				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
+				result.setStatus(404);
+				return result;
+			}
+
 			// retrieve questionnaire form for survey to do answer validation
 			HttpResponse r = downloadQuestionnaireForm(qid); 
-			System.out.println(new Date() + " downloaded form ");
 
 			if(200 != r.getStatus()){
 				// if questionnaire form does not exist, pass on response containing error status
 				return r;
 			}
 
+			Document form;
+
+			// parse form to XML document incl. validation; will later on be necessary to build query for
+			// questionnaire answer table
+			try{
+				form = validateQuestionnaireData(r.getResult());
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			// create query for result table
+			
+			// example query:
+			// 
+			//     select uid,
+			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
+			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
+			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
+			//     from mobsos.survey_result where sid = 1 and cid = 1 group by uid;
+	
+			JSONObject questions = extractQuestionInformation(form);
+			String sql = "select uid, \n"; 
+			
+			Iterator<String> it = questions.keySet().iterator();
+
+			while(it.hasNext()){
+				String key = it.next();
+
+				JSONObject def = (JSONObject) questions.get(key);
+				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
+					sql += "  MAX(IF(qkey = '" + key + "', qval, NULL)) AS \"" + key + "\"";
+				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
+						"qu:OrdinalScaleQuestionPageType".equals(def.get("type"))){
+					sql += "  MAX(IF(qkey = '" + key + "', cast(qval as unsigned), NULL)) AS \"" + key + "\"";
+				}
+				if(it.hasNext()){
+					sql += ",\n";
+				} else {
+					sql += "\n";
+				}
+			}
+			
+			sql += " from " + jdbcSchema + ".survey_result where sid ="+ id + " and cid =" + cid + " group by uid;";
+			
+			//System.out.println("SQL: \n" + sql);
+			
+			// execute generated query
+			Statement s = connection.createStatement();
+			ResultSet rs = s.executeQuery(sql);
+			
+			// format and return result
+			String res = createCSVQuestionnaireResult(rs, questions);
+			
+			HttpResponse result = new HttpResponse(res);
+			result.setStatus(200);
+			return result;
+
+		} catch (Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+	}
+	
+	private String createCSVQuestionnaireResult(ResultSet rs, JSONObject qinfo) throws SQLException{
+		int cols = rs.getMetaData().getColumnCount();
+		
+		String res = "";
+		String headline = "";
+		
+		// first create header row
+		for(int i=1;i<=cols;i++){
+			headline += rs.getMetaData().getColumnName(i);
+			if(i<cols) headline += ";";
+		}
+		res += headline + "\n";
+		
+		// now compile answer data
+		String data = "";
+		while(rs.next()){
+			for(int i=1;i<=cols;i++){
+				Object o = rs.getObject(i);
+				data += o.toString();
+				if(i<cols) data += ";";
+			}
+			data += "\n";
+		}
+		res += data.trim();
+		return res;
+	}
+	
+	private String createJSONQuestionnaireResult(ResultSet rs, JSONObject qinfo) throws SQLException{
+		JSONObject res = new JSONObject();
+		int cols = rs.getMetaData().getColumnCount();
+		
+		// first create header row by including all question information
+		JSONArray header = new JSONArray();
+		for(int i=1;i<=cols;i++){
+			JSONObject o = (JSONObject) qinfo.get(rs.getMetaData().getColumnName(i));
+			if(o == null){
+				o = new JSONObject();
+				o.put("id","uid");
+				o.put("name","User Identifier");
+			} else {
+				o.put("id",rs.getMetaData().getColumnName(i));
+			}
+			header.add(o);
+		}
+		res.put("head",header);
+		
+		// now compile answer data
+		JSONArray data = new JSONArray();
+		while(rs.next()){
+			
+			JSONArray resrow = new JSONArray();
+			
+			for(int i=1;i<=cols;i++){
+				Object o = rs.getObject(i);
+				if(rs.getMetaData().getColumnType(i) == Types.VARCHAR){
+					resrow.add(rs.getString(i));
+				} else {
+					resrow.add(rs.getBigDecimal(i));
+				}
+			}
+			data.add(resrow);
+		}
+		return res.toJSONString();
+	}
+
+	@POST
+	@Path("surveys/{id}/answers/{cid}")
+	public HttpResponse submitQuestionnaireAnswer(@PathParam("id") int id, @PathParam("cid") long cid, @ContentParam String answerXml){
+		try{
+			// if community not found, return 404
 			try{
 				this.getActiveNode().getAgent(cid);
-				
 			} catch (AgentNotKnownException e){
 				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
 				result.setStatus(404);
 				return result;
+			}
+
+			// retrieve survey id;
+			int qid = getQuestionnaireIdForSurvey(id);
+
+			if(qid == -1){
+				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
+				result.setStatus(404);
+				return result;
+			}
+
+			// retrieve questionnaire form for survey to do answer validation
+			HttpResponse r = downloadQuestionnaireForm(qid); 
+
+			if(200 != r.getStatus()){
+				// if questionnaire form does not exist, pass on response containing error status
+				return r;
 			}
 
 			Document form;
@@ -922,9 +1071,7 @@ public class SurveyService extends Service {
 			// parse form to XML document incl. validation
 			try{
 				form = validateQuestionnaireData(r.getResult());
-				System.out.println(new Date() + " validated form ");
 			} catch (SAXException e){
-				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -933,9 +1080,7 @@ public class SurveyService extends Service {
 			// parse answer to XML document incl. validation
 			try{
 				answer = validateQuestionnaireData(answerXml);
-				System.out.println(new Date() + " validated answer ");
 			} catch (SAXException e){
-				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -946,9 +1091,7 @@ public class SurveyService extends Service {
 			// validate if answer matches form.
 			try{
 				answerFieldTable = validateAnswer(form,answer);
-				System.out.println(new Date() + " validated match between form and answer");
 			} catch (IllegalArgumentException e){
-				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -958,11 +1101,6 @@ public class SurveyService extends Service {
 			long communityId = cid;
 			long userId = this.getActiveAgent().getId();
 
-			System.out.println("User ID: " + userId);
-			System.out.println("Community ID: " + communityId);
-			System.out.println("Survey ID: "+ surveyId);
-			System.out.println("Answer Field Table: " + answerFieldTable.toJSONString());
-
 			Iterator<String> it = answerFieldTable.keySet().iterator();
 			while(it.hasNext()){
 
@@ -971,21 +1109,16 @@ public class SurveyService extends Service {
 
 				submitQuestionAnswerStatement.clearParameters();
 				submitQuestionAnswerStatement.setLong(1, userId);
-				submitQuestionAnswerStatement.setLong(2, communityId);
+				submitQuestionAnswerStatement.setLong(2, cid);
 				submitQuestionAnswerStatement.setInt(3,surveyId);
 				submitQuestionAnswerStatement.setString(4, qkey);
 				submitQuestionAnswerStatement.setString(5, qval);
 				submitQuestionAnswerStatement.addBatch();
 
-				System.out.println(new Date() + " written answer for key " + qkey);
-
 			}
 			submitQuestionAnswerStatement.executeBatch();
 
 			connection.commit();
-
-			// at this point, we are sure, that submitted answer matches questionnaire.
-			// write answer to database now.
 
 			HttpResponse result = new HttpResponse("Questionnaire answer stored successfully.");
 			result.setStatus(200);
@@ -998,21 +1131,6 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-
-	private int getQuestionnaireIdForSurvey(int sid) throws SQLException{
-		surveyGetQuestionnaireIdStatement.clearParameters();
-		surveyGetQuestionnaireIdStatement.setInt(1, sid);
-
-		ResultSet rs = surveyGetQuestionnaireIdStatement.executeQuery();
-		if(!rs.isBeforeFirst()){
-			return -1;
-		} else {
-			rs.next();
-			return rs.getInt("qid");
-		}
-	}
-
-
 
 	// ---------------------------- private helper methods -----------------------
 
@@ -1118,6 +1236,22 @@ public class SurveyService extends Service {
 
 		} else {
 			return null;
+		}
+	}
+
+	/**
+	 * Retrieves identifier of questionnaire for given survey or -1 if no questionnaire was defined, yet.
+	 */
+	private int getQuestionnaireIdForSurvey(int sid) throws SQLException{
+		surveyGetQuestionnaireIdStatement.clearParameters();
+		surveyGetQuestionnaireIdStatement.setInt(1, sid);
+
+		ResultSet rs = surveyGetQuestionnaireIdStatement.executeQuery();
+		if(!rs.isBeforeFirst()){
+			return -1;
+		} else {
+			rs.next();
+			return rs.getInt("qid");
 		}
 	}
 
