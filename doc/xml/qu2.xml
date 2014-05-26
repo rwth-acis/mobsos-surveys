@@ -7,8 +7,8 @@
 	<qu:Page name="Introduction" 
 	      xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			The Antonio Banderas questionnaire intends to gather information about
-			properties of Antonio Banderas, the famous American actor.
+			${USER.NAME}, welcome to the ${SURVEY.NAME}!
+			In this questionnaire, we invite you to rate the homosexuality and coolness of the resource ${SURVEY.RESOURCE} in the context of community ${COMMUNITY.ID}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -20,7 +20,7 @@
 		  required="true"
 	      xsi:type="qu:DichotomousQuestionPageType">
 		<qu:Instructions>
-			Do you think Antonio Banderas is a homosexual?
+			Is resource ${SURVEY.RESOURCE} homosexual?
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -34,16 +34,16 @@
 		  required="true"		  
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Please rate the coolness of Antonio Banderas on a scale from 0 to 10.
+			Please rate the coolness of resource ${SURVEY.RESOURCE} on a scale from 0 to 10.
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Favorite Movie" 
+	<qu:Page name="Other" 
 	      qid="A.2.3"
 		  required="true"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			Please write down your favorite movie with Antonio Banderas.
+			What else can you tell us about ${SURVEY.RESOURCE}, regarding its coolness and homosexuality?
 		</qu:Instructions>
 	</qu:Page>
 	

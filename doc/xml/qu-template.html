@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>${SURVEY.NAME}</title>
+
+		<!-- Bootstrap -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/main.css" rel="stylesheet">
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+		  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div class="jumbotron">
+		<span style="float: left;"><img src="${SURVEY.LOGO}" height="64px" alt="Logo of ${SURVEY.ORGANIZATION}" /></span>
+		<span>
+		  <h2 id="name"><b>${SURVEY.NAME}</b></h2>
+		</span>
+		<div style="text-align:justify">
+			${SURVEY.DESCRIPTION}
+		</div>
+		<div style="margin-top:10px;"><i>&copy; <span id="owner">${SURVEY.OWNER}</span>, <span id="org"/>${SURVEY.ORGANIZATION}</span></i></div>
+		</div>
+		
+		<div class="container" id="pages" />
+		
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<!-- Include all compiled plugins (below), or include individual files as needed -->
+		<script src="js/vendor/bootstrap.min.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>

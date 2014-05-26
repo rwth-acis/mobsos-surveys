@@ -33,6 +33,8 @@ package i5.las2peer.services.mobsos;
 
 
 import i5.las2peer.p2p.LocalNode;
+import i5.las2peer.restMapper.MediaType;
+import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.ServiceAgent;
@@ -749,8 +751,69 @@ public class SurveyServiceTest {
 //			} 
 //		}
 
+//	@Test
+//	public void testSubmitQuestionnaireAnswer(){
+//		try{
+//			// first add a new questionnaire
+//			ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+//			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+//			URL u = new URL((String) o.get("url"));
+//
+//			// read content from example questionnaire XML file
+//			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+//
+//			// upload questionnaire XML content
+//			ClientResponse result=c.sendRequest("POST", u.getPath() + "/form",qform);
+//			assertEquals(200, result.getHttpCode());
+//
+//			// then create survey using the previously created questionnaire and form
+//			ClientResponse csvres=c.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+//			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
+//			URL su = new URL((String) svu.get("url"));
+//
+//			System.out.println("Survey URL:" + su);
+//			System.out.println("Questionnaire URL: " + u);
+//
+//			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
+//			System.out.println("Questionnaire id: " + qid);
+//
+//			// now set questionnaire to survey
+//			JSONObject qidset = new JSONObject();
+//			qidset.put("qid", qid);
+//
+//			ClientResponse ares=c.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString());
+//			assertEquals(200, ares.getHttpCode());
+//
+//			// read content from example questionnaire answer XML file
+//			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2.xml"));
+//			// submit questionnaire answer XML content
+//			ares=c.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer);
+//			assertEquals(200, ares.getHttpCode());
+//
+//			// do the same with a second user and another result
+//			String qa3=IOUtils.getStringFromFile(new File("./doc/xml/qa3.xml"));
+//			ares=c2.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qa3);
+//			assertEquals(200, ares.getHttpCode());
+//			
+//			// now try to get results
+//			ClientResponse ga=c.sendRequest("GET", su.getPath() + "/answers/"+group1.getId(),"");
+//			assertEquals(200, ga.getHttpCode());
+//			System.out.println(ga.getResponse());
+//
+//		} catch (MalformedURLException e){
+//			e.printStackTrace();
+//			fail("Service returned malformed URL!");
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//			fail("Service returned invalid JSON! " + e.getMessage());
+//		} 
+//	}
+	
 	@Test
-	public void testSubmitQuestionnaireAnswer(){
+	public void testGetSurveyQuestionnaireForm(){
 		try{
 			// first add a new questionnaire
 			ClientResponse r = c.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
@@ -782,21 +845,14 @@ public class SurveyServiceTest {
 			ClientResponse ares=c.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString());
 			assertEquals(200, ares.getHttpCode());
 
-			// read content from example questionnaire answer XML file
-			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2.xml"));
-			// submit questionnaire answer XML content
-			ares=c.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer);
-			assertEquals(200, ares.getHttpCode());
-
-			// do the same with a second user and another result
-			String qa3=IOUtils.getStringFromFile(new File("./doc/xml/qa3.xml"));
-			ares=c2.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qa3);
-			assertEquals(200, ares.getHttpCode());
+			String npath = su.getPath() + "/questionnaire/" + group1.getId();
+			System.out.println("GET " + npath);
+			// now we are ready to download questionnaire form for given survey in a given community context.
+			ClientResponse qsfres=c.sendRequest("GET", su.getPath() + "/questionnaire/" + group1.getId(),"","",MediaType.TEXT_HTML,new Pair[]{});
 			
-			// now try to get results
-			ClientResponse ga=c.sendRequest("GET", su.getPath() + "/answers/"+group1.getId(),"");
-			assertEquals(200, ga.getHttpCode());
-			System.out.println(ga.getResponse());
+			System.out.println("Status: " + qsfres.getHttpCode());
+			System.out.println("Response: " + qsfres.getResponse());
+			
 
 		} catch (MalformedURLException e){
 			e.printStackTrace();
@@ -810,6 +866,7 @@ public class SurveyServiceTest {
 		} 
 	}
 
+	/*
 	@Test
 	public void testSubmitInvalidQuestionnaireAnswer(){
 		try{
@@ -903,7 +960,7 @@ public class SurveyServiceTest {
 		} 
 	}
 
-	/*
+	
 	@Test
 	public void testAgentExperiments(){
 		// test with user agent

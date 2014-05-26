@@ -44,6 +44,7 @@ import i5.las2peer.restMapper.annotations.POST;
 import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
 import i5.las2peer.restMapper.annotations.PathParam;
+import i5.las2peer.restMapper.annotations.Produces;
 import i5.las2peer.restMapper.annotations.Version;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
@@ -52,11 +53,15 @@ import i5.las2peer.tools.GroupAgentGenerator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -70,8 +75,13 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.TimeZone;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
@@ -386,6 +396,371 @@ public class SurveyService extends Service {
 			result.setStatus(500);
 			return result;
 		}
+	}
+
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("surveys/{id}/questionnaire/{cid}")
+	public HttpResponse getSurveyQuestionnaireFormHTML(@PathParam("id") int id, @PathParam("cid") long cid){
+		try{
+
+			GroupAgent community;
+			// if community not found, return 404
+			try{
+
+				Agent a = this.getActiveNode().getAgent(cid);
+				if(!(a instanceof GroupAgent)){
+					HttpResponse result = new HttpResponse("Agent " + cid + " does not represent a community!");
+					result.setStatus(400);
+					return result;
+				}
+				community = (GroupAgent) a;
+			} catch (AgentNotKnownException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+
+			// retrieve survey data; if survey does not exist, return 404.
+			HttpResponse r = getSurvey(id);
+			if(200 != r.getStatus()){
+				System.err.println(r.getResult());
+				return r;
+			}
+
+			JSONObject survey = (JSONObject) JSONValue.parse(r.getResult());
+
+			// check if survey has the questionnaire id field qid set. If not, return 404 with a respective message.
+			if(null == survey.get("qid")){
+				HttpResponse result = new HttpResponse("Questionnaire not set for survey " + id + ".");
+				result.setStatus(404);
+				return result;
+			}
+
+			long qid = (Long) survey.get("qid");
+
+			// now download questionnaire form from database
+			questionnaireDownloadFormStatement.clearParameters();
+			questionnaireDownloadFormStatement.setLong(1, qid);
+
+			ResultSet rs = questionnaireDownloadFormStatement.executeQuery();
+
+			if (!rs.isBeforeFirst()){
+				HttpResponse result = new HttpResponse("Form for questionnaire " + qid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+
+			rs.next();
+
+			String formXml = rs.getString(1);
+
+			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),community);
+
+			Document form;
+			// before returning form, make sure it's still valid (may be obsolete step...)
+			try{
+				form = validateQuestionnaireData(adaptedFormXml);
+			} catch(IOException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+				result.setStatus(500);
+				return result;
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+
+			String text = new Scanner(new File("./doc/xml/qu-template.html")).useDelimiter("\\A").next();
+
+			System.out.println(text);
+
+			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), community);
+
+			Vector<String> qpages = new Vector<String>();
+
+			NodeList nodeList = form.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
+			for (int i = 0; i < nodeList.getLength(); i++) {
+
+
+				Node node = nodeList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					Element e = (Element) node;
+					if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
+
+						String qpage = "\t\t\t<div class=\"row\">\n";
+
+						String name = e.getAttribute("name");
+						qpage += "\t\t\t\t<h2>" + name + "</h2>\n";
+
+						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
+
+						String cssClass = "question";
+
+						if(e.getAttribute("required") != null && e.getAttribute("required").equals("true")){
+							cssClass += " required";
+							instr += " <i>(required)</i>";
+						}
+
+						qpage +="\t\t\t\t<div class=\"" + cssClass + "\" >" + instr + "</div>\n";
+
+						String qtype = e.getAttribute("xsi:type");
+
+						String quid = e.getAttribute("qid");
+
+						if("qu:OrdinalScaleQuestionPageType".equals(qtype)){
+							int defval = Integer.parseInt(e.getAttribute("defval"));
+							String minlabel = e.getAttribute("minlabel");
+							String maxlabel = e.getAttribute("maxlabel");
+							int minval =  Integer.parseInt(e.getAttribute("minval"));
+							int maxval = Integer.parseInt(e.getAttribute("maxval"));
+
+							qpage += "\t\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
+							qpage += "\t\t\t\t\t<span class=\"btn\">" + minlabel + "</span>\n";
+							for(int k=minval;k<=maxval;k++){
+								qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
+								qpage += "\t\t\t\t\t\t<input name=\""+ quid + "\" type=\"radio\" value=\""+k + "\">" + k + "\n";
+								qpage += "\t\t\t\t\t</label>\n";
+							}
+							qpage += "\t\t\t\t\t<span class=\"btn\">" + maxlabel + "</span>\n";
+							qpage += "\t\t\t\t</div>\n";
+
+						} else if ("qu:DichotomousQuestionPageType".equals(qtype)){
+							int defval = Integer.parseInt(e.getAttribute("defval"));
+							String minlabel = e.getAttribute("minlabel");
+							String maxlabel = e.getAttribute("maxlabel");
+
+							qpage += "\t\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
+							qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
+							qpage += "\t\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"0\">" + minlabel + "\n";
+							qpage += "\t\t\t\t\t</label>\n";
+							qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
+							qpage += "\t\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"1\">" + maxlabel + "\n";
+							qpage += "\t\t\t\t\t</label>\n";
+							qpage += "\t\t\t\t</div>\n";
+
+						} else if ("qu:FreeTextQuestionPageType".equals(qtype)){
+							qpage += "\t\t\t\t<textarea name=\"" +quid + "\" class=\"freetext\" rows=\"3\"></textarea>\n";
+						}
+
+						qpage += "\t\t\t</div>\n";
+						qpages.add(qpage);
+					}
+				}
+			}
+			// now that all questions are extracted and transformed to HTML, append them to final HTML.
+			String questionDivs = "";
+
+			for(int j=0;j<qpages.size();j++){
+				questionDivs += qpages.get(j);
+			}
+
+			adaptText = adaptText.replaceAll("id=\"pages\" />","id=\"pages\" >\n" + questionDivs + "\t\t\t<div class=\"row\">\n\t\t\t\t<input id=\"submit\" type=\"submit\" />\n\t\t\t</div>\n\t\t</div>");
+
+			HttpResponse result = new HttpResponse(adaptText);
+			result.setStatus(200);
+			return result;
+
+		} catch (Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+
+	}
+
+	@GET
+	@Produces(MediaType.TEXT_XML)
+	@Path("surveys/{id}/questionnaire/{cid}")
+	public HttpResponse getSurveyQuestionnaireFormXML(@PathParam("id") int id, @PathParam("cid") long cid){
+		try{
+
+			GroupAgent community;
+			// if community not found, return 404
+			try{
+
+				Agent a = this.getActiveNode().getAgent(cid);
+				if(!(a instanceof GroupAgent)){
+					HttpResponse result = new HttpResponse("Agent " + cid + " does not represent a community!");
+					result.setStatus(400);
+					return result;
+				}
+				community = (GroupAgent) a;
+			} catch (AgentNotKnownException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+
+			System.out.println("Community found");
+
+			// retrieve survey data; if survey does not exist, return 404.
+			HttpResponse r = getSurvey(id);
+			if(200 != r.getStatus()){
+				System.err.println(r.getResult());
+				return r;
+			}
+
+			JSONObject survey = (JSONObject) JSONValue.parse(r.getResult());
+
+			// check if survey has the questionnaire id field qid set. If not, return 404 with a respective message.
+			if(null == survey.get("qid")){
+				HttpResponse result = new HttpResponse("Questionnaire not set for survey " + id + ".");
+				result.setStatus(404);
+				return result;
+			}
+
+			long qid = (Long) survey.get("qid");
+
+			// now download questionnaire form from database
+			questionnaireDownloadFormStatement.clearParameters();
+			questionnaireDownloadFormStatement.setLong(1, qid);
+
+			ResultSet rs = questionnaireDownloadFormStatement.executeQuery();
+
+			if (!rs.isBeforeFirst()){
+				HttpResponse result = new HttpResponse("Form for questionnaire " + qid + " does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+
+			rs.next();
+
+			String formXml = rs.getString(1);
+
+			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),community);
+
+			// before returning form, make sure it's still valid (may be obsolete step...)
+			try{
+				validateQuestionnaireData(adaptedFormXml);
+				HttpResponse result = new HttpResponse(adaptedFormXml);
+				result.setStatus(200);
+				return result;
+			} catch(IOException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+				result.setStatus(500);
+				return result;
+			} catch (SAXException e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+				result.setStatus(400);
+				return result;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		}
+	}
+
+	/**
+	 * Adapts a given questionnaire form before being administered to a requesting user in a given community context.
+	 * For adaptation purposes, questionnaire authors can make use of a set of author tags, which are replaced by this method.
+	 * The syntax for author tags is ${AT}. The following values for AT are supported:
+	 * <ul>
+	 * 	<li>USER.ID - identifier of requesting user</li>
+	 *  <li>USER.NAME - login name of requesting user</li>
+	 * 	<li>USER.MAIL - email address of requesting user</li>
+	 * 	<li>COMMUNITY.ID - identifier of community, in whose context questionnaire form is requested</li>
+	 * 	<li>SURVEY.ID - identifier of survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.NAME - name of survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.DESCRIPTION - description of survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.RESOURCE - resource under consideration in survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.START - ISO-8601 compliant UTC start time of survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.END - ISO-8601 compliant UTC end time of survey, in whose context questionnaire form is requested </li>
+	 *  <li>SURVEY.OWNER - owner of survey </li>
+	 *  <li>SURVEY.ORGANIZATION - organization owner of survey belongs to </li>
+	 *  <li>SURVEY.LOGO - logo to be shown in survey header, e.g. organization logo </li>
+	 * </ul>
+	 * 
+	 * @param originalFormXml
+	 * @param survey
+	 * @param user
+	 * @param community
+	 * @return
+	 */
+	private String adaptForm(String originalFormXml, JSONObject survey, UserAgent user, GroupAgent community){
+		// detect all  tags used by questionnaire author throughout the form 
+		// and replace them by the respective values.
+		Pattern p = Pattern.compile("\\$\\{([^\\}])+\\}");
+		Matcher m = p.matcher(originalFormXml);
+
+		String adaptedform = new String(originalFormXml);
+
+		// replace any occurring author tags within questionnaire form
+		Vector<String> foundTags = new Vector<String>();
+		while(m.find()){
+			String tag = m.group().substring(2,m.group().length()-1);
+			String value = null;
+			if(!foundTags.contains(tag)){
+				if(tag.startsWith("USER")){
+					if(tag.endsWith("ID")){
+						value = "" + user.getId();
+					} else if(tag.endsWith("NAME")){
+						value = user.getLoginName();
+					} else if(tag.endsWith("MAIL")){
+						value = user.getEmail();
+					}
+				} else if(tag.startsWith("COMMUNITY")){
+					if(tag.endsWith("ID")){
+						value = "" + community.getId();
+					} 
+				} else if(tag.startsWith("SURVEY.")){
+					if (tag.endsWith("ID")){
+						value = (String) survey.get("id");
+					} else if (tag.endsWith("NAME")){
+						value = (String) survey.get("name");
+					} else if (tag.endsWith("DESCRIPTION")){
+						value = (String) survey.get("description");
+					} else if (tag.endsWith("RESOURCE")){
+						value = (String) survey.get("resource");
+					} else if (tag.endsWith("START")){
+						value = (String) survey.get("start");
+					} else if (tag.endsWith("END")){
+						value = (String) survey.get("end");
+					} else if (tag.endsWith("OWNER")){
+						value = (String) survey.get("owner");
+					} else if (tag.endsWith("ORGANIZATION")){
+						value = (String) survey.get("organization");
+					} else if (tag.endsWith("LOGO")){
+						value = (String) survey.get("logo");
+					}
+				}
+
+				//TODO: add more author tags, if necessary.
+
+				if(value!=null){
+					adaptedform = adaptedform.replaceAll("\\$\\{"+tag+"\\}",value);
+					//System.out.println("Resolved questionnaire author tag: "+tag);
+					foundTags.add(tag);
+				}
+				else{
+					System.err.println("Warning: could not resolve questionnaire author tag '"+tag+"'");
+				}
+			}
+		}
+
+		/*
+				// add a welcome information page to be displayed before any questionnaire content provided by the 
+				// questionnaire author is presented.
+				String introPageName = "Welcome";
+				String introPageInstructions = "First of all welcome and thank you for your participation in our survey '"+svin[1]+"'."+svin[2]+
+				"Within this survey you will now be asked to fill in questionnaire '"+quin[1]+"' regarding community "+g.getName()+". "+quin[2]+" On the following "+quin[3]+" pages you will be asked to answer "+(Integer.parseInt(quin[5]) + Integer.parseInt(quin[6]) +Integer.parseInt(quin[7]))+" questions in total."+
+				"In "+quin[5]+" questions you will be asked to decide between two alternatives (yes/no or the like). Another "+quin[6]+" questions will ask you to provide an ordinal scale ranking regarding certain properties of service "+ed.getName()+". "+
+				"Another "+quin[7]+" questions will ask you to enter informal text (e.g. for personal comments). You can decide for yourself, if you want to answer or skip each individual question. However, please try to answer as many questions as possible. "+
+				"If you do not understand a particular question you are advised to skip it. Let's go for it!";
+
+				String introPageXml = "\n<qu:Page name=\""+introPageName+"\" xsi:type=\"qu:InformationPageType\">\n  <qu:Instructions>"+introPageInstructions+"</qu:Instructions>\n</qu:Page>\n";
+				adaptedform = adaptedform.replaceFirst("<qu:Page",introPageXml+"<qu:Page");
+		 */
+		return adaptedform;
 	}
 
 	@POST
@@ -744,6 +1119,8 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}/form")
 	public HttpResponse downloadQuestionnaireForm(@PathParam("id") int id){
 		try{
+
+			// check if questionnaire exists; if not, return 404.
 			int exown = checkExistenceOwnership(id,1);
 
 			// check if questionnaire exists; if not, return 404.
@@ -864,10 +1241,10 @@ public class SurveyService extends Service {
 			int exown = checkExistenceOwnership(id,0);
 
 			GroupAgent community;
-			
+
 			// if community not found, return 404
 			try{
-			 community = (GroupAgent) this.getActiveNode().getAgent(cid);
+				community = (GroupAgent) this.getActiveNode().getAgent(cid);
 			} catch (AgentNotKnownException e){
 				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
 				result.setStatus(404);
@@ -877,7 +1254,7 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
-			
+
 			// allow access to answer data only, if current user is either survey owner or member of given community
 			if(exown == -1 || !community.isMember(this.getActiveAgent())){
 				HttpResponse result = new HttpResponse("Access to answer information only for owner of survey " + id + " and members of community " + cid);
@@ -916,7 +1293,7 @@ public class SurveyService extends Service {
 			}
 
 			// create query for result table
-			
+
 			// example query:
 			// 
 			//     select uid,
@@ -924,10 +1301,10 @@ public class SurveyService extends Service {
 			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
 			//     from mobsos.survey_result where sid = 1 and cid = 1 group by uid;
-	
+
 			JSONObject questions = extractQuestionInformation(form);
 			String sql = "select uid, \n"; 
-			
+
 			Iterator<String> it = questions.keySet().iterator();
 
 			while(it.hasNext()){
@@ -946,18 +1323,18 @@ public class SurveyService extends Service {
 					sql += "\n";
 				}
 			}
-			
+
 			sql += " from " + jdbcSchema + ".survey_result where sid ="+ id + " and cid =" + cid + " group by uid;";
-			
+
 			//System.out.println("SQL: \n" + sql);
-			
+
 			// execute generated query
 			Statement s = connection.createStatement();
 			ResultSet rs = s.executeQuery(sql);
-			
+
 			// format and return result
 			String res = createCSVQuestionnaireResult(rs, questions);
-			
+
 			HttpResponse result = new HttpResponse(res);
 			result.setStatus(200);
 			return result;
@@ -969,20 +1346,20 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	private String createCSVQuestionnaireResult(ResultSet rs, JSONObject qinfo) throws SQLException{
 		int cols = rs.getMetaData().getColumnCount();
-		
+
 		String res = "";
 		String headline = "";
-		
+
 		// first create header row
 		for(int i=1;i<=cols;i++){
 			headline += rs.getMetaData().getColumnName(i);
 			if(i<cols) headline += ";";
 		}
 		res += headline + "\n";
-		
+
 		// now compile answer data
 		String data = "";
 		while(rs.next()){
@@ -996,11 +1373,11 @@ public class SurveyService extends Service {
 		res += data.trim();
 		return res;
 	}
-	
+
 	private String createJSONQuestionnaireResult(ResultSet rs, JSONObject qinfo) throws SQLException{
 		JSONObject res = new JSONObject();
 		int cols = rs.getMetaData().getColumnCount();
-		
+
 		// first create header row by including all question information
 		JSONArray header = new JSONArray();
 		for(int i=1;i<=cols;i++){
@@ -1015,13 +1392,13 @@ public class SurveyService extends Service {
 			header.add(o);
 		}
 		res.put("head",header);
-		
+
 		// now compile answer data
 		JSONArray data = new JSONArray();
 		while(rs.next()){
-			
+
 			JSONArray resrow = new JSONArray();
-			
+
 			for(int i=1;i<=cols;i++){
 				Object o = rs.getObject(i);
 				if(rs.getMetaData().getColumnType(i) == Types.VARCHAR){
@@ -1191,6 +1568,8 @@ public class SurveyService extends Service {
 			o.put("organization", rs.getString("organization"));
 			o.put("logo", rs.getString("logo"));
 			o.put("resource",rs.getString("resource"));
+			o.put("qid",rs.getInt("qid"));
+
 
 			long ts_start = rs.getTimestamp("start").getTime();
 			long ts_end = rs.getTimestamp("end").getTime();
