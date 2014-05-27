@@ -474,27 +474,32 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			String text = new Scanner(new File("./doc/xml/qu-template.html")).useDelimiter("\\A").next();
-
-			System.out.println(text);
+			String text = new Scanner(new File("./doc/xml/questionnaire-template.html")).useDelimiter("\\A").next();
 
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), community);
 
 			Vector<String> qpages = new Vector<String>();
+			Vector<String> navpills = new Vector<String>();
 
 			NodeList nodeList = form.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
+	    
+			// then iterate over all question pages
 			for (int i = 0; i < nodeList.getLength(); i++) {
-
-
+				
 				Node node = nodeList.item(i);
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) node;
 					if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
-
-						String qpage = "\t\t\t<div class=\"row\">\n";
+						
+						// first add nav pill item
+						String navpill = "\t\t\t\t\t<li><a href=\"#step-" + i +"\"><h4 class=\"list-group-item-heading\">" + i + "</h4></a></li>\n";
+						navpills.add(navpill);
+						
+						// then add question page
+						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 well text-center\">\n";
 
 						String name = e.getAttribute("name");
-						qpage += "\t\t\t\t<h2>" + name + "</h2>\n";
+						qpage += "\t\t\t<h2>" + name + "</h2>\n";
 
 						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
 
@@ -505,61 +510,82 @@ public class SurveyService extends Service {
 							instr += " <i>(required)</i>";
 						}
 
-						qpage +="\t\t\t\t<div class=\"" + cssClass + "\" >" + instr + "</div>\n";
+						qpage +="\t\t\t<div class=\"" + cssClass + "\" >" + instr + "</div>\n";
 
 						String qtype = e.getAttribute("xsi:type");
 
 						String quid = e.getAttribute("qid");
 
 						if("qu:OrdinalScaleQuestionPageType".equals(qtype)){
+							
+							// TODO: do something with default value, if set.
 							int defval = Integer.parseInt(e.getAttribute("defval"));
 							String minlabel = e.getAttribute("minlabel");
 							String maxlabel = e.getAttribute("maxlabel");
 							int minval =  Integer.parseInt(e.getAttribute("minval"));
 							int maxval = Integer.parseInt(e.getAttribute("maxval"));
 
-							qpage += "\t\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
-							qpage += "\t\t\t\t\t<span class=\"btn\">" + minlabel + "</span>\n";
+							qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
+							qpage += "\t\t\t\t<span class=\"btn\">" + minlabel + "</span>\n";
 							for(int k=minval;k<=maxval;k++){
-								qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
-								qpage += "\t\t\t\t\t\t<input name=\""+ quid + "\" type=\"radio\" value=\""+k + "\">" + k + "\n";
-								qpage += "\t\t\t\t\t</label>\n";
+								qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
+								qpage += "\t\t\t\t\t<input name=\""+ quid + "\" type=\"radio\" value=\""+k + "\">" + k + "\n";
+								qpage += "\t\t\t\t</label>\n";
 							}
-							qpage += "\t\t\t\t\t<span class=\"btn\">" + maxlabel + "</span>\n";
-							qpage += "\t\t\t\t</div>\n";
+							qpage += "\t\t\t\t<span class=\"btn\">" + maxlabel + "</span>\n";
+							qpage += "\t\t\t</div>\n";
 
 						} else if ("qu:DichotomousQuestionPageType".equals(qtype)){
+							
+							// TODO: do something with default value, if set.
 							int defval = Integer.parseInt(e.getAttribute("defval"));
 							String minlabel = e.getAttribute("minlabel");
 							String maxlabel = e.getAttribute("maxlabel");
 
-							qpage += "\t\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
-							qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
-							qpage += "\t\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"0\">" + minlabel + "\n";
-							qpage += "\t\t\t\t\t</label>\n";
-							qpage += "\t\t\t\t\t<label class=\"btn btn-primary\">\n";
-							qpage += "\t\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"1\">" + maxlabel + "\n";
-							qpage += "\t\t\t\t\t</label>\n";
-							qpage += "\t\t\t\t</div>\n";
+							qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
+							qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
+							qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"0\">" + minlabel + "\n";
+							qpage += "\t\t\t\t</label>\n";
+							qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
+							qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"1\">" + maxlabel + "\n";
+							qpage += "\t\t\t\t</label>\n";
+							qpage += "\t\t\t</div>\n";
 
 						} else if ("qu:FreeTextQuestionPageType".equals(qtype)){
-							qpage += "\t\t\t\t<textarea name=\"" +quid + "\" class=\"freetext\" rows=\"3\"></textarea>\n";
+							qpage += "\t\t\t<textarea name=\"" +quid + "\" class=\"freetext\" rows=\"3\"></textarea>\n";
 						}
 
-						qpage += "\t\t\t</div>\n";
+						qpage += "\t\t</div></div></div>\n";
 						qpages.add(qpage);
 					}
 				}
 			}
-			// now that all questions are extracted and transformed to HTML, append them to final HTML.
+			
+			// now that all questions are extracted and transformed to HTML, append nav pill items and question pages to final HTML.
+			
+			// first serialize nav pill items
+			String navpillItems = "";
+			for(int j=0;j<navpills.size();j++){
+				navpillItems += navpills.get(j);
+			}
+			
+			// then serialize question page divs
 			String questionDivs = "";
-
 			for(int j=0;j<qpages.size();j++){
 				questionDivs += qpages.get(j);
 			}
 
-			adaptText = adaptText.replaceAll("id=\"pages\" />","id=\"pages\" >\n" + questionDivs + "\t\t\t<div class=\"row\">\n\t\t\t\t<input id=\"submit\" type=\"submit\" />\n\t\t\t</div>\n\t\t</div>");
+			// then generate answer link
+			URL answerUrl = new URL(epUrl+"surveys/"+id+"/answers/"+cid); 
+			
+			String answerLink = "<a href=\""+ answerUrl + "\" id=\"return-url\" class=\"hidden\" ></a>";
+			
+			// finally insert all generated parts into the resulting adapted HTML
+			adaptText = adaptText.replaceAll("<!-- NAVPILLS -->", navpillItems);
+			adaptText = adaptText.replaceAll("<!-- QUESTIONPAGES -->",questionDivs);
+			adaptText = adaptText.replaceAll("<!-- ANSWERLINK -->", answerLink);
 
+			// return adapted HTML
 			HttpResponse result = new HttpResponse(adaptText);
 			result.setStatus(200);
 			return result;

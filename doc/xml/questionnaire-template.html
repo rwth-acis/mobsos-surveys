@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>${SURVEY.NAME}</title>
+
+	<!-- Bootstrap -->
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<style>
+		.page-header {
+			margin: 10px;
+		}
+		
+		table td {
+			padding: 10px;
+		}
+		table h2 {
+			padding: 0px;
+		}
+		.question {
+			padding: 10px;
+			font-size: 1.3em;
+		}
+	
+		.btn {
+			margin: 4px;
+		}
+	</style>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+	
+	<div style="page-header">
+		<table>
+			<tr>
+				<td>
+					<img src="${SURVEY.LOGO}" height="64px" alt="Logo for ${SURVEY.NAME}" />
+				</td>
+				<td>
+					<span>
+						<h2>${SURVEY.NAME}</h2>
+						<div style="margin-top:5px;">
+							<i><span id="org"/>&copy; ${SURVEY.ORGANIZATION}</span></i>
+						</div>
+					</span>
+				</td>
+			</tr>
+		</table>
+	</div>
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-12">
+				<ul class="nav nav-pills btn-small setup-panel">
+					<li class="active"><a href="#intro"><h4 class="list-group-item-heading">Introduction</h4></a></li>
+<!-- NAVPILLS -->
+					<li><a href="#submission"><h4 class="list-group-item-heading">Submission</h4></a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="row setup-content" id="intro">
+			<div class="col-xs-12">
+				<div class="col-md-12 well text-center">
+					<h2>Introduction</h2>
+					<div style="text-align: left;">${SURVEY.DESCRIPTION}</div>
+				</div>
+			</div>
+		</div>
+<!-- QUESTIONPAGES -->
+		<div class="row setup-content" id="submission">
+			<div class="col-xs-12">
+				<div class="col-md-12 well text-center">
+					<h1 class="text-center">Submission</h1>
+					<div style="text-align: left;">
+					By clicking the submit button below, you will submit your answers.
+					Thank you very much for your participation!
+					</div>
+					<input class="btn btn-lg btn-success" id="submit" type="submit" />
+					<!-- ANSWERLINK -->
+				</div>
+			</div>
+		</div>
+		<div>
+			<button id="prev-step" class="btn btn-primary btn-lg pull-left">Prev</button>
+			<button id="next-step" class="btn btn-primary btn-lg pull-right">Next</button>
+		</div>
+	</div>
+			
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(init);
+		
+		function collectAnswers(e){
+			e.preventDefault();
+			var values = {};
+			// collect all input from form elements
+			var questions  = $("input[name]:checked, .freetext");
+			for(var i=0;i < questions.length; i++ ){
+				values[questions.eq(i).attr("name")] = questions.eq(i).val();
+			}
+			console.log(values);
+			var return_url = $("#return-url").attr("href");
+			// posting the crap to the service;
+			$.post(return_url,values);
+			
+			// Send the data using post
+			var posting = $.post( return_url, values );
+			 
+			// Put the results in a div
+			posting.done(function( data ) {
+				console.log(data);
+			});
+		}
+		
+		function init() {
+		
+			var navListItems = $('ul.setup-panel li a'), allWells = $('.setup-content');
+			allWells.hide();
+
+			navListItems.click(function(e)
+			{
+				e.preventDefault();
+				var $target = $($(this).attr('href')),
+					$item = $(this).closest('li');
+				
+				var id=$(this).attr('href');
+				if(id == '#submission'){
+					$('#prev-step').removeClass('disabled');
+					$('#next-step').addClass('disabled');
+				} else if (id == '#intro'){
+					$('#prev-step').addClass('disabled');
+					$('#next-step').removeClass('disabled');
+				} else {
+					$('#next-step').removeClass('disabled');
+					$('#prev-step').removeClass('disabled');
+				}
+				
+				if (!$item.hasClass('disabled')) {
+					navListItems.closest('li').removeClass('active');
+					$item.addClass('active');
+					allWells.hide();
+					$target.show();
+				}
+			});
+			
+			$('ul.setup-panel li.active a').trigger('click');
+			$('#prev-step').addClass('disabled');
+
+			$('#prev-step').on('click', function(e) {
+				$('ul.setup-panel li.active').prev().find('a').trigger('click');
+			});
+			
+			$('#next-step').on('click', function(e) {
+				$('ul.setup-panel li.active').next().find('a').trigger('click');
+			});
+			
+			$("#submit").click(collectAnswers);	
+		}
+	</script>
+</body>
+</html>
