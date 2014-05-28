@@ -1,25 +1,33 @@
 echo IMPORTANT: the following curl tests require valid credentials. Run 'ant all' to generate a LAS2peer test user agent 'UserA'. The agent's login can be extracted from the file ./etc/startup/agent-user-UserA.xml. It is the numeric value contained in the id-element. The agent's password is set to a default value "userAPass". Whenever you rerun 'ant all', new public/private keys and a new id are generated for the test user agent. Do not forget to adapt credentials in curl calls!
 
 set endpoint=http://localhost:8080/mobsos
-set credentials=4442538330439435920:userAPass
+set cred1=5830973071816504729:userAPass
+set cred2=5593111138118188637:userBPass
+
+echo "create new questionnaire 1"
+curl -v -X POST %endpoint%/questionnaires --user %cred1% -H "Content-Type: application/json" -d "{\"name\":\"Learning Layers Standard Application Success Questionnaire\",\"description\":\"A questionnaire to assess the success of an application developed by the Learning Layers project in different dimensions of success.\",\"organization\":\"Learning Layers\",\"logo\":\"http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png\"}"
+pause
+
+echo "upload questionnaire form"
+curl -v -X POST %endpoint%/questionnaires/1/form --user %cred1% --data-binary @doc/xml/qu2.xml -H 'Content-type:text/xml'
+pause
+
+echo "create new survey 1"
+curl -v -X POST %endpoint%/surveys --user %cred1% -H "Content-Type: application/json" -d "{\"name\":\"SeViAnno Success Survey\",\"description\":\"A survey to assess the different factors of success in applications developed by the Learning Layers project (http://learning-layers.eu).\",\"resource\":\"https://github.com/learning-layers/sevianno\",\"organization\":\"Learning Layers\",\"logo\":\"http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png\",\"start\":\"2014-05-20T00:00:00Z\",\"end\":\"2014-06-20T23:59:59Z\"}"
+pause
+
+echo "set questionnaire for survey 1"
+curl -v -X POST %endpoint%/surveys/1/questionnaire --user %cred1% -H "Content-Type: application/json" -d "{\"qid\":1}"
+pause
+
+echo "get questionnaire form with second user without community context"
+curl -v -X GET %endpoint%/surveys/1/questionnaire --user %cred1% -H "Content-Type: text/html" > form.html
 
 echo "list all surveys"
-curl -X GET %endpoint%/surveys --user %credentials%
+curl -v -X GET %endpoint%/surveys --user %cred1%
 pause
 
-echo "delete all surveys"
-curl -v -X "DELETE" %endpoint%/surveys --user %credentials%
-pause
 
-echo "create new survey"
-curl -v -X POST %endpoint%/surveys --user %credentials% -H "Content-Type: application/json" -d "{\"name\":\"Antonio Banderas Success Survey\",\"description\":\"A survey to find out which facets of Antonio Banderas make him so successful.\",\"resource\":\"http://www.imdb.com/name/nm0000104/\",\"organization\":\"ACIS Group\",\"logo\":\"http://dbis.rwth-aachen.de/cms/images/logo.jpg\",\"start\":\"2014-05-20T00:00:00Z\",\"end\":\"2014-06-20T23:59:59Z\"}"
-pause
-
-echo "list all surveys"
-curl -v -X GET %endpoint%/surveys --user %credentials%
-pause
-
-echo "retrieve survey information"
 
 REM pause
 

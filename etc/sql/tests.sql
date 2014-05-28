@@ -45,8 +45,21 @@ insert into mobsos.survey_result(uid,cid,sid,qkey,qval,time) values
 
 select distinct(qkey) from mobsos.survey_result;
 
-select uid,
+select uid, cid,
 MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
 MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
-from mobsos.survey_result where sid = 1 and cid = 1 group by uid;
+from mobsos.survey_result where sid = 1 group by uid, cid;
+
+select * from mobsos.survey_result;
+
+delete from mobsos.survey_result;
+delete from mobsos.survey;
+delete from mobsos.questionnaire;
+
+alter table mobsos.questionnaire auto_increment = 1;
+alter table mobsos.survey auto_increment = 1;
+
+select * from questionnaire;
+select * from survey;
+

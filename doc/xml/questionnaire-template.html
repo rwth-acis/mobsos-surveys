@@ -78,10 +78,15 @@
 			<div class="col-xs-12">
 				<div class="col-md-12 well text-center">
 					<h1 class="text-center">Submission</h1>
-					<div style="text-align: left;">
-					By clicking the submit button below, you will submit your answers.
+					<span class="help-block question">
+					Before submitting your questionnaire form, please confirm your identity by entering your password below.<br/><br/>
 					Thank you very much for your participation!
+					</span>
+					<div class="form-group">
+						<input type="hidden" class="form-control" id="uid" value="${USER.ID}"></input>
+						<center><input type="password" class="form-control" id="passwd" placeholder="Password" size="20" style="width:200px"></center>
 					</div>
+					
 					<input class="btn btn-lg btn-success" id="submit" type="submit" />
 					<!-- ANSWERLINK -->
 				</div>

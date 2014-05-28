@@ -215,7 +215,10 @@
         </java>
     </target>
 	
-    <target name="generate_user_agent" depends="jar">
+	<available file="${user_agent1.path}" property="agent1_exists"/>
+	<available file="${user_agent2.path}" property="agent2_exists"/>
+	
+    <target name="generate_user_agent1" depends="jar" unless="agent1_exists">
         <echo message="Writing User Agent 1 XML to ${user_agent1.path}"/>
         <java classname="i5.las2peer.tools.UserAgentGenerator"
             classpathref="libraries"
@@ -225,6 +228,9 @@
             >
             <arg line="'${las2peer_user1.password}' '${las2peer_user1.name}' '${las2peer_user1.email}'"/>
         </java>
+    </target>
+	
+	<target name="generate_user_agent2" depends="jar" unless="agent2_exists">
 		<echo message="Writing User Agent 2 XML to ${user_agent2.path}"/>
         <java classname="i5.las2peer.tools.UserAgentGenerator"
             classpathref="libraries"
@@ -236,7 +242,7 @@
         </java>
     </target>
 	
-    <target name="generate_configs" depends="generate_service_agent, generate_user_agent">
+    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1, generate_user_agent2">
 <echo file="${passphrases.path}" append="false">agent-service-${service.name}.xml;${service.password}
 agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}
 agent-user-${las2peer_user2.name}.xml;${las2peer_user2.password}
