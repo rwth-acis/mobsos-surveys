@@ -45,6 +45,7 @@ import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
 import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Produces;
+import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
@@ -140,6 +141,9 @@ public class SurveyService extends Service {
 
 	private PreparedStatement surveyGetQuestionnaireIdStatement;
 
+	private PreparedStatement surveysFullQueryStatement;
+	private PreparedStatement questionnairesFullQueryStatement;
+
 	public SurveyService(){
 		// set values from configuration file
 		this.setFieldValues();
@@ -163,8 +167,26 @@ public class SurveyService extends Service {
 		//System.out.println(getRESTMapping());
 	}
 
+	// authentication done by Web Connector
+	// only emulates an auth endpoint.
 	@GET
-	@Path("agents/{id}")
+	@Path("auth")
+	public HttpResponse authenticate(){
+		HttpResponse result = new HttpResponse("");
+		result.setStatus(200);
+		return result;
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("agentinfo")
+	public HttpResponse getMyAgentInformation(){
+		return getAgentInformation(this.getActiveAgent().getId());
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("agentinfo/{id}")
 	public HttpResponse getAgentInformation(@PathParam("id") long id){
 		try{
 			try {
@@ -210,26 +232,50 @@ public class SurveyService extends Service {
 	 * @return
 	 */
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
-	public HttpResponse getSurveys()
+	public HttpResponse getSurveys(@QueryParam(defaultValue = "0", name = "f") int full)
 	{
 
 		try {
 			JSONObject r = new JSONObject();
 			JSONArray a = new JSONArray();
 
-			ResultSet rs = surveysQueryStatement.executeQuery();
+			if(full <= 0){
+				ResultSet rs = surveysQueryStatement.executeQuery();
 
-			while(rs.next()){
-				String id = rs.getString("id");
-				a.add(epUrl + "mobsos/surveys/" + id);
+				while(rs.next()){
+					String id = rs.getString("id");
+					a.add(epUrl + "mobsos/surveys/" + id);
+				}
+
+				r.put("surveys", a);
+
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setStatus(200);
+				return result;
+			} else {
+				ResultSet rs = surveysFullQueryStatement.executeQuery();
+
+				if (!rs.isBeforeFirst()){
+					r.put("surveys", a);
+					HttpResponse result = new HttpResponse(r.toJSONString());
+					result.setStatus(200);
+					return result;
+				}
+
+				while(rs.next()){
+					JSONObject survey = readSurveyFromResultSet(rs);
+					survey.put("url", epUrl + "mobsos/surveys/" + survey.get("id"));
+					a.add(survey);
+				}
+
+				r.put("surveys", a);
+
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setStatus(200);
+				return result;
 			}
-
-			r.put("surveys", a);
-
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setStatus(200);
-			return result;
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -307,6 +353,7 @@ public class SurveyService extends Service {
 	 * @return
 	 */
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
 	public HttpResponse getSurvey(@PathParam("id") int id){
 
@@ -321,7 +368,8 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-
+		
+			rs.next();
 			JSONObject r = readSurveyFromResultSet(rs);
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(200);
@@ -1099,26 +1147,47 @@ public class SurveyService extends Service {
 	 */
 	@GET
 	@Path("questionnaires")
-	public HttpResponse getQuestionnaires()
+	public HttpResponse getQuestionnaires(@QueryParam(defaultValue = "0", name = "f") int full)
 	{
-
 		try {
 			JSONObject r = new JSONObject();
 			JSONArray a = new JSONArray();
 
-			ResultSet rs = questionnairesQueryStatement.executeQuery();
+			if(full <=0){
+				ResultSet rs = questionnairesQueryStatement.executeQuery();
 
-			while(rs.next()){
-				String id = rs.getString("id");
-				a.add(epUrl + "mobsos/questionnaires/" + id);
+				while(rs.next()){
+					String id = rs.getString("id");
+					a.add(epUrl + "mobsos/questionnaires/" + id);
+				}
+
+				r.put("questionnaires", a);
+
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setStatus(200);
+				return result;
+			} else {
+				ResultSet rs = questionnairesFullQueryStatement.executeQuery();
+
+				if (!rs.isBeforeFirst()){
+					r.put("questionnaires", a);
+					HttpResponse result = new HttpResponse(r.toJSONString());
+					result.setStatus(200);
+					return result;
+				}
+
+				while(rs.next()){
+					JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
+					questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
+					a.add(questionnaire);
+				}
+
+				r.put("questionnaires", a);
+
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setStatus(200);
+				return result;
 			}
-
-			r.put("questionnaires", a);
-
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setStatus(200);
-			return result;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			HttpResponse result = new HttpResponse("");
@@ -1206,7 +1275,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-
+			rs.next();
 			JSONObject r = readQuestionnaireFromResultSet(rs);
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(200);
@@ -1405,11 +1474,12 @@ public class SurveyService extends Service {
 			// before storing to database validate questionnaire form
 			try{
 				form = validateQuestionnaireData(formXml);
-			} catch(IOException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-				result.setStatus(500);
-				return result;
+				System.out.println("Document Element: " + form.getDocumentElement().getNodeName());
+				if(!form.getDocumentElement().getNodeName().equals("qu:Questionnaire")){
+					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: Document element must be 'qu:Questionnaire'.");
+					result.setStatus(400);
+					return result;
+				}
 
 			} catch (SAXException e){
 				e.printStackTrace();
@@ -1557,7 +1627,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	@GET
 	@Path("surveys/{id}/answers")
 	public HttpResponse retrieveQuestionnaireAnswersNoCommunity(@PathParam("id") int id){
@@ -1723,7 +1793,7 @@ public class SurveyService extends Service {
 		}
 		return res.toJSONString();
 	}
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/answers")
@@ -1835,7 +1905,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	/*
 	@POST
 	@Consumes(MediaType.TEXT_XML)
@@ -2068,68 +2138,52 @@ public class SurveyService extends Service {
 	 * Marshals survey data in a result set from the MobSOS database to a JSON representation.
 	 */
 	private JSONObject readSurveyFromResultSet(ResultSet rs) throws SQLException{
-		if(rs == null){
-			return null; 
-		}
 
-		if(rs.next()){
-			JSONObject o = new JSONObject();
+		JSONObject o = new JSONObject();
 
-			o.put("id",rs.getInt("id"));
-			o.put("name",rs.getString("name"));
-			o.put("description",rs.getString("description"));
-			o.put("owner",rs.getString("owner"));
-			o.put("organization", rs.getString("organization"));
-			o.put("logo", rs.getString("logo"));
-			o.put("resource",rs.getString("resource"));
-			o.put("qid",rs.getInt("qid"));
+		o.put("id",rs.getInt("id"));
+		o.put("name",rs.getString("name"));
+		o.put("description",rs.getString("description"));
+		o.put("owner",rs.getString("owner"));
+		o.put("organization", rs.getString("organization"));
+		o.put("logo", rs.getString("logo"));
+		o.put("resource",rs.getString("resource"));
+		o.put("qid",rs.getInt("qid"));
 
 
-			long ts_start = rs.getTimestamp("start").getTime();
-			long ts_end = rs.getTimestamp("end").getTime();
+		long ts_start = rs.getTimestamp("start").getTime();
+		long ts_end = rs.getTimestamp("end").getTime();
 
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			String d_start = dateFormat.format(new Date(ts_start));
-			String d_end = dateFormat.format(new Date(ts_end));
+		String d_start = dateFormat.format(new Date(ts_start));
+		String d_end = dateFormat.format(new Date(ts_end));
 
-			//System.out.println(ts_start + " -> " + d_start);
-			//System.out.println(ts_end + " -> " + d_end);
+		//System.out.println(ts_start + " -> " + d_start);
+		//System.out.println(ts_end + " -> " + d_end);
 
-			o.put("start",d_start);
-			o.put("end",d_end);
+		o.put("start",d_start);
+		o.put("end",d_end);
 
-			return o;
-
-		} else {
-			return null;
-		}
+		return o;
 	}
 
 	/**
 	 * Marshals questionnaire data in a result set from the MobSOS database to a JSON representation.
 	 */
 	private JSONObject readQuestionnaireFromResultSet(ResultSet rs) throws SQLException{
-		if(rs == null){
-			return null; 
-		}
 
-		if(rs.next()){
-			JSONObject o = new JSONObject();
+		JSONObject o = new JSONObject();
 
-			o.put("id",rs.getInt("id"));
-			o.put("name",rs.getString("name"));
-			o.put("description",rs.getString("description"));
-			o.put("owner",rs.getString("owner"));
-			o.put("organization", rs.getString("organization"));
-			o.put("logo", rs.getString("logo"));
+		o.put("id",rs.getInt("id"));
+		o.put("name",rs.getString("name"));
+		o.put("description",rs.getString("description"));
+		o.put("owner",rs.getString("owner"));
+		o.put("organization", rs.getString("organization"));
+		o.put("logo", rs.getString("logo"));
 
-			return o;
-
-		} else {
-			return null;
-		}
+		return o;
 	}
 
 	/**
@@ -2358,6 +2412,7 @@ public class SurveyService extends Service {
 
 		surveyInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end ) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 		surveysQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".survey");
+		surveysFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey order by name");
 		surveysDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey");
 
 		surveyQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
@@ -2368,6 +2423,7 @@ public class SurveyService extends Service {
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
 		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire");
+		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire order by name");
 		questionnairesDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
 
 		questionnaireQueryStatement = connection.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
@@ -2418,11 +2474,11 @@ public class SurveyService extends Service {
 		validator.validate(new DOMSource(doc));
 		return doc;
 	}
-	
+
 	private JSONObject convertAnswerXMLtoJSON(Document answer){
-		
+
 		JSONObject result = new JSONObject();
-		
+
 		NodeList qs = answer.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
 
 		for (int i = 0; i < qs.getLength(); i++) {
@@ -2433,7 +2489,7 @@ public class SurveyService extends Service {
 		}
 		return result;
 	}
-	
+
 	private JSONObject validateAnswer(Document form, JSONObject answer){
 		JSONObject result = new JSONObject();
 
@@ -2444,12 +2500,12 @@ public class SurveyService extends Service {
 
 		Iterator<String> ait = answer.keySet().iterator();
 		while(ait.hasNext()){
-			
+
 			String qid = ait.next();
 			String qval = (String) answer.get(qid);
-		
+
 			//System.out.println("Submitted Question ID: "+q.getAttribute("qid"));
-			
+
 			// if question provided in answer is not contained in questionnaire, the answer does not match the questionnaire.
 			if(!questions.keySet().contains(qid)){
 				throw new IllegalArgumentException("Questionnaire answer does not match form! Question ID "+qid+" is not defined in questionnaire.");
@@ -2461,7 +2517,7 @@ public class SurveyService extends Service {
 			// for each type check further constraints
 			String type = (String) question.get("type");
 			if(type.equals("qu:DichotomousQuestionPageType")){
-				
+
 				// for dichotomous questions the only two possible answers are 0 and 1.
 				if(!qval.equals("0") && !qval.equals("1")){
 					throw new IllegalArgumentException("Questionnaire answer does not match questionnaire! The value submitted for question "+qid+" is expected to be either 0 or 1, but was "+qval+"!");
@@ -2517,7 +2573,7 @@ public class SurveyService extends Service {
 		JSONObject result = new JSONObject();
 
 		JSONObject questions = extractQuestionInformation(form);
-		
+
 		System.out.println(convertAnswerXMLtoJSON(answer));
 
 		// then iterate over all question items in the submitted answer and check, if 

@@ -1,8 +1,8 @@
 echo IMPORTANT: the following curl tests require valid credentials. Run 'ant all' to generate a LAS2peer test user agent 'UserA'. The agent's login can be extracted from the file ./etc/startup/agent-user-UserA.xml. It is the numeric value contained in the id-element. The agent's password is set to a default value "userAPass". Whenever you rerun 'ant all', new public/private keys and a new id are generated for the test user agent. Do not forget to adapt credentials in curl calls!
 
 set endpoint=http://localhost:8080/mobsos
-set cred1=5830973071816504729:userAPass
-set cred2=5593111138118188637:userBPass
+set cred1=-1129441051103213434:userAPass
+set cred2=-7951771804140944940:userBPass
 
 echo "create new questionnaire 1"
 curl -v -X POST %endpoint%/questionnaires --user %cred1% -H "Content-Type: application/json" -d "{\"name\":\"Learning Layers Standard Application Success Questionnaire\",\"description\":\"A questionnaire to assess the success of an application developed by the Learning Layers project in different dimensions of success.\",\"organization\":\"Learning Layers\",\"logo\":\"http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png\"}"
