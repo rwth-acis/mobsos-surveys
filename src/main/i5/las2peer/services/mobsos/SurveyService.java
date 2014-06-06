@@ -368,7 +368,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-		
+
 			rs.next();
 			JSONObject r = readSurveyFromResultSet(rs);
 			HttpResponse result = new HttpResponse(r.toJSONString());
@@ -628,6 +628,7 @@ public class SurveyService extends Service {
 		}
 
 	}
+
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
@@ -1144,54 +1145,54 @@ public class SurveyService extends Service {
 	/**
 	 * Retrieves a list of all questionnaires.
 	 * @return
+	 * @throws SQLException 
 	 */
 	@GET
 	@Path("questionnaires")
-	public HttpResponse getQuestionnaires(@QueryParam(defaultValue = "0", name = "f") int full)
+	public HttpResponse getQuestionnaires(@QueryParam(defaultValue = "0", name = "f") int full, @QueryParam(defaultValue = "D", name = "q") String query) throws SQLException
 	{
-		try {
-			JSONObject r = new JSONObject();
-			JSONArray a = new JSONArray();
+		JSONObject r = new JSONObject();
+		JSONArray a = new JSONArray();
 
-			if(full <=0){
-				ResultSet rs = questionnairesQueryStatement.executeQuery();
+		if(full <=0){
+			questionnairesQueryStatement.clearParameters();
+			questionnairesQueryStatement.setString(1,query);
 
-				while(rs.next()){
-					String id = rs.getString("id");
-					a.add(epUrl + "mobsos/questionnaires/" + id);
-				}
+			ResultSet rs = questionnairesQueryStatement.executeQuery();
 
+			while(rs.next()){
+				String id = rs.getString("id");
+				a.add(epUrl + "mobsos/questionnaires/" + id);
+			}
+
+			r.put("questionnaires", a);
+
+			HttpResponse result = new HttpResponse(r.toJSONString());
+			result.setStatus(200);
+			return result;
+		} else {
+			questionnairesFullQueryStatement.clearParameters();
+			questionnairesFullQueryStatement.setString(1,query);
+
+			ResultSet rs = questionnairesFullQueryStatement.executeQuery();
+
+			if (!rs.isBeforeFirst()){
 				r.put("questionnaires", a);
-
-				HttpResponse result = new HttpResponse(r.toJSONString());
-				result.setStatus(200);
-				return result;
-			} else {
-				ResultSet rs = questionnairesFullQueryStatement.executeQuery();
-
-				if (!rs.isBeforeFirst()){
-					r.put("questionnaires", a);
-					HttpResponse result = new HttpResponse(r.toJSONString());
-					result.setStatus(200);
-					return result;
-				}
-
-				while(rs.next()){
-					JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
-					questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
-					a.add(questionnaire);
-				}
-
-				r.put("questionnaires", a);
-
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setStatus(200);
 				return result;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("");
-			result.setStatus(500);
+
+			while(rs.next()){
+				JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
+				questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
+				a.add(questionnaire);
+			}
+
+			r.put("questionnaires", a);
+
+			HttpResponse result = new HttpResponse(r.toJSONString());
+			result.setStatus(200);
 			return result;
 		}
 	}
@@ -2422,8 +2423,8 @@ public class SurveyService extends Service {
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
-		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire");
-		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire order by name");
+		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire where name like '?'");
+		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire where name like '?' order by name");
 		questionnairesDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
 
 		questionnaireQueryStatement = connection.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
