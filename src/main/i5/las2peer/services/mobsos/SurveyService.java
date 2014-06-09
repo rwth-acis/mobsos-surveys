@@ -1204,6 +1204,7 @@ public class SurveyService extends Service {
 	@POST
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
+		System.out.println("???At least entering here???");
 		try {
 			JSONObject o;
 
@@ -1214,11 +1215,14 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
+			
+			System.out.println("About to store questionnaire: " + o.toJSONString());
 
 			int qid = storeNewQuestionnaire(o);
 
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
+			System.out.println("Return JSON: *" + r.toJSONString() + "*");
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(201);
 

@@ -106,6 +106,7 @@ public class SurveyServiceTest {
 		user1 = MockAgentFactory.getAdam();
 		user2 = MockAgentFactory.getAbel();
 		user3 = MockAgentFactory.getEve();
+		
 
 		Agent[] as;
 
@@ -877,6 +878,7 @@ public class SurveyServiceTest {
 		try{
 			// first add a new questionnaire
 			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			System.out.println("Response after post questionnaire: " + r.getResponse());
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
 
