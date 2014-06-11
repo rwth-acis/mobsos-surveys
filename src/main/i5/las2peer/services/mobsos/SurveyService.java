@@ -161,6 +161,8 @@ public class SurveyService extends Service {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 
 		// print out REST mapping for this service
@@ -1149,15 +1151,21 @@ public class SurveyService extends Service {
 	 */
 	@GET
 	@Path("questionnaires")
-	public HttpResponse getQuestionnaires(@QueryParam(defaultValue = "0", name = "f") int full, @QueryParam(defaultValue = "D", name = "q") String query) throws SQLException
+	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "0" ) int full, @QueryParam(name="q",defaultValue="") String query)
 	{
+		System.out.println("Entering here?");
+		try{
 		JSONObject r = new JSONObject();
 		JSONArray a = new JSONArray();
 
 		if(full <=0){
+			System.out.println("Questionnaire return type: URL");
+			
 			questionnairesQueryStatement.clearParameters();
-			questionnairesQueryStatement.setString(1,query);
-
+			questionnairesQueryStatement.setString(1,"%" + query + "%");
+			questionnairesQueryStatement.setString(2,"%" + query + "%");
+			questionnairesQueryStatement.setString(3,"%" + query + "%");
+			
 			ResultSet rs = questionnairesQueryStatement.executeQuery();
 
 			while(rs.next()){
@@ -1171,12 +1179,16 @@ public class SurveyService extends Service {
 			result.setStatus(200);
 			return result;
 		} else {
+			System.out.println("Questionnaire return type: full");
 			questionnairesFullQueryStatement.clearParameters();
-			questionnairesFullQueryStatement.setString(1,query);
-
+			questionnairesFullQueryStatement.setString(1,"%" + query + "%");
+			questionnairesFullQueryStatement.setString(2,"%" + query + "%");
+			questionnairesFullQueryStatement.setString(3,"%" + query + "%");
+			
 			ResultSet rs = questionnairesFullQueryStatement.executeQuery();
 
 			if (!rs.isBeforeFirst()){
+				System.out.println("Empty result");
 				r.put("questionnaires", a);
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setStatus(200);
@@ -1193,6 +1205,16 @@ public class SurveyService extends Service {
 
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(200);
+			return result;
+		}} catch(SQLException e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
+			result.setStatus(500);
+			return result;
+		} catch(Exception e){
+			e.printStackTrace();
+			HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
+			result.setStatus(500);
 			return result;
 		}
 	}
@@ -2427,8 +2449,8 @@ public class SurveyService extends Service {
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
-		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire where name like '?'");
-		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire where name like '?' order by name");
+		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire where name like ? or description like ? or organization like ?");
+		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire where name like ? or description like ? or organization like ? order by name");
 		questionnairesDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
 
 		questionnaireQueryStatement = connection.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
