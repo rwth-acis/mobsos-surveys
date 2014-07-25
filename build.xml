@@ -13,7 +13,7 @@
 	
     <property name="service_agent.path" value="${startup}/agent-service-${service.name}.xml" />
     <property name="user_agent1.path" value="${startup}/agent-user-${las2peer_user1.name}.xml" />
-	<property name="user_agent2.path" value="${startup}/agent-user-${las2peer_user2.name}.xml" />
+	<property name="anonymous_agent.path" value="${startup}/agent-user-${las2peer_anonymous.name}.xml" />
 	<property name="passphrases.path" value="${startup}/passphrases.txt" />
 	
     <presetdef name="javac">
@@ -266,7 +266,7 @@
     </target>
 	
 	<available file="${user_agent1.path}" property="agent1_exists"/>
-	<available file="${user_agent2.path}" property="agent2_exists"/>
+	<available file="${anonymous_agent.path}" property="agent2_exists"/>
 	
     <target name="generate_user_agent1" depends="jar" unless="agent1_exists">
         <echo message="Writing User Agent 1 XML to ${user_agent1.path}"/>
@@ -280,19 +280,19 @@
         </java>
     </target>
 	
-	<target name="generate_user_agent2" depends="jar" unless="agent2_exists">
-		<echo message="Writing User Agent 2 XML to ${user_agent2.path}"/>
+	<target name="generate_anonymous_agent" depends="jar" unless="agent2_exists">
+		<echo message="Writing User Agent 2 XML to ${anonymous_agent.path}"/>
         <java classname="i5.las2peer.tools.UserAgentGenerator"
             classpathref="libraries"
             failonerror="true"
             fork="true"
-            output="${user_agent2.path}"
+            output="${anonymous_agent.path}"
             >
             <arg line="'${las2peer_user2.password}' '${las2peer_user2.name}' '${las2peer_user2.email}'"/>
         </java>
     </target>
 	
-    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1, generate_user_agent2">
+    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1, generate_anonymous_agent">
 <echo file="${passphrases.path}" append="false">agent-service-${service.name}.xml;${service.password}
 agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}
 agent-user-${las2peer_user2.name}.xml;${las2peer_user2.password}
