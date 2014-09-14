@@ -35,9 +35,6 @@ package i5.las2peer.services.mobsos;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import i5.las2peer.p2p.LocalNode;
-import i5.las2peer.restMapper.MediaType;
-import i5.las2peer.restMapper.RESTMapper;
-import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.ServiceAgent;
@@ -48,16 +45,10 @@ import i5.las2peer.webConnector.client.ClientResponse;
 import i5.las2peer.webConnector.client.MiniClient;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -81,8 +72,6 @@ public class SurveyServiceTest {
 
 	private static UserAgent user1, user2, user3;
 	private static GroupAgent group1, group2;
-
-	private static final String testPass = "adamspass";
 
 	private static final String testServiceClass = "i5.las2peer.services.mobsos.SurveyService";
 
@@ -144,7 +133,7 @@ public class SurveyServiceTest {
 
 		c1 = new MiniClient();
 		c1.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c1.setLogin(Long.toString(user1.getId()), testPass);
+		c1.setLogin(Long.toString(user1.getId()), "adamsPass");
 
 		c2 = new MiniClient();
 		c2.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
@@ -162,13 +151,12 @@ public class SurveyServiceTest {
 		try
 		{
 			System.out.println("waiting..");
-			Thread.sleep(5000);
+			Thread.sleep(3000);
 		}
 		catch(InterruptedException e)
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -946,21 +934,42 @@ public class SurveyServiceTest {
 
 	@Test
 	public void testSearchQuestionnaires(){
-		// test with user agent
-
+		
 		try
 		{
-			// first add two new questionnaires
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-			c1.sendRequest("POST", "mobsos/questionnaires",generateNeedleQuestionnaireJSON().toJSONString());
+			//first delete all questionnaires
+			long before, after;
+			long t = 500;
+			
+			before = System.currentTimeMillis();
+			ClientResponse dr = c2.sendRequest("DELETE", "mobsos/questionnaires","");
+			after = System.currentTimeMillis();
+			
+			System.out.println("Request DELETE mobsos/questionnaires processed in " + (after-before) + "ms");
+			assertEquals(true, ((after-before) < t));
+			assertEquals(200, dr.getHttpCode());
+			
+			// then add two new questionnaires
+			before = System.currentTimeMillis();
+			c2.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			after = System.currentTimeMillis();
+			System.out.println("Request POST mobsos/questionnaires processed in " + (after-before) + "ms");
+			assertEquals(true, ((after-before) < t));
+			
+			c2.sendRequest("POST", "mobsos/questionnaires",generateNeedleQuestionnaireJSON().toJSONString());
 
 			System.out.println("Getting all questionnaires full:");
-			ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires?full=1","");
-			System.out.println("Response" + result.getResponse());
-			assertEquals(200,result.getHttpCode());
+			before = System.currentTimeMillis();
+			ClientResponse c3result=c3.sendRequest("GET", "mobsos/questionnaires?full=1","");
+			after = System.currentTimeMillis();
+			System.out.println("Request GET mobsos/questionnaires?full=1 processed in " + (after-before) + "ms");
+			ClientResponse c2result=c2.sendRequest("GET", "mobsos/questionnaires?full=1","");
+			
+			assertEquals(200,c2result.getHttpCode());
+			assertEquals(200,c3result.getHttpCode());
 			
 			System.out.println("Retrieve needle in haystack:");
-			result=c1.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack&full=1","");
+			ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
 			System.out.println("Response" + result.getResponse());
 			assertEquals(200,result.getHttpCode());
 		}

@@ -4,6 +4,8 @@
 /startup
 /log
 /lib
+/ssl
+./node-storage/*
 etc/ivy/ivy.jar
 /service
 /etc/startup

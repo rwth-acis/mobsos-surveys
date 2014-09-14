@@ -33,36 +33,18 @@ package i5.las2peer.services.mobsos;
 
 import i5.las2peer.api.Service;
 import i5.las2peer.p2p.AgentNotKnownException;
-import i5.las2peer.restMapper.HttpResponse;
-import i5.las2peer.restMapper.MediaType;
-import i5.las2peer.restMapper.RESTMapper;
-import i5.las2peer.restMapper.annotations.Consumes;
-import i5.las2peer.restMapper.annotations.ContentParam;
-import i5.las2peer.restMapper.annotations.DELETE;
-import i5.las2peer.restMapper.annotations.GET;
-import i5.las2peer.restMapper.annotations.POST;
-import i5.las2peer.restMapper.annotations.PUT;
-import i5.las2peer.restMapper.annotations.Path;
-import i5.las2peer.restMapper.annotations.PathParam;
-import i5.las2peer.restMapper.annotations.Produces;
-import i5.las2peer.restMapper.annotations.QueryParam;
-import i5.las2peer.restMapper.annotations.Version;
+import i5.las2peer.restMapper.*;
+import i5.las2peer.restMapper.annotations.*;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
-import i5.las2peer.tools.GroupAgentGenerator;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -76,7 +58,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.TimeZone;
@@ -84,6 +65,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.DataSource;
 import javax.xml.XMLConstants;
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
@@ -94,6 +76,14 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.ConnectionFactory;
+import org.apache.commons.dbcp2.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp2.PoolableConnection;
+import org.apache.commons.dbcp2.PoolableConnectionFactory;
+import org.apache.commons.dbcp2.PoolingDataSource;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -119,7 +109,12 @@ import org.xml.sax.SAXException;
 @Version("0.1")
 public class SurveyService extends Service {
 
+	private final static String Q_SEARCH_QUESTIONNAIRE = "select id from questionnaire where name like ? or description like ? or organization like ?";
+	private final static String Q_SEARCH_QUESTIONNAIRE_FULL = "select * from questionnaire where name like ? or description like ? or organization like ? order by name";
+
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
+
+	private static BasicDataSource dataSource;
 
 	private Connection connection;
 	private PreparedStatement surveyInsertStatement, surveysQueryStatement, surveysDeleteStatement;
@@ -128,7 +123,6 @@ public class SurveyService extends Service {
 	private PreparedStatement questionnaireInsertStatement, questionnairesQueryStatement, questionnairesDeleteStatement;
 	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement;
 	private PreparedStatement questionnaireUploadFormStatement, questionnaireDownloadFormStatement;
-
 	private PreparedStatement submitQuestionAnswerStatement, submitQuestionAnswerStatementNoC;
 
 	private DocumentBuilder parser;
@@ -145,28 +139,97 @@ public class SurveyService extends Service {
 	private PreparedStatement questionnairesFullQueryStatement;
 
 	public SurveyService(){
+
 		// set values from configuration file
 		this.setFieldValues();
 
 		this.monitor = true;
 
 		try {
-			initDatabaseConnection();
+			//initDatabaseConnection();
 			initXMLInfrastructure();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 
+		try {
+			Class.forName(jdbcDriverClassName);
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		System.out.println("Setting up Data Source...");
+		setupDataSource();
+		System.out.println("Done.");
+		
+		printDataSourceStats(dataSource);
+
+		/*
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+
+		try {
+			System.out.println("Creating connection.");
+			conn = dataSource.getConnection();
+			System.out.println("Creating prepared statement.");
+			stmt = conn.prepareStatement("select id from questionnaire");
+
+			System.out.println("While: ");
+			printDataSourceStats(dataSource);
+
+			System.out.println("Executing statement.");
+			rset = stmt.executeQuery();
+			System.out.println("Results:");
+			int numcols = rset.getMetaData().getColumnCount();
+			while(rset.next()) {
+				for(int i=1;i<=numcols;i++) {
+					System.out.print("\t" + rset.getString(i));
+				}
+				System.out.println("");
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} catch(UnsupportedOperationException e){
+			System.err.println(e.getMessage());
+			e.printStackTrace();
+		} 
+		finally {
+			try { if (rset != null) rset.close(); } catch(Exception e) { }
+			try { if (stmt != null) stmt.close(); } catch(Exception e) { }
+			try { if (conn != null) conn.close(); } catch(Exception e) { }
+		}
+
+		System.out.println("Afterwards: ");
+		printDataSourceStats(dataSource);
+
+		 */
+
 		// print out REST mapping for this service
 		//System.out.println(getRESTMapping());
+	}
+
+	public void setupDataSource() {
+		dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(jdbcDriverClassName);
+		dataSource.setUsername(jdbcLogin);
+		dataSource.setPassword(jdbcPass);
+		dataSource.setUrl(jdbcUrl + jdbcSchema);
+		dataSource.setValidationQuery("select 1");
+	}
+
+	public static void printDataSourceStats(DataSource ds) {
+		System.out.println("Data Source Stats: ");
+		BasicDataSource bds = (BasicDataSource) ds;
+		System.out.println("  Num Active: " + bds.getNumActive());
+		System.out.println("  Num Idle: " + bds.getNumIdle());
+		System.out.println("  Max Idle: " + bds.getMaxIdle());
+		System.out.println("  Max Total: " + bds.getMaxTotal());
+		System.out.println("  Max Conn Lifetime Millis: " + bds.getMaxConnLifetimeMillis());
+		System.out.println("  Min Idle: " + bds.getMinIdle());
+		System.out.println("  Min Evictable Idletime Millis: " + bds.getMinEvictableIdleTimeMillis());
+		System.out.println("  Validation Query: " + bds.getValidationQuery());
 	}
 
 	// authentication done by Web Connector
@@ -174,7 +237,7 @@ public class SurveyService extends Service {
 	@GET
 	@Path("auth")
 	public HttpResponse authenticate(){
-		HttpResponse result = new HttpResponse("");
+		HttpResponse result = new HttpResponse("Success");
 		result.setStatus(200);
 		return result;
 	}
@@ -1073,8 +1136,6 @@ public class SurveyService extends Service {
 				return qresp;
 			}
 
-
-
 			surveySetQuestionnaireStatement.clearParameters();
 			surveySetQuestionnaireStatement.setInt(1, qid);
 			surveySetQuestionnaireStatement.setInt(2, id);
@@ -1151,65 +1212,69 @@ public class SurveyService extends Service {
 	 */
 	@GET
 	@Path("questionnaires")
-	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "0" ) int full, @QueryParam(name="q",defaultValue="") String query)
+	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query)
 	{
-		System.out.println("Entering here?");
 		try{
-		JSONObject r = new JSONObject();
-		JSONArray a = new JSONArray();
+			JSONObject r = new JSONObject(); //result to return in HTTP response
+			JSONArray qs = new JSONArray(); // variable for collecting questionnaires from DB
 
-		if(full <=0){
-			System.out.println("Questionnaire return type: URL");
-			
-			questionnairesQueryStatement.clearParameters();
-			questionnairesQueryStatement.setString(1,"%" + query + "%");
-			questionnairesQueryStatement.setString(2,"%" + query + "%");
-			questionnairesQueryStatement.setString(3,"%" + query + "%");
-			
-			ResultSet rs = questionnairesQueryStatement.executeQuery();
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-			while(rs.next()){
-				String id = rs.getString("id");
-				a.add(epUrl + "mobsos/questionnaires/" + id);
+			// use query for questionnaire id per default
+			String sQuery = Q_SEARCH_QUESTIONNAIRE;
+
+			// if query param full is provided greater 0, then use query for full questionnaire data set.
+			if(full > 0){
+				sQuery = Q_SEARCH_QUESTIONNAIRE_FULL;
 			}
 
-			r.put("questionnaires", a);
+			// +++ dsi 
+			try{
+				c = dataSource.getConnection();
+				s = c.prepareStatement(sQuery);
+				s.setString(1,"%" + query + "%");
+				s.setString(2,"%" + query + "%");
+				s.setString(3,"%" + query + "%");
 
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setStatus(200);
-			return result;
-		} else {
-			System.out.println("Questionnaire return type: full");
-			questionnairesFullQueryStatement.clearParameters();
-			questionnairesFullQueryStatement.setString(1,"%" + query + "%");
-			questionnairesFullQueryStatement.setString(2,"%" + query + "%");
-			questionnairesFullQueryStatement.setString(3,"%" + query + "%");
-			
-			ResultSet rs = questionnairesFullQueryStatement.executeQuery();
+				rs = s.executeQuery();
 
-			if (!rs.isBeforeFirst()){
-				System.out.println("Empty result");
-				r.put("questionnaires", a);
-				HttpResponse result = new HttpResponse(r.toJSONString());
-				result.setStatus(200);
+				// in case result set is empty...
+				if (!rs.isBeforeFirst()){
+					r.put("questionnaires", qs);
+					HttpResponse result = new HttpResponse(r.toJSONString());
+					result.setStatus(200);
+					return result;
+				}
+
+				// in case result set contains entries...
+				while(rs.next()){
+					if(full>0){
+						JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
+						questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
+						qs.add(questionnaire);	
+					} else {
+						String id = rs.getString("id");
+						qs.add(epUrl + "mobsos/questionnaires/" + id);
+					}
+				}
+
+			} catch (Exception e){
+				e.printStackTrace();
+				HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
+				result.setStatus(500);
 				return result;
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace();}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace();}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace();}
 			}
+			// --- dsi
 
-			while(rs.next()){
-				JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
-				questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
-				a.add(questionnaire);
-			}
-
-			r.put("questionnaires", a);
-
+			r.put("questionnaires", qs);
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(200);
-			return result;
-		}} catch(SQLException e){
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
-			result.setStatus(500);
 			return result;
 		} catch(Exception e){
 			e.printStackTrace();
@@ -1227,7 +1292,6 @@ public class SurveyService extends Service {
 	@POST
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
-		System.out.println("???At least entering here???");
 		try {
 			JSONObject o;
 
@@ -1238,14 +1302,11 @@ public class SurveyService extends Service {
 				result.setStatus(400);
 				return result;
 			}
-			
-			System.out.println("About to store questionnaire: " + o.toJSONString());
 
 			int qid = storeNewQuestionnaire(o);
 
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
-			System.out.println("Return JSON: *" + r.toJSONString() + "*");
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(201);
 
@@ -1266,18 +1327,46 @@ public class SurveyService extends Service {
 	@DELETE
 	@Path("questionnaires")
 	public HttpResponse deleteQuestionnaires(){
-		try {
-			questionnairesDeleteStatement.executeUpdate();
-			connection.commit();
+		
+		System.out.println("Deleting all questionnaires...");
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
 
+		try {
+			conn = dataSource.getConnection();
+			stmt = conn.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
+			stmt.executeUpdate();
+			
 			HttpResponse result = new HttpResponse("");
 			result.setStatus(200);
 			return result;
-		} catch (Exception e) {
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("");
+			
+		} catch(SQLException e) {
+			HttpResponse result = new HttpResponse(e.getMessage());
 			result.setStatus(500);
 			return result;
+		} catch(UnsupportedOperationException e){
+			HttpResponse result = new HttpResponse(e.getMessage());
+			result.setStatus(500);
+			return result;
+		} 
+		finally {
+			try { if (rset != null) rset.close(); } catch(Exception e) {
+				HttpResponse result = new HttpResponse(e.getMessage());
+				result.setStatus(500);
+				return result;
+			}
+			try { if (stmt != null) stmt.close(); } catch(Exception e) {
+				HttpResponse result = new HttpResponse(e.getMessage());
+				result.setStatus(500);
+				return result;
+			}
+			try { if (conn != null) conn.close(); } catch(Exception e) {
+				HttpResponse result = new HttpResponse(e.getMessage());
+				result.setStatus(500);
+				return result;
+			}
 		}
 	}
 
@@ -2381,26 +2470,44 @@ public class SurveyService extends Service {
 	 */
 	private int storeNewSurvey(JSONObject survey) throws IllegalArgumentException, SQLException{
 
-		surveyInsertStatement.clearParameters();
-		surveyInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
-		surveyInsertStatement.setString(2, (String) survey.get("organization"));
-		surveyInsertStatement.setString(3, (String) survey.get("logo"));
-		surveyInsertStatement.setString(4, (String) survey.get("name"));
-		surveyInsertStatement.setString(5, (String) survey.get("description"));
-		surveyInsertStatement.setString(6, (String) survey.get("resource"));
-		surveyInsertStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("start")).getTimeInMillis()));
-		surveyInsertStatement.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("end")).getTimeInMillis()));
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
 
-		surveyInsertStatement.executeUpdate();
-		ResultSet rs = surveyInsertStatement.getGeneratedKeys();
+		try {
+			conn = dataSource.getConnection();
+			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end ) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		
+			stmt.clearParameters();
+			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
+			stmt.setString(2, (String) survey.get("organization"));
+			stmt.setString(3, (String) survey.get("logo"));
+			stmt.setString(4, (String) survey.get("name"));
+			stmt.setString(5, (String) survey.get("description"));
+			stmt.setString(6, (String) survey.get("resource"));
+			stmt.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("start")).getTimeInMillis()));
+			stmt.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("end")).getTimeInMillis()));
 
-		connection.commit();
+			stmt.executeUpdate();
+			ResultSet rs = stmt.getGeneratedKeys();
 
-		if (rs.next()) {
-			return rs.getInt(1);
-		} else {
-			throw new NoSuchElementException("No new id was created");
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else {
+				throw new NoSuchElementException("No new survey was created!");
+			}
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} catch(UnsupportedOperationException e){
+			e.printStackTrace();
+		} 
+		finally {
+			try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); }
+			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace();}
+			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); }
 		}
+		return -1;
 	}
 
 	/**
@@ -2409,23 +2516,41 @@ public class SurveyService extends Service {
 	 */
 	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException{
 
-		questionnaireInsertStatement.clearParameters();
-		questionnaireInsertStatement.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
-		questionnaireInsertStatement.setString(2, (String) questionnaire.get("organization"));
-		questionnaireInsertStatement.setString(3, (String) questionnaire.get("logo"));
-		questionnaireInsertStatement.setString(4, (String) questionnaire.get("name"));
-		questionnaireInsertStatement.setString(5, (String) questionnaire.get("description"));
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
 
-		questionnaireInsertStatement.executeUpdate();
-		ResultSet rs = questionnaireInsertStatement.getGeneratedKeys();
+		try {
+			conn = dataSource.getConnection();
+			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
+			
+			stmt.clearParameters();
+			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
+			stmt.setString(2, (String) questionnaire.get("organization"));
+			stmt.setString(3, (String) questionnaire.get("logo"));
+			stmt.setString(4, (String) questionnaire.get("name"));
+			stmt.setString(5, (String) questionnaire.get("description"));
 
-		connection.commit();
+			stmt.executeUpdate();
+			ResultSet rs = stmt.getGeneratedKeys();
 
-		if (rs.next()) {
-			return rs.getInt(1);
-		} else {
-			throw new NoSuchElementException("No new id was created");
+			if (rs.next()) {
+				return rs.getInt(1);
+			} else {
+				throw new NoSuchElementException("No new questionnaire was created!");
+			}
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} catch(UnsupportedOperationException e){
+			e.printStackTrace();
+		} 
+		finally {
+			try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); }
+			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace();}
+			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); }
 		}
+		return -1;
 	}
 
 	/**
@@ -2449,8 +2574,6 @@ public class SurveyService extends Service {
 		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 
 		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
-		questionnairesQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".questionnaire where name like ? or description like ? or organization like ?");
-		questionnairesFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".questionnaire where name like ? or description like ? or organization like ? order by name");
 		questionnairesDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
 
 		questionnaireQueryStatement = connection.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");

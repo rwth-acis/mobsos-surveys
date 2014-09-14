@@ -2,7 +2,7 @@ drop schema if exists mobsos;
 create schema if not exists mobsos default character set utf8 collate utf8_general_ci;
 use mobsos;
 
-grant usage on *.* to acdsense@localhost identified by 'dito'; 
+grant usage on *.* to mobsos@localhost identified by 'mobsosrules'; 
 grant all privileges on mobsos.* to acdsense@localhost;
 
 -- -----------------------------------------------------
@@ -23,7 +23,6 @@ create table questionnaire (
 create index idx_q_own on questionnaire (owner);
 create index idx_q_org on questionnaire (organization);
 create index idx_q_log on questionnaire (logo);
-create fulltext index idx_q_dsc on questionnaire (description);
 
 -- -----------------------------------------------------
 -- Definition table 'survey'
@@ -51,8 +50,7 @@ create table survey (
 create index idx_s_owner on survey(owner);
 create index idx_s_org on survey (organization);
 create index idx_s_log on survey (logo);
-create fulltext index idx_s_topic on survey(resource);
-create fulltext index idx_s_desc on survey(description);
+create index idx_s_topic on survey(resource);
 
 -- -----------------------------------------------------
 -- Definition table 'survey_context'
