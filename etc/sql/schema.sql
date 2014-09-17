@@ -3,7 +3,7 @@ create schema if not exists mobsos default character set utf8 collate utf8_gener
 use mobsos;
 
 grant usage on *.* to mobsos@localhost identified by 'mobsosrules'; 
-grant all privileges on mobsos.* to acdsense@localhost;
+grant all privileges on mobsos.* to mobsos@localhost;
 
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
