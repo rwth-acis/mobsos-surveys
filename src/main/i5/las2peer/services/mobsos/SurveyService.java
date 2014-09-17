@@ -27,7 +27,7 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+ */
 
 package i5.las2peer.services.mobsos;
 
@@ -177,6 +177,8 @@ public class SurveyService extends Service {
 	@Path("questionnaires")
 	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query)
 	{
+		String onAction = "retrieving questionnaires";
+
 		try{
 			JSONObject r = new JSONObject(); //result to return in HTTP response
 			JSONArray qs = new JSONArray(); // variable for collecting questionnaires from DB
@@ -225,13 +227,11 @@ public class SurveyService extends Service {
 
 			} catch (Exception e){
 				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
-				result.setStatus(500);
-				return result;
+				return internalError(onAction);
 			} finally {
-				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace();}
-				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace();}
-				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace();}
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
 			// --- dsi
 
@@ -241,9 +241,7 @@ public class SurveyService extends Service {
 			return result;
 		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Could not retrieve questionnaires (f=" + full + "). Cause: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
@@ -255,6 +253,9 @@ public class SurveyService extends Service {
 	@POST
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
+
+		String onAction = "creating new questionnaire";
+
 		try {
 			JSONObject o;
 
@@ -277,9 +278,7 @@ public class SurveyService extends Service {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("");
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
@@ -291,7 +290,8 @@ public class SurveyService extends Service {
 	@Path("questionnaires")
 	public HttpResponse deleteQuestionnaires(){
 
-		System.out.println("Deleting all questionnaires...");
+		String onAction = "deleting all questionnaires";
+
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
@@ -305,31 +305,13 @@ public class SurveyService extends Service {
 			result.setStatus(200);
 			return result;
 
-		} catch(SQLException e) {
-			HttpResponse result = new HttpResponse(e.getMessage());
-			result.setStatus(500);
-			return result;
-		} catch(UnsupportedOperationException e){
-			HttpResponse result = new HttpResponse(e.getMessage());
-			result.setStatus(500);
-			return result;
+		} catch(SQLException | UnsupportedOperationException e) {
+			return internalError(onAction);
 		} 
 		finally {
-			try { if (rset != null) rset.close(); } catch(Exception e) {
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(500);
-				return result;
-			}
-			try { if (stmt != null) stmt.close(); } catch(Exception e) {
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(500);
-				return result;
-			}
-			try { if (conn != null) conn.close(); } catch(Exception e) {
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(500);
-				return result;
-			}
+			try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 		}
 	}
 
@@ -343,27 +325,45 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}")
 	public HttpResponse getQuestionnaire(@PathParam("id") int id){
 
+		String onAction = "retrieving questionnaire " + id;
 		try {
-			questionnaireQueryStatement.clearParameters();
-			questionnaireQueryStatement.setInt(1, id);
 
-			ResultSet rs = questionnaireQueryStatement.executeQuery();
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
 
-			if (!rs.isBeforeFirst()){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist!");
-				result.setStatus(404);
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
+				stmt.setInt(1, id);
+
+				rset = stmt.executeQuery();
+
+				if (!rset.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist!");
+					result.setStatus(404);
+					return result;
+				}
+				rset.next();
+				JSONObject r = readQuestionnaireFromResultSet(rset);
+
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setStatus(200);
 				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			}
-			rs.next();
-			JSONObject r = readQuestionnaireFromResultSet(rs);
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setStatus(200);
-			return result;
-		} catch (Exception e) {
+		}
+
+		catch (Exception e) {
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal Error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
@@ -599,7 +599,7 @@ public class SurveyService extends Service {
 	{
 
 		String onAction = "retrieving surveys";
-		
+
 		try{
 			JSONObject r = new JSONObject(); //result to return in HTTP response
 			JSONArray qs = new JSONArray(); // variable for collecting surveys from DB
@@ -677,7 +677,7 @@ public class SurveyService extends Service {
 	public HttpResponse createSurvey(@ContentParam String content)
 	{
 		String onAction = "creating new survey";
-		
+
 		try {
 			JSONObject o;
 
@@ -712,9 +712,9 @@ public class SurveyService extends Service {
 	@DELETE
 	@Path("surveys")
 	public HttpResponse deleteSurveys(){
-		
+
 		String onAction = "deleting surveys";
-		
+
 		try{
 			Connection c = null;
 			PreparedStatement s = null;
@@ -759,7 +759,7 @@ public class SurveyService extends Service {
 	public HttpResponse getSurvey(@PathParam("id") int id){
 
 		String onAction = "retrieving survey " + id;
-		
+
 		try{
 			JSONObject r = new JSONObject(); //result to return in HTTP response
 			JSONArray qs = new JSONArray(); // variable for collecting surveys from DB
@@ -869,7 +869,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	/**
 	 * Deletes a survey with a given id. The respective survey may only be deleted, if the active agent is the survey's owner.
 	 * 
@@ -1268,7 +1268,7 @@ public class SurveyService extends Service {
 		}
 	}
 
-	
+
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -1569,9 +1569,9 @@ public class SurveyService extends Service {
 
 		}
 	}
-	
+
 	// ---- community-aware extensions (TODO later)
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/questionnaire/{cid}")
@@ -1857,7 +1857,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	
+
 	@GET
 	@Path("surveys/{id}/answers/{cid}")
 	public HttpResponse retrieveQuestionnaireAnswersForCommunity(@PathParam("id") int id, @PathParam("cid") long cid){
@@ -2079,7 +2079,7 @@ public class SurveyService extends Service {
 		 */
 		return adaptedform;
 	}
-	
+
 	/**
 	 * Checks if survey or questionnaire exists and active agent is owner.
 	 * 
@@ -2118,7 +2118,7 @@ public class SurveyService extends Service {
 		}
 
 	}
-	
+
 	/**
 	 * TODO: documentation
 	 * 
@@ -2819,7 +2819,7 @@ public class SurveyService extends Service {
 		result.setStatus(500);
 		return result;
 	}
-	
+
 	private void setupDataSource() {
 		dataSource = new BasicDataSource();
 		dataSource.setDefaultAutoCommit(true);
