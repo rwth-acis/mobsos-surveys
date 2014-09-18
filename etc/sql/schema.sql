@@ -53,22 +53,9 @@ create index idx_s_log on survey (logo);
 create index idx_s_topic on survey(resource);
 
 -- -----------------------------------------------------
--- Definition table 'survey_context'
+-- Definition table 'response'
 -- -----------------------------------------------------
-create table survey_context ( 
-	sid mediumint not null,
-	qid mediumint not null,
-	aid mediumint not null,
-	constraint struct_pk primary key (sid,qid,aid),
-	constraint struct_fk_sid foreign key (sid) references survey(id)
-		on delete cascade
-		on update no action,
-	constraint struct_fk_qid foreign key (qid) references questionnaire(id)
-		on delete cascade
-		on update no action 
-);
-
-create table survey_result (
+create table response (
 	id bigint not null auto_increment,
 	uid varchar(128) not null,
 	cid varchar(128),
@@ -82,4 +69,17 @@ create table survey_result (
 		on delete cascade
 		on update no action
 );	
+
+create table survey_context ( 
+	sid mediumint not null,
+	qid mediumint not null,
+	aid mediumint not null,
+	constraint struct_pk primary key (sid,qid,aid),
+	constraint struct_fk_sid foreign key (sid) references survey(id)
+		on delete cascade
+		on update no action,
+	constraint struct_fk_qid foreign key (qid) references questionnaire(id)
+		on delete cascade
+		on update no action 
+);
 

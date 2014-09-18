@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 import i5.las2peer.api.Service;
-import i5.las2peer.p2p.AgentNotKnownException;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
@@ -41,12 +40,12 @@ import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
 import i5.las2peer.restMapper.annotations.GET;
 import i5.las2peer.restMapper.annotations.POST;
+import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
 import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Produces;
 import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
-import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
 
@@ -57,7 +56,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -104,7 +102,25 @@ import org.xml.sax.SAXException;
  * 
  * MobSOS Survey Service
  * 
- * TODO: add class documentation
+ * A RESTful service for the management, conduction and processing of online surveys. 
+ * 
+ * The data model behind this service consists of three main entities: surveys, questionnaires and responses. 
+ * A questionnaire is described by basic metadata and – most essentially – a form. Any questionnaire 
+ * can be re-used in an arbitrary number of surveys. Surveys serve as management contexts for the collection 
+ * of responses to a given questionnaire. A survey is described by basic metadata, a start and optional end-time, 
+ * a subject URI linking to an arbitrary resource being target of the survey, a reference to a predefined questionnaire, 
+ * and a number of responses. A response is described by an optional identifier of the survey participant, the time of 
+ * submitting the response, and a completed questionnaire form. For questionnaire forms, MobSOS comes with an XML Schema
+ * defining scale, dichotomous, and free-text items, but - given the inherent extensibility of XML - being open for 
+ * further extensions.
+ * 
+ * This service is part of the MobSOS collection of services, which is mainly dedicated to 
+ * exploring, modeling, and measuring Community Information System Success (CISS) as a complex 
+ * construct established by multiple dimensions and factors. As part of MobSOS, the Survey Service 
+ * enables to collect subjective data on CISS, that is not retrievable from automatically monitored data.
+ * 
+ * However, the design of this service and its underlying data model is deliberately kept as 
+ * generic and independent as possible and should thus be applicable for any kind of online survey.
  * 
  * @author Dominik Renzel
  *
@@ -117,15 +133,6 @@ public class SurveyService extends Service {
 
 	private static BasicDataSource dataSource;
 
-	private Connection connection;
-	private PreparedStatement surveyInsertStatement, surveysQueryStatement, surveysDeleteStatement;
-	private PreparedStatement surveyQueryStatement, surveyCheckOwnerStatement, surveyDeleteStatement, surveyUpdateStatement, surveySetQuestionnaireStatement;
-
-	private PreparedStatement questionnaireInsertStatement, questionnairesQueryStatement, questionnairesDeleteStatement;
-	private PreparedStatement questionnaireQueryStatement, questionnaireCheckOwnerStatement, questionnaireDeleteStatement, questionnaireUpdateStatement;
-	private PreparedStatement questionnaireUploadFormStatement, questionnaireDownloadFormStatement;
-	private PreparedStatement submitQuestionAnswerStatement, submitQuestionAnswerStatementNoC;
-
 	private DocumentBuilder parser;
 	private Validator validator;
 
@@ -133,11 +140,6 @@ public class SurveyService extends Service {
 	private String jdbcDriverClassName;
 	private String jdbcUrl, jdbcSchema;
 	private String jdbcLogin, jdbcPass;
-
-	private PreparedStatement surveyGetQuestionnaireIdStatement;
-
-	private PreparedStatement surveysFullQueryStatement;
-	private PreparedStatement questionnairesFullQueryStatement;
 
 	public SurveyService(){
 
@@ -161,6 +163,7 @@ public class SurveyService extends Service {
 		}
 
 		// set up data source (as alternative to regular connection)
+		// TODO: move up, as soon as old init database obsolete
 		setupDataSource();
 		printDataSourceStats(dataSource);
 
@@ -168,12 +171,16 @@ public class SurveyService extends Service {
 		//System.out.println(getRESTMapping());
 	}
 
+	// ============= QUESTIONNAIRE-RELATED RESOURCES ==============
+
 	/**
+	 * TODO: write documentation
 	 * Retrieves a list of all questionnaires.
 	 * @return
 	 * @throws SQLException 
 	 */
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
 	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query)
 	{
@@ -246,11 +253,14 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation 
+	 * 
 	 * Creates a new questionnaire.
 	 * @param content
 	 * @return
 	 */
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
 
@@ -259,16 +269,20 @@ public class SurveyService extends Service {
 		try {
 			JSONObject o;
 
+			// first parse passed questionnaire data 
 			try{
 				o = parseQuestionnaire(content);
 			} catch (IllegalArgumentException | ParseException e){
-				HttpResponse result = new HttpResponse(e.getMessage());
+				// if passed data is invalid, respond error to user
+				HttpResponse result = new HttpResponse("Invalid questionnaire! " + e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
 
+			// store valid questionnaire to database
 			int qid = storeNewQuestionnaire(o);
 
+			// respond to user with newly created id/URL
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
 			HttpResponse result = new HttpResponse(r.toJSONString());
@@ -283,6 +297,8 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation
+	 * 
 	 * Deletes all questionnaires at once without any check for ownership. 
 	 * This method should be only be used for development and with absolute caution!
 	 */
@@ -316,16 +332,19 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation
 	 * Retrieves information for a given questionnaire.
 	 * 
 	 * @param id
 	 * @return
 	 */
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
 	public HttpResponse getQuestionnaire(@PathParam("id") int id){
 
 		String onAction = "retrieving questionnaire " + id;
+
 		try {
 
 			Connection conn = null;
@@ -368,67 +387,92 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation
+	 * 
 	 * Updates a survey with a given id. The respective survey may only be deleted, if the active agent is the survey's owner.
 	 * 
 	 * @param id
 	 * @return
 	 */
-	@POST
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
 	public HttpResponse updateQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
-		try {
-			int exown;
-			exown = checkExistenceOwnership(id,1);
+		String onAction = "updating questionnaire " + id;
 
-			// check if questionnaire exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-			// if questionnaire exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " may only be deleted by its owner.");
-				result.setStatus(401);
-				return result;
-			}
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-			// if survey exists and active agent is owner, proceed.
-
-			JSONObject o;
-			// parse and validate content. If invalid, return 400 (bad request)
+			// +++ dsi 
 			try{
-				o = parseQuestionnaire(content);
-			} catch (IllegalArgumentException | ParseException e){
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(400);
+
+				int exown;
+				exown = checkExistenceOwnership(id,1);
+
+				// check if questionnaire exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if questionnaire exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " may only be updated by its owner.");
+					result.setStatus(401);
+					return result;
+				}
+
+				// Proceed, if survey exists and active agent is owner 
+
+				// parse and validate content. If invalid, return 400 (bad request)
+				JSONObject o;
+
+				try{
+					o = parseQuestionnaire(content);
+				} catch (IllegalArgumentException | ParseException e){
+					// respond with 400, if content for updated questionnaire is not valid
+					HttpResponse result = new HttpResponse("Invalid questionnaire data! " + e.getMessage());
+					result.setStatus(400);
+					return result;
+				}
+
+				// if parsed content is ok, execute update
+				s = c.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=? where id = ?");
+
+				s.setString(1, (String) o.get("organization") );
+				s.setString(2, (String) o.get("logo") );
+				s.setString(3, (String) o.get("name") );
+				s.setString(4, (String) o.get("description") );
+				s.setInt(5, id);
+
+				s.executeUpdate();
+
+				HttpResponse result = new HttpResponse("Questionnaire " + id + " updated successfully.");
+				result.setStatus(200);
 				return result;
+
+			} catch (Exception e){
+				e.printStackTrace();
+				return internalError(onAction);
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
+			// --- dsi
 
-			questionnaireUpdateStatement.clearParameters();
-			questionnaireUpdateStatement.setString(1, (String) o.get("organization") );
-			questionnaireUpdateStatement.setString(2, (String) o.get("logo") );
-			questionnaireUpdateStatement.setString(3, (String) o.get("name") );
-			questionnaireUpdateStatement.setString(4, (String) o.get("description") );
-			questionnaireUpdateStatement.setInt(5, id);
-
-			questionnaireUpdateStatement.executeUpdate();
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Questionnaire " + id + " updated.");
-			result.setStatus(200);
-			return result;
-
-		} catch (Exception e) {
+		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal Error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
 	/**
+	 * TODO: write documentation
+	 * 
 	 * Deletes a questionnaire with a given id. The respective questionnaire may only be deleted, if the active agent is the questionnaire's owner.
 	 * 
 	 * @param id
@@ -437,158 +481,228 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}")
 	public HttpResponse deleteQuestionnaire(@PathParam("id") int id){
 
-		try {
+		String onAction = "deleting questionnaire " + id;
 
-			int exown = checkExistenceOwnership(id,1);
-
-			// check if questionnaire exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-			// if questionnaire exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " may only be deleted by its owner.");
-				result.setStatus(401);
-				return result;
-			}
-
-			questionnaireDeleteStatement.clearParameters();
-			questionnaireDeleteStatement.setInt(1, id);
-
-			int r = questionnaireDeleteStatement.executeUpdate();
-			connection.commit();
-
-			HttpResponse result;
-
-			result = new HttpResponse("Questionnaire " + id + " deleted.");
-			result.setStatus(200);
-
-			return result;
-		} catch (Exception e) {
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("");
-			result.setStatus(500);
-			return result;
-		}
-	}
-
-	@GET
-	@Path("questionnaires/{id}/form")
-	public HttpResponse downloadQuestionnaireForm(@PathParam("id") int id){
 		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-			// check if questionnaire exists; if not, return 404.
-			int exown = checkExistenceOwnership(id,1);
-
-			// check if questionnaire exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-
-			questionnaireDownloadFormStatement.clearParameters();
-			questionnaireDownloadFormStatement.setInt(1, id);
-
-			ResultSet rs = questionnaireDownloadFormStatement.executeQuery();
-
-			if (!rs.isBeforeFirst()){
-				HttpResponse result = new HttpResponse("Form for questionnaire " + id + " does not exist!");
-				result.setStatus(404);
-				return result;
-			}
-
-			rs.next();
-
-			String formXml = rs.getString(1);
-			// before returning form, make sure it's still valid (may be obsolete step...)
+			// +++ dsi 
 			try{
-				validateQuestionnaireData(formXml);
-				HttpResponse result = new HttpResponse(formXml);
-				result.setStatus(200);
-				return result;
-			} catch(IOException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-				result.setStatus(500);
-				return result;
 
-			} catch (SAXException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
+				// first check if questionnaire to be deleted exists and current agent is owner.
+				int exown = checkExistenceOwnership(id,1);
 
-		} catch (Exception e){
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
-		}
-	}
-
-	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy
-	@Path("questionnaires/{id}/form")
-	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
-		try {
-			int exown = checkExistenceOwnership(id,1);
-
-			// check if questionnaire exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-			// if questionnaire exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Form for questionnaire " + id + "  may only be uploaded by its owner.");
-				result.setStatus(401);
-				return result;
-			}
-
-			Document form;
-			// before storing to database validate questionnaire form
-			try{
-				form = validateQuestionnaireData(formXml);
-				System.out.println("Document Element: " + form.getDocumentElement().getNodeName());
-				if(!form.getDocumentElement().getNodeName().equals("qu:Questionnaire")){
-					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: Document element must be 'qu:Questionnaire'.");
-					result.setStatus(400);
+				// check if questionnaire exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if questionnaire exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " may only be deleted by its owner!");
+					result.setStatus(401);
 					return result;
 				}
 
-			} catch (SAXException e){
-				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
+				// Proceed, iff questionnaire exists and active agent is owner.
+				c = dataSource.getConnection();
+				s = c.prepareStatement("delete from "+ jdbcSchema + ".questionnaire where id = ?");
+				s.setInt(1, id);
+
+				int r = s.executeUpdate();
+
+				HttpResponse result = new HttpResponse("Questionnaire " + id + " deleted successfully.");
+				result.setStatus(200);
 				return result;
+
+			} catch (Exception e){
+				e.printStackTrace();
+				return internalError(onAction);
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
-
-			// if form XML is valid, then store it to database
-			questionnaireUploadFormStatement.clearParameters();
-			questionnaireUploadFormStatement.setString(1, formXml);
-			questionnaireUploadFormStatement.setInt(2, id);
-
-			questionnaireUploadFormStatement.executeUpdate();
-
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
-			result.setStatus(200);
-			return result;
+			// --- dsi
 
 		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
 	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.TEXT_XML)
+	@Path("questionnaires/{id}/form")
+	public HttpResponse downloadQuestionnaireForm(@PathParam("id") int id){
+
+		String onAction = "downloading form for questionnaire " + id;
+
+		try{
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+
+				// check if questionnaire exists; if not, return 404.
+				int exown = checkExistenceOwnership(id,1);
+
+				// check if questionnaire exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+
+				// if questionnaire exists, retrieve form
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select form from " + jdbcSchema + ".questionnaire where id = ?");
+				stmt.setInt(1, id);
+
+				ResultSet rs = stmt.executeQuery();
+
+				// if questionnaire does not define a form yet, respond with not found
+				// this error should not occur in regular operation!
+				if (!rs.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not define a form!");
+					result.setStatus(404);
+					return result;
+				}
+
+				// questionnaire defines a form; validate and respond to user
+				rs.next();
+				String formXml = rs.getString(1);
+
+				// before returning form, make sure it's still valid (TODO: think about removing check after testing)
+				try{
+					validateQuestionnaireData(formXml);
+					HttpResponse result = new HttpResponse(formXml);
+					result.setStatus(200);
+					return result;
+				} catch(IOException e){
+					e.printStackTrace();
+					return internalError(onAction);
+
+				} catch (SAXException e){
+					e.printStackTrace();
+					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+					result.setStatus(400);
+					return result;
+				}
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+
+	/**
+	 * TODO: write documentation
+	 * @param id
+	 * @param formXml
+	 * @return
+	 */
+	@PUT
+	@Consumes(MediaType.TEXT_XML)
+	@Path("questionnaires/{id}/form")
+	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
+
+		String onAction = "uploading form for questionnaire " + id;
+
+		try{
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+
+				// 
+				int exown = checkExistenceOwnership(id,1);
+
+				// check if questionnaire exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if questionnaire exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Form for questionnaire " + id + "  may only be uploaded by its owner.");
+					result.setStatus(401);
+					return result;
+				}
+
+
+				// before storing to database validate questionnaire form
+				try{
+					// validate form XML against MobSOS Survey XML Schema. Since the schema also defines valid responses, a next check
+					// is needed to make sure the passed and valid XML is a questionnaire form, and not a response. 
+					Document form = validateQuestionnaireData(formXml);
+
+					if(!form.getDocumentElement().getNodeName().equals("qu:Questionnaire")){
+						HttpResponse result = new HttpResponse("Document is not a questionnaire form! Cause: Document element must be 'qu:Questionnaire'.");
+						result.setStatus(400);
+						return result;
+					}
+
+				} catch (SAXException e){
+					e.printStackTrace();
+					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
+					result.setStatus(400);
+					return result;
+				}
+
+				// store valid form to database
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("update "+ jdbcSchema + ".questionnaire set form=? where id = ?");
+
+				stmt.setString(1, formXml);
+				stmt.setInt(2, id);
+				stmt.executeUpdate();
+
+				// respond to user
+				HttpResponse result = new HttpResponse("Form upload for questionnaire " + id + " successful.");
+				result.setStatus(200);
+				return result;
+
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+
+	// ============= SURVEY-RELATED RESOURCES ==============
+
+	/**
+	 * TODO: write documentation 
 	 * Retrieves a list of all surveys.
 	 * @return
 	 */
@@ -611,12 +725,11 @@ public class SurveyService extends Service {
 			// use query for survey id per default
 			String sQuery = "select id from survey where name like ? or description like ? or organization like ?";
 
-			// if query param full is provided greater 0, then use query for full questionnaire data set.
+			// if query parameter full is provided greater 0, then use query for full questionnaire data set.
 			if(full > 0){
 				sQuery = "select * from survey where name like ? or description like ? or organization like ? order by name";
 			}
 
-			// +++ dsi 
 			try{
 				c = dataSource.getConnection();
 				s = c.prepareStatement(sQuery);
@@ -654,12 +767,12 @@ public class SurveyService extends Service {
 				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
-			// --- dsi
 
 			r.put("surveys", qs);
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(200);
 			return result;
+
 		} catch(Exception e){
 			e.printStackTrace();
 			return internalError(onAction);
@@ -667,36 +780,41 @@ public class SurveyService extends Service {
 	}
 
 	/**
-	 * Creates a new survey
+	 * TODO: write documentation
 	 * 
-	 * @param content
+	 * @param data
 	 * 
 	 */
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys")
-	public HttpResponse createSurvey(@ContentParam String content)
+	public HttpResponse createSurvey(@ContentParam String data)
 	{
 		String onAction = "creating new survey";
 
 		try {
 			JSONObject o;
 
+			// first parse survey data passed by user
 			try{
-				o = parseSurvey(content);
+				o = parseSurvey(data);
 			} catch (IllegalArgumentException | ParseException e){
+				// if passed content is invalid for some reason, notify user
 				e.printStackTrace();
-				HttpResponse result = new HttpResponse(e.getMessage());
+				HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
 
+			// if passed content is valid, store as new survey
 			int sid = storeNewSurvey(o);
 
+			// respond to user with newly generated survey id/URL
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/surveys/" + sid);
+
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setStatus(201);
-
 			return result;
 
 		} catch (Exception e) {
@@ -706,6 +824,7 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation with clear warning!!!!
 	 * Deletes all surveys at once without any check for ownership. 
 	 * This method should be only be used for development and with absolute caution!
 	 */
@@ -748,6 +867,7 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation
 	 * Retrieves information for a given survey
 	 * 
 	 * @param id
@@ -762,7 +882,6 @@ public class SurveyService extends Service {
 
 		try{
 			JSONObject r = new JSONObject(); //result to return in HTTP response
-			JSONArray qs = new JSONArray(); // variable for collecting surveys from DB
 
 			Connection c = null;
 			PreparedStatement s = null;
@@ -770,19 +889,21 @@ public class SurveyService extends Service {
 
 			// +++ dsi 
 			try{
+				// query for given survey
 				c = dataSource.getConnection();
 				s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
-
 				s.setInt(1,id);
 
 				rs = s.executeQuery();
 
+				// if survey does not exist, respond to user with not found
 				if (!rs.isBeforeFirst()){
 					HttpResponse result = new HttpResponse("Survey " + id + " does not exist!");
 					result.setStatus(404);
 					return result;
 				}
 
+				// if survey was found, respond to user with JSON result
 				rs.next();
 				r = readSurveyFromResultSet(rs);
 				HttpResponse result = new HttpResponse(r.toJSONString());
@@ -807,70 +928,93 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * TODO: write documentation
 	 * Updates a survey with a given id. The respective survey may only be deleted, if the active agent is the survey's owner.
 	 * 
 	 * @param id
 	 * @return
 	 */
-	@POST //TODO: replace by PUT as soon as new Web Connector version is available via ivy.
+	@PUT
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
 	public HttpResponse updateSurvey(@PathParam("id") int id, @ContentParam String content){
 
-		try {
-			int exown;
-			exown = checkExistenceOwnership(id,0);
+		String onAction = "updating survey " + id;
 
-			// check if survey exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
-				result.setStatus(404);
-				return result;
-			} 
-			// if survey exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Survey " + id + " may only be deleted by its owner.");
-				result.setStatus(401);
-				return result;
-			}
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-			// if survey exists and active agent is owner, proceed.
-
-			JSONObject o;
-			// parse and validate content. If invalid, return 400 (bad request)
+			// +++ dsi 
 			try{
-				o = parseSurvey(content);
-			} catch (IllegalArgumentException | ParseException e){
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(400);
+
+				int exown;
+				// survey may only be updated if survey exists and active agent is owner
+				exown = checkExistenceOwnership(id,0);
+
+				// check if survey exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if survey exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Survey " + id + " may only be deleted by its owner.");
+					result.setStatus(401);
+					return result;
+				}
+
+				// if survey exists and active agent is owner, proceed.
+
+				JSONObject o;
+				// parse and validate content. If invalid, return 400 (bad request)
+				try{
+					o = parseSurvey(content);
+				} catch (IllegalArgumentException | ParseException e){
+					HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
+					result.setStatus(400);
+					return result;
+				}
+
+				c = dataSource.getConnection();
+				s = c.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
+
+				s.setString(1, (String) o.get("organization"));
+				s.setString(2, (String) o.get("logo"));
+				s.setString(3, (String) o.get("name"));
+				s.setString(4, (String) o.get("description"));
+				s.setString(5, (String) o.get("resource"));
+				s.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
+				s.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
+				s.setInt(8, id);
+
+				s.executeUpdate();
+
+				HttpResponse result = new HttpResponse("Survey " + id + " updated successfully.");
+				result.setStatus(200);
 				return result;
+
+			} catch (Exception e){
+				e.printStackTrace();
+				return internalError(onAction);
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
+			// --- dsi
 
-			surveyUpdateStatement.clearParameters();
-			surveyUpdateStatement.setString(1, (String) o.get("organization"));
-			surveyUpdateStatement.setString(2, (String) o.get("logo"));
-			surveyUpdateStatement.setString(3, (String) o.get("name"));
-			surveyUpdateStatement.setString(4, (String) o.get("description"));
-			surveyUpdateStatement.setString(5, (String) o.get("resource"));
-			surveyUpdateStatement.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
-			surveyUpdateStatement.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
-			surveyUpdateStatement.setInt(8, id);
-
-			surveyUpdateStatement.executeUpdate();
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Survey " + id + " updated.");
-			result.setStatus(200);
-			return result;
-
-		} catch (Exception e) {
+		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal Error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
+
 	}
 
 	/**
+	 * TODO: write documentation
 	 * Deletes a survey with a given id. The respective survey may only be deleted, if the active agent is the survey's owner.
 	 * 
 	 * @param id
@@ -879,47 +1023,82 @@ public class SurveyService extends Service {
 	@Path("surveys/{id}")
 	public HttpResponse deleteSurvey(@PathParam("id") int id){
 
-		try {
+		String onAction = "deleting survey " + id;
 
-			int exown = checkExistenceOwnership(id,0);
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-			// check if survey exists; if not, return 404.
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
-				result.setStatus(404);
+			// +++ dsi 
+			try{
+
+				// first check if survey to be deleted exists and current agent is owner.
+				int exown = checkExistenceOwnership(id,0);
+
+				// check if survey exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if survey exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Survey " + id + " may only be deleted by its owner.");
+					result.setStatus(401);
+					return result;
+				}
+
+				// if survey exists and active agent is owner, perform deletion
+				c = dataSource.getConnection();
+				s = c.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
+				s.setInt(1, id);
+
+				int r = s.executeUpdate();
+
+				// TODO: check return value of update to see if deletion really occurred
+				System.out.println("Result: " + r);
+
+				HttpResponse result = new HttpResponse("Survey " + id + " deleted successfully.");
+				result.setStatus(200);
 				return result;
-			} 
-			// if survey exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Survey " + id + " may only be deleted by its owner.");
-				result.setStatus(401);
-				return result;
+
+			} catch (Exception e){
+				e.printStackTrace();
+				return internalError(onAction);
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
 			}
+			// --- dsi
 
-			surveyDeleteStatement.clearParameters();
-			surveyDeleteStatement.setInt(1, id);
-
-			int r = surveyDeleteStatement.executeUpdate();
-			connection.commit();
-
-			HttpResponse result;
-
-			result = new HttpResponse("Survey " + id + " deleted.");
-			result.setStatus(200);
-
-			return result;
-		} catch (Exception e) {
+		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("");
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	@Path("surveys/{id}/questionnaire")
+	@Path("surveys/{id}/form")
 	public HttpResponse getSurveyQuestionnaireFormHTML(@PathParam("id") int id){
+
+		String onAction = "downloading questionnaire form for survey " + id;
+
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rset = null;
+		String formXml;
+
+		// -----------------
+
 		try{
 
 			// retrieve survey data; if survey does not exist, return 404.
@@ -931,31 +1110,43 @@ public class SurveyService extends Service {
 
 			JSONObject survey = (JSONObject) JSONValue.parse(r.getResult());
 
-			// check if survey has the questionnaire id field qid set. If not, return 404 with a respective message.
+			// check if survey has the questionnaire id field qid set. If not, return not found.
 			if(null == survey.get("qid")){
 				HttpResponse result = new HttpResponse("Questionnaire not set for survey " + id + ".");
 				result.setStatus(404);
 				return result;
 			}
 
+			// if questionnaire was found, download questionnaire form
 			long qid = (Long) survey.get("qid");
 
-			// now download questionnaire form from database
-			questionnaireDownloadFormStatement.clearParameters();
-			questionnaireDownloadFormStatement.setLong(1, qid);
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select form from " + jdbcSchema + ".questionnaire where id = ?");
+				stmt.setLong(1, qid);
+				ResultSet rs = stmt.executeQuery();
 
-			ResultSet rs = questionnaireDownloadFormStatement.executeQuery();
+				// if no form was uploaded for questionnaire, respond to user with not found
+				if (!rs.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("Form for questionnaire " + qid + " does not exist!");
+					result.setStatus(404);
+					return result;
+				}
 
-			if (!rs.isBeforeFirst()){
-				HttpResponse result = new HttpResponse("Form for questionnaire " + qid + " does not exist!");
-				result.setStatus(404);
-				return result;
+				rs.next();
+
+				formXml = rs.getString(1);
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			}
 
-			rs.next();
-
-			String formXml = rs.getString(1);
-
+			// adapt form template to concrete survey and user
 			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),null);
 
 			Document form;
@@ -964,9 +1155,7 @@ public class SurveyService extends Service {
 				form = validateQuestionnaireData(adaptedFormXml);
 			} catch(IOException e){
 				e.printStackTrace();
-				HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-				result.setStatus(500);
-				return result;
+				return internalError(onAction);
 			} catch (SAXException e){
 				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
@@ -974,10 +1163,15 @@ public class SurveyService extends Service {
 				return result;
 			}
 
+			// now start to transform XML into ready-to-use HTML
+
+			// start off with template
 			String text = new Scanner(new File("./doc/xml/questionnaire-template.html")).useDelimiter("\\A").next();
 
+			// do all adaptation to user and survey
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), null);
 
+			// add HTML elements for all questionnaire items accordingly
 			Vector<String> qpages = new Vector<String>();
 			Vector<String> navpills = new Vector<String>();
 
@@ -989,6 +1183,8 @@ public class SurveyService extends Service {
 				Node node = nodeList.item(i);
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) node;
+
+					// differentiate between possible item types and add HTML accordingly
 					if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
 
 						// first add nav pill item
@@ -1092,100 +1288,144 @@ public class SurveyService extends Service {
 
 		} catch (Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @param content
+	 * @return
+	 */
 	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/questionnaire")
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
-		try {
-			int exown;
-			exown = checkExistenceOwnership(id,0);
+		String onAction = "setting questionnaire for survey " + id;
 
-			// check if survey exists; if not, return 404.
+		try{
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+
+				int exown;
+				exown = checkExistenceOwnership(id,0);
+
+				// check if survey exists; if not, return 404.
+				if(exown == -1){
+					HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
+					result.setStatus(404);
+					return result;
+				} 
+				// if survey exists, check if active agent is owner. if not, return 401.
+				else if (exown == 0){
+					HttpResponse result = new HttpResponse("Survey " + id + " may only be managed by its owner.");
+					result.setStatus(401);
+					return result;
+				}
+
+				// if survey exists and active agent is owner, proceed.
+
+				JSONObject o;
+
+				// parse and validate content. If invalid, return 400 (bad request)
+				try{
+					o = (JSONObject) JSONValue.parseWithException(content);
+				} catch (ParseException e){
+					HttpResponse result = new HttpResponse(e.getMessage());
+					result.setStatus(400);
+					return result;
+				}
+
+				if(!(o.size() == 1 && o.keySet().contains("qid"))) {
+					HttpResponse result = new HttpResponse("Invalid JSON for setting questionnaire! Must only contain one field qid!");
+					result.setStatus(400);
+					return result;
+				}
+
+				// now check if questionnaire really exists
+				int qid = Integer.parseInt(o.get("qid")+"");
+				HttpResponse qresp = getQuestionnaire(qid);
+
+				if(qresp.getStatus()!=200){
+					return qresp;
+				}
+
+				// TODO: at this point we need to check, if users already submitted responses. What to do in this case to avoid data loss?
+				// Responses should under no circumstances be deleted! Idea: respond with a forbidden error that asks user to first clear all 
+				// responses before changing questionnaire. Requires DELETE support in resource surveys/{id}/responses.
+
+				int responses = countResponses(id);
+
+				if(responses > 0){
+					String msg = "Forbidden to change questionnaire, because end-user responses exist! " 
+							+ "To resolve this problem, first make sure to export existing survey response data. " 
+							+ "Then delete existing responses data with a DELETE to resource surveys/"+id+"/responses." 
+							+ "Then try again to change questionnaire.";
+
+					HttpResponse forb = new HttpResponse(msg);
+					forb.setStatus(403);
+					return forb;
+				}
+
+				// if no responses are available, continue and change questionnaire
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("update "+ jdbcSchema + ".survey set qid=? where id =?");
+
+				stmt.setInt(1, qid);
+				stmt.setInt(2, id);
+				stmt.executeUpdate();
+
+				HttpResponse result = new HttpResponse("Questionnaire for survey " + id + " set successfully.");
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+
+	/**
+	 * TODO: write documentation
+	 * 
+	 * For given survey retrieves all responses submitted by end-users in convenient CSV format
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.TEXT_CSV)
+	@Path("surveys/{id}/responses")
+	public HttpResponse retrieveSurveyResponses(@PathParam("id") int id){
+
+		String onAction = "retrieving responses for survey " + id;
+
+		try{
+			int exown = checkExistenceOwnership(id,0);
+
+			// check if survey exists. If not, respond with not found.
 			if(exown == -1){
 				HttpResponse result = new HttpResponse("Survey " + id + " does not exist.");
 				result.setStatus(404);
 				return result;
-			} 
-			// if survey exists, check if active agent is owner. if not, return 401.
-			else if (exown == 0){
-				HttpResponse result = new HttpResponse("Survey " + id + " may only be managed by its owner.");
-				result.setStatus(401);
-				return result;
 			}
 
-			// if survey exists and active agent is owner, proceed.
-
-			JSONObject o;
-
-			// parse and validate content. If invalid, return 400 (bad request)
-			try{
-				o = (JSONObject) JSONValue.parseWithException(content);
-			} catch (ParseException e){
-				HttpResponse result = new HttpResponse(e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
-
-			if(!(o.size() == 1 && o.keySet().contains("qid"))) {
-				HttpResponse result = new HttpResponse("Invalid JSON for setting questionnaire! Must only contain one field qid!");
-				result.setStatus(400);
-				return result;
-			}
-
-			// now check if questionnaire really exists
-			int qid = Integer.parseInt(o.get("qid")+"");
-			HttpResponse qresp = getQuestionnaire(qid);
-
-			if(qresp.getStatus()!=200){
-				return qresp;
-			}
-
-			surveySetQuestionnaireStatement.clearParameters();
-			surveySetQuestionnaireStatement.setInt(1, qid);
-			surveySetQuestionnaireStatement.setInt(2, id);
-			surveySetQuestionnaireStatement.executeUpdate();
-
-			connection.commit();
-
-			// furthermore, prepare a relational table for storing results
-
-			// TODO: at this point we need to check, if answers were already provided. If so, these answers must be deleted.
-
-			HttpResponse result = new HttpResponse("Questionnaire for survey " + id + " set.");
-			result.setStatus(200);
-			return result;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal Error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
-		}
-	}
-
-	@GET
-	@Path("surveys/{id}/answers")
-	public HttpResponse retrieveQuestionnaireAnswersNoCommunity(@PathParam("id") int id){
-		try{
-			int exown = checkExistenceOwnership(id,0);
-
-			// allow access to answer data only, if current user is either survey owner or member of given community
-			if(exown == -1){
-				HttpResponse result = new HttpResponse("Access to answer information only for owner of survey " + id + ".");
-				result.setStatus(401);
-				return result;
-			}
-
-			// retrieve survey id;
+			// check if a questionnaire for survey is defined. If not, respond with not found.
 			int qid = getQuestionnaireIdForSurvey(id);
-
 			if(qid == -1){
 				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
 				result.setStatus(404);
@@ -1195,15 +1435,15 @@ public class SurveyService extends Service {
 			// retrieve questionnaire form for survey to do answer validation
 			HttpResponse r = downloadQuestionnaireForm(qid); 
 
+			// if questionnaire form does not exist, pass on response containing error status
 			if(200 != r.getStatus()){
-				// if questionnaire form does not exist, pass on response containing error status
 				return r;
-			}
-
-			Document form;
+			}	
 
 			// parse form to XML document incl. validation; will later on be necessary to build query for
 			// questionnaire answer table
+			Document form;
+
 			try{
 				form = validateQuestionnaireData(r.getResult());
 			} catch (SAXException e){
@@ -1213,7 +1453,7 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			// create query for result table
+			// generate query for result table
 
 			// example query:
 			// 
@@ -1221,7 +1461,7 @@ public class SurveyService extends Service {
 			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
 			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
-			//     from mobsos.survey_result where sid = 1 and cid = 1 group by uid;
+			//     from mobsos.response where sid = 1 and cid = 1 group by uid;
 
 			JSONObject questions = extractQuestionInformation(form);
 			String sql = "select uid, cid, \n"; 
@@ -1245,35 +1485,53 @@ public class SurveyService extends Service {
 				}
 			}
 
-			sql += " from " + jdbcSchema + ".survey_result where sid ="+ id + " group by uid, cid;";
+			sql += " from " + jdbcSchema + ".response where sid ="+ id + " group by uid, cid;";
 
-			//System.out.println("SQL: \n" + sql);
+			System.out.println("SQL for retrieving survey responses: \n" + sql);
 
 			// execute generated query
-			Statement s = connection.createStatement();
-			ResultSet rs = s.executeQuery(sql);
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
 
-			// format and return result
-			String res = createCSVQuestionnaireResult(rs);
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement(sql);
+				rset = stmt.executeQuery();
 
-			HttpResponse result = new HttpResponse(res);
-			result.setStatus(200);
-			return result;
+				// format and return result
+				String res = createCSVQuestionnaireResult(rset);
+
+				HttpResponse result = new HttpResponse(res);
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
 
 		} catch (Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
-
-
+	/**
+	 * TODO: write documentation
+	 * @param id
+	 * @param answerJSON
+	 * @return
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("surveys/{id}/answers")
-	public HttpResponse submitQuestionnaireAnswerJSON(@PathParam("id") int id, @ContentParam String answerJSON){
+	@Path("surveys/{id}/responses")
+	public HttpResponse submitSurveyResponseJSON(@PathParam("id") int id, @ContentParam String answerJSON){
+		String onAction = "submitting response to survey " + id;
 		try{
 
 			// retrieve survey id;
@@ -1308,7 +1566,7 @@ public class SurveyService extends Service {
 			try{
 				answer = (JSONObject) JSONValue.parseWithException(answerJSON);	
 			} catch (ParseException e){
-				HttpResponse result = new HttpResponse("Questionnaire answer is not valid JSON! Cause: " + e.getMessage());
+				HttpResponse result = new HttpResponse("Survey response is not valid JSON! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
@@ -1319,48 +1577,71 @@ public class SurveyService extends Service {
 			try{
 				answerFieldTable = validateAnswer(form,answer);
 			} catch (IllegalArgumentException e){
-				HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
+				HttpResponse result = new HttpResponse("Survey response is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
 
+			// after all validation finally persist survey response in database
 			int surveyId = id;
 			long userId = this.getActiveAgent().getId();
 
-			Iterator<String> it = answerFieldTable.keySet().iterator();
-			while(it.hasNext()){
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
 
-				String qkey = it.next();
-				String qval = ""+answerFieldTable.get(qkey);
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("insert into " + jdbcSchema + ".response(uid,sid,qkey,qval) values (?,?,?,?)");
 
-				submitQuestionAnswerStatementNoC.clearParameters();
-				submitQuestionAnswerStatementNoC.setLong(1, userId);
-				submitQuestionAnswerStatementNoC.setInt(2,surveyId);
-				submitQuestionAnswerStatementNoC.setString(3, qkey);
-				submitQuestionAnswerStatementNoC.setString(4, qval);
-				submitQuestionAnswerStatementNoC.addBatch();
+				Iterator<String> it = answerFieldTable.keySet().iterator();
+				while(it.hasNext()){
 
+					String qkey = it.next();
+					String qval = ""+answerFieldTable.get(qkey);
+
+					stmt.setLong(1, userId);
+					stmt.setInt(2,surveyId);
+					stmt.setString(3, qkey);
+					stmt.setString(4, qval);
+					stmt.addBatch();
+
+				}
+				stmt.executeBatch();
+				
+				HttpResponse result = new HttpResponse("Response to survey " + id + " submitted successfully.");
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				e.printStackTrace();
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			}
-			submitQuestionAnswerStatementNoC.executeBatch();
-
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Questionnaire answer stored successfully.");
-			result.setStatus(200);
-			return result;
-
 		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @param answerXml
+	 * @return
+	 */
 	@POST
 	@Consumes(MediaType.TEXT_XML)
-	@Path("surveys/{id}/answers")
-	public HttpResponse submitQuestionnaireAnswerXML(@PathParam("id") int id, @ContentParam String answerXml){
+	@Path("surveys/{id}/responses")
+	public HttpResponse submitSurveyResponseXML(@PathParam("id") int id, @ContentParam String answerXml){
+		
+		String onAction = "submitting response to survey " + id;
+		
 		try{
 			Document answer;
 			// parse answer to XML document incl. validation
@@ -1372,105 +1653,60 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			return submitQuestionnaireAnswerJSON(id, convertAnswerXMLtoJSON(answer).toJSONString());
+			return submitSurveyResponseJSON(id, convertAnswerXMLtoJSON(answer).toJSONString());
 
 		} catch(Exception e){
 			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
+			return internalError(onAction);
 		}
 	}
+
+	
+	/**
+	 * TODO: write documentation
+	 * @param id
+	 * @return
+	 */
+	@DELETE
+	@Path("surveys/{id}/responses")
+	public HttpResponse deleteSurveyResponses(@PathParam("id") int id){
+
+		String onAction = "deleting responses for survey " + id;
+
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
+
+			// +++ dsi 
+			try{
+				c = dataSource.getConnection();
+				s = c.prepareStatement("delete from " + jdbcSchema + ".response where sid = ?");
+				s.setInt(1, id);
+				s.executeUpdate();
+
+				HttpResponse result = new HttpResponse("Responses to survey " + id + " deleted successfully.");
+				result.setStatus(200);
+				return result;
+
+			} catch (Exception e){
+				e.printStackTrace();
+				return internalError(onAction);
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+			}
+			// --- dsi
+
+		} catch(Exception e){
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+	// ============= COMMUNITY EXTENSIONS (TODO) ==============
 
 	/*
-	@POST
-	@Consumes(MediaType.TEXT_XML)
-	@Path("surveys/{id}/answers")
-	public HttpResponse submitQuestionnaireAnswerXML(@PathParam("id") int id, @ContentParam String answerXml){
-		try{
-
-			// retrieve survey id;
-			int qid = getQuestionnaireIdForSurvey(id);
-
-			if(qid == -1){
-				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
-				result.setStatus(404);
-				return result;
-			}
-
-			// retrieve questionnaire form for survey to do answer validation
-			HttpResponse r = downloadQuestionnaireForm(qid); 
-
-			if(200 != r.getStatus()){
-				// if questionnaire form does not exist, pass on response containing error status
-				return r;
-			}
-
-			Document form;
-			Document answer;
-
-			// parse form to XML document incl. validation
-			try{
-				form = validateQuestionnaireData(r.getResult());
-			} catch (SAXException e){
-				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
-
-			// parse answer to XML document incl. validation
-			try{
-				answer = validateQuestionnaireData(answerXml);
-			} catch (SAXException e){
-				HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
-
-			JSONObject answerFieldTable;
-
-			// validate if answer matches form.
-			try{
-				answerFieldTable = validateAnswer(form,convertAnswerXMLtoJSON(answer));
-			} catch (IllegalArgumentException e){
-				HttpResponse result = new HttpResponse("Questionnaire answer is invalid! Cause: " + e.getMessage());
-				result.setStatus(400);
-				return result;
-			}
-
-			int surveyId = id;
-			long userId = this.getActiveAgent().getId();
-
-			Iterator<String> it = answerFieldTable.keySet().iterator();
-			while(it.hasNext()){
-
-				String qkey = it.next();
-				String qval = ""+answerFieldTable.get(qkey);
-
-				submitQuestionAnswerStatementNoC.clearParameters();
-				submitQuestionAnswerStatementNoC.setLong(1, userId);
-				submitQuestionAnswerStatementNoC.setInt(2,surveyId);
-				submitQuestionAnswerStatementNoC.setString(3, qkey);
-				submitQuestionAnswerStatementNoC.setString(4, qval);
-				submitQuestionAnswerStatementNoC.addBatch();
-
-			}
-			submitQuestionAnswerStatementNoC.executeBatch();
-
-			connection.commit();
-
-			HttpResponse result = new HttpResponse("Questionnaire answer stored successfully.");
-			result.setStatus(200);
-			return result;
-
-		} catch(Exception e){
-			e.printStackTrace();
-			HttpResponse result = new HttpResponse("Internal error: " + e.getMessage());
-			result.setStatus(500);
-			return result;
-		}
-	}*/
-
 	@POST
 	@Consumes(MediaType.TEXT_XML)
 	@Path("surveys/{id}/answers/{cid}")
@@ -1569,8 +1805,6 @@ public class SurveyService extends Service {
 
 		}
 	}
-
-	// ---- community-aware extensions (TODO later)
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
@@ -1924,7 +2158,7 @@ public class SurveyService extends Service {
 			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
 			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
-			//     from mobsos.survey_result where sid = 1 and cid = 1 group by uid;
+			//     from mobsos.response where sid = 1 and cid = 1 group by uid;
 
 			JSONObject questions = extractQuestionInformation(form);
 			String sql = "select uid, \n"; 
@@ -1948,7 +2182,7 @@ public class SurveyService extends Service {
 				}
 			}
 
-			sql += " from " + jdbcSchema + ".survey_result where sid ="+ id + " and cid =" + cid + " group by uid;";
+			sql += " from " + jdbcSchema + ".response where sid ="+ id + " and cid =" + cid + " group by uid;";
 
 			//System.out.println("SQL: \n" + sql);
 
@@ -1970,6 +2204,7 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
+	*/
 
 	// ---------------------------- private helper methods -----------------------
 
@@ -2084,37 +2319,58 @@ public class SurveyService extends Service {
 	 * Checks if survey or questionnaire exists and active agent is owner.
 	 * 
 	 * @param id int survey or questionnaire id
+	 * @param type int 0 for survey, 1 for questionnaire
 	 * @return int -1 if survey does not exist, 0 if active agent is not owner, 1 if active agent is owner
 	 * @throws SQLException 
 	 */
 	private int checkExistenceOwnership(int id, int type) throws SQLException{
-		ResultSet rs;
 
-		if(type == 0){
-			surveyCheckOwnerStatement.clearParameters();
-			surveyCheckOwnerStatement.setInt(1, id);
-			rs = surveyCheckOwnerStatement.executeQuery();
-		} else {
-			questionnaireCheckOwnerStatement.clearParameters();
-			questionnaireCheckOwnerStatement.setInt(1, id);
-			rs = questionnaireCheckOwnerStatement.executeQuery();
-		}
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
 
-		// survey/questionnaire does not exist
-		if (!rs.isBeforeFirst()){
-			return -1; 
-		}
+			// +++ dsi 
+			try{
+				c = dataSource.getConnection();
 
-		rs.next();
-		String owner = rs.getString(1);
+				if(type == 0){
+					s = c.prepareStatement("select owner from " + jdbcSchema + ".survey where id = ?");
+				} else {
+					s = c.prepareStatement("select owner from " + jdbcSchema + ".questionnaire where id = ?");
+				}
 
-		// active agent is not owner.
-		if(!owner.equals(""+this.getActiveAgent().getId())){
-			return 0;
-		} 
-		// active agent is owner.
-		else {
-			return 1;
+				s.setInt(1, id);
+				rs = s.executeQuery();
+
+				// survey/questionnaire does not exist
+				if (!rs.isBeforeFirst()){
+					return -1; 
+				}
+
+				rs.next();
+				String owner = rs.getString(1);
+
+				// active agent is not owner.
+				if(!owner.equals(""+this.getActiveAgent().getId())){
+					return 0;
+				} 
+				// active agent is owner.
+				else {
+					return 1;
+				}
+
+			} catch (Exception e){
+				throw e;
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { throw e;}
+				try { if (s != null) s.close(); } catch(Exception e) { throw e;}
+				try { if (c != null) c.close(); } catch(Exception e) { throw e;}
+			}
+			// --- dsi
+
+		} catch(Exception e){
+			throw e;
 		}
 
 	}
@@ -2254,18 +2510,47 @@ public class SurveyService extends Service {
 	}
 
 	/**
+	 * Checks if for a given survey users have submitted responses and how many. 
+	 * @param sid
+	 * @return int number of responses submitted
+	 */
+	private int countResponses(int sid){
+		//TODO: implement method
+		// some query with "select count(distinct()) from response where "...
+		return 0;
+	}
+
+	/**
 	 * Retrieves identifier of questionnaire for given survey or -1 if no questionnaire was defined, yet.
 	 */
 	private int getQuestionnaireIdForSurvey(int sid) throws SQLException{
-		surveyGetQuestionnaireIdStatement.clearParameters();
-		surveyGetQuestionnaireIdStatement.setInt(1, sid);
+		
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
-		ResultSet rs = surveyGetQuestionnaireIdStatement.executeQuery();
-		if(!rs.isBeforeFirst()){
-			return -1;
-		} else {
-			rs.next();
-			return rs.getInt("qid");
+		try {
+			conn = dataSource.getConnection();
+			stmt = conn.prepareStatement("select qid from " + jdbcSchema + ".survey where id = ?");
+			stmt.setInt(1, sid);
+
+			rs = stmt.executeQuery();
+			
+			if(!rs.isBeforeFirst()){
+				return -1;
+			} else {
+				rs.next();
+				return rs.getInt("qid");
+			}
+			
+
+		} catch(SQLException | UnsupportedOperationException e) {
+			throw e;
+		} 
+		finally {
+			try { if (rs != null) rs.close(); } catch(Exception e) {throw e;}
+			try { if (stmt != null) stmt.close(); } catch(Exception e) {throw e;}
+			try { if (conn != null) conn.close(); } catch(Exception e) {throw e;}
 		}
 	}
 
@@ -2502,42 +2787,6 @@ public class SurveyService extends Service {
 			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); }
 		}
 		return -1;
-	}
-
-	/**
-	 * Initializes the connection to the MobSOS database and all prepared statements used in service methods.
-	 */
-	private void initDatabaseConnection() throws ClassNotFoundException, SQLException{
-
-		Class.forName(jdbcDriverClassName);
-		connection = DriverManager.getConnection(jdbcUrl+jdbcSchema,jdbcLogin, jdbcPass);
-		connection.setAutoCommit(false);
-
-		surveyInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end ) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-		surveysQueryStatement = connection.prepareStatement("select id from " + jdbcSchema + ".survey");
-		surveysFullQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey order by name");
-		surveysDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey");
-
-		surveyQueryStatement = connection.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
-		surveyCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".survey where id = ?");
-		surveyUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
-		surveySetQuestionnaireStatement = connection.prepareStatement("update "+ jdbcSchema + ".survey set qid=? where id =?");
-		surveyDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
-
-		questionnaireInsertStatement = connection.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
-		questionnairesDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire");
-
-		questionnaireQueryStatement = connection.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
-		questionnaireCheckOwnerStatement = connection.prepareStatement("select owner from " + jdbcSchema + ".questionnaire where id = ?");
-		questionnaireUpdateStatement = connection.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=? where id = ?");
-		questionnaireDeleteStatement = connection.prepareStatement("delete from "+ jdbcSchema + ".questionnaire where id = ?");
-
-		questionnaireUploadFormStatement = connection.prepareStatement("update "+ jdbcSchema + ".questionnaire set form=? where id = ?");
-		questionnaireDownloadFormStatement = connection.prepareStatement("select form from " + jdbcSchema + ".questionnaire where id = ?");
-
-		surveyGetQuestionnaireIdStatement = connection.prepareStatement("select qid from " + jdbcSchema + ".survey where id = ?");
-		submitQuestionAnswerStatement = connection.prepareStatement("insert into " + jdbcSchema + ".survey_result(uid,cid,sid,qkey,qval) values (?,?,?,?,?)");
-		submitQuestionAnswerStatementNoC = connection.prepareStatement("insert into " + jdbcSchema + ".survey_result(uid,sid,qkey,qval) values (?,?,?,?)");
 	}
 
 	/**
