@@ -105,7 +105,7 @@ import org.xml.sax.SAXException;
  * A RESTful service for the management, conduction and processing of online surveys. 
  * 
  * The data model behind this service consists of three main entities: surveys, questionnaires and responses. 
- * A questionnaire is described by basic metadata and – most essentially – a form. Any questionnaire 
+ * A questionnaire is described by basic metadata and most essentially a form. Any questionnaire 
  * can be re-used in an arbitrary number of surveys. Surveys serve as management contexts for the collection 
  * of responses to a given questionnaire. A survey is described by basic metadata, a start and optional end-time, 
  * a subject URI linking to an arbitrary resource being target of the survey, a reference to a predefined questionnaire, 
@@ -275,6 +275,7 @@ public class SurveyService extends Service {
 			} catch (IllegalArgumentException | ParseException e){
 				// if passed data is invalid, respond error to user
 				HttpResponse result = new HttpResponse("Invalid questionnaire! " + e.getMessage());
+				result.setHeader("Content-Type", MediaType.TEXT_PLAIN);
 				result.setStatus(400);
 				return result;
 			}
@@ -286,6 +287,7 @@ public class SurveyService extends Service {
 			JSONObject r = new JSONObject();
 			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
 			HttpResponse result = new HttpResponse(r.toJSONString());
+			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 			result.setStatus(201);
 
 			return result;
@@ -2674,10 +2676,10 @@ public class SurveyService extends Service {
 						URL u = new URL((String) o.get(key));
 						HttpURLConnection con = (HttpURLConnection) u.openConnection();
 						if(404 == con.getResponseCode()){
-							throw new IllegalArgumentException("Illegal value for questionnaire field logo. Should be a valid URL to an image resource.");
+							throw new IllegalArgumentException("Illegal value for questionnaire field 'logo'. Should be a valid URL to an image resource.");
 						}
 						if(!con.getContentType().matches("image/.*")){
-							throw new IllegalArgumentException("Illegal value for questionnaire field logo. Should be a valid URL to an image resource.");
+							throw new IllegalArgumentException("Illegal value for questionnaire field 'logo'. Should be a valid URL to an image resource.");
 						}
 					} catch (MalformedURLException e) {
 						throw new IllegalArgumentException("Illegal value for questionnaire field 'logo'. Should be a valid URL to an image resource.");
@@ -3065,6 +3067,7 @@ public class SurveyService extends Service {
 
 	private HttpResponse internalError(String onAction){
 		HttpResponse result = new HttpResponse("Internal error while " + onAction + "!");
+		result.setHeader("Content-Type", MediaType.TEXT_PLAIN);
 		result.setStatus(500);
 		return result;
 	}

@@ -34,6 +34,7 @@ package i5.las2peer.services.mobsos;
 
 import static org.junit.Assert.*;
 import i5.las2peer.p2p.LocalNode;
+import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.Agent;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.ServiceAgent;
@@ -187,37 +188,88 @@ public class SurveyServiceTest {
 
 	}
 
-
 	/**
-	 * Test the creation of new surveys.
+	 * Test the retrieval of questionnaire lists.
 	 */
 	@Test
-	public void testSurveyCreation()
-	{
+	public void testQuestionnaireListRetrieval(){
 		try {
-
-			ClientResponse result=c2.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
-
-			System.out.println(result.getResponse());
-			assertEquals(201, result.getHttpCode());
-
+			ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
+			assertEquals(200,result.getHttpCode());
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
 			JSONObject jo = (JSONObject) o;
-			assertTrue(jo.keySet().contains("url"));
-			String urlStr = (String) jo.get("url");
-			URL url = new URL(urlStr);
-			System.out.println("Created new survey: " + jo.toJSONString());
+			assertTrue(jo.get("questionnaires") != null);
+			o = jo.get("questionnaires");
+			assertTrue(o instanceof JSONArray);
+			//System.out.println(jo.toJSONString());
 
-		} catch (ParseException e){
-			e.printStackTrace();
+		} catch (ParseException e) {
 			fail("Could not parse service response to JSON Object!");
-		} catch (MalformedURLException e){
 			e.printStackTrace();
-			fail("Service should return a valid URL to the new survey's resource");
 		}
 	}
 
+	@Test
+	public void testRetrieveSearchQuestionnaires(){
+
+		try
+		{
+			//first delete all questionnaires
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// then generate two questionnaires, one to be searched
+			c2.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c3.sendRequest("POST", "mobsos/questionnaires",generateNeedleQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+
+			// list only questionnaire URLs
+			try {
+				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+				System.out.println("List of Questionnaire URLs: " + result.getResponse());
+				
+				assertEquals(200,result.getHttpCode());
+				assertEquals("application/json", result.getHeader("Content-Type"));
+				Object o = JSONValue.parseWithException(result.getResponse().trim());
+				assertTrue(o instanceof JSONObject);
+				JSONObject jo = (JSONObject) o;
+				assertTrue(jo.containsKey("questionnaires"));
+				o = jo.get("questionnaires");
+				assertTrue(o instanceof JSONArray);
+				JSONArray a = (JSONArray) o;
+				assertEquals(2,a.size());
+				
+			} catch (ParseException e) {
+				fail("Could not parse service response to JSON Object!");
+				e.printStackTrace();
+			}
+
+			// search for specific questionnaire with query string
+			try {
+				ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
+				System.out.println("List of Questionnaires: " + result.getResponse());
+				
+				assertEquals(200,result.getHttpCode());
+				assertEquals("application/json", result.getHeader("Content-Type"));
+				Object o = JSONValue.parseWithException(result.getResponse().trim());
+				assertTrue(o instanceof JSONObject);
+				JSONObject jo = (JSONObject) o;
+				assertTrue(jo.containsKey("questionnaires"));
+				o = jo.get("questionnaires");
+				assertTrue(o instanceof JSONArray);
+				JSONArray a = (JSONArray) o;
+				assertEquals(1,a.size());
+				
+			} catch (ParseException e) {
+				fail("Could not parse service response to JSON Object!");
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			fail ( "Exception: " + e );
+		}	
+	}
 
 	/**
 	 * Test the creation of new questionnaires.
@@ -227,9 +279,17 @@ public class SurveyServiceTest {
 	{
 		try {
 
-			ClientResponse result=c2.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			// first delete all questionnaires
+			c2.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// then create new questionnaire
+			ClientResponse result=c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			assertEquals(201, result.getHttpCode());
+			assertEquals("application/json",result.getHeader("Content-Type"));
+
+			System.out.println("Newly created questionnaire response: " + result.getResponse());
+
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
 			JSONObject jo = (JSONObject) o;
@@ -246,62 +306,8 @@ public class SurveyServiceTest {
 		}
 	}
 
-
 	/**
-	 * Test the creation of new surveys with invalid data.
-	 */
-	@Test
-	public void testBadRequestSurveyCreation()
-	{
-		JSONObject invalidSurvey = generateSurveyJSON(); // until now, survey JSON is ok. Introduce problems now...
-		invalidSurvey.put("name", new Integer(2)); // name must be string
-
-		ClientResponse result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("name", "Alcoholics Standard Survey"); //make valid again and introduce other problem
-		invalidSurvey.put("start", "20144-33-44T1000"); //introduce wrong time
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("start", "2014-05-08T12:00:00Z"); //make valid again and introduce other problem
-		invalidSurvey.put("end", "2014-04-01T00:00:00Z"); // end time before start time
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("end", "2014-06-08T00:00:00Z"); // make valid again and introduce other problem
-		invalidSurvey.put("logo","dbis"); // malformed logo URL
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg"); // make valid again and introduce other problem
-		invalidSurvey.put("resource","shitonashingle"); // malformed resource URL
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-		invalidSurvey.put("resource","http://dbis.rwth-aachen.de/nonexistingresource"); // non-existing resource URL
-
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
-		assertEquals(400, result.getHttpCode());
-
-	}
-
-	/**
-	 * Test the creation of new questionnaires with invalid data.
+	 * Test the failing creation of new questionnaires with invalid data, including correctness of error messages.
 	 */
 	@Test
 	public void testBadRequestQuestionnaireCreation()
@@ -309,122 +315,212 @@ public class SurveyServiceTest {
 		JSONObject invalidQuestionnaire = generateQuestionnaireJSON(); // until now, questionnaire JSON is ok. Introduce problems now...
 		invalidQuestionnaire.put("name", new Integer(2)); // name must be string
 
-		ClientResponse result=c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString());
+		ClientResponse result;
+
+		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+
+		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 		invalidQuestionnaire.put("name", "Alcoholics Standard Questionnaire"); //make valid again and introduce other problem
 		invalidQuestionnaire.put("logo","dbis"); // malformed logo URL
 
-		result=c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString());
+		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+
+		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 		invalidQuestionnaire.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
 
-		result=c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString());
+		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+
+		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 		invalidQuestionnaire.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
 
-		result=c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString());
-		System.out.println("Resulting message: " + result.getResponse());
+		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+
+		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 	}
 
 
-	/**
-	 * Test the retrieval of survey lists.
-	 */
-	@Test
-	public void testSurveyListRetrieval(){
-		try {
-			ClientResponse result=c1.sendRequest("GET", "mobsos/surveys?full=1","");
-			assertEquals(200,result.getHttpCode());
-			Object o = JSONValue.parseWithException(result.getResponse().trim());
-			assertTrue(o instanceof JSONObject);
-			JSONObject jo = (JSONObject) o;
-			System.out.println(jo.toJSONString());
-			assertTrue(jo.get("surveys") != null);
-			o = jo.get("surveys");
-			assertTrue(o instanceof JSONArray);
-			System.out.println("List of Surveys: " + jo.toJSONString());
+	//	/**
+	//	 * Test the creation of new surveys.
+	//	 */
+	//	@Test
+	//	public void testSurveyCreation()
+	//	{
+	//		try {
+	//
+	//			ClientResponse result=c2.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+	//
+	//			System.out.println(result.getResponse());
+	//			assertEquals(201, result.getHttpCode());
+	//
+	//			Object o = JSONValue.parseWithException(result.getResponse().trim());
+	//			assertTrue(o instanceof JSONObject);
+	//			JSONObject jo = (JSONObject) o;
+	//			assertTrue(jo.keySet().contains("url"));
+	//			String urlStr = (String) jo.get("url");
+	//			URL url = new URL(urlStr);
+	//			System.out.println("Created new survey: " + jo.toJSONString());
+	//
+	//		} catch (ParseException e){
+	//			e.printStackTrace();
+	//			fail("Could not parse service response to JSON Object!");
+	//		} catch (MalformedURLException e){
+	//			e.printStackTrace();
+	//			fail("Service should return a valid URL to the new survey's resource");
+	//		}
+	//	}
+	//
+	//
+	//	/**
+	//	 * Test the creation of new surveys with invalid data.
+	//	 */
+	//	@Test
+	//	public void testBadRequestSurveyCreation()
+	//	{
+	//		JSONObject invalidSurvey = generateSurveyJSON(); // until now, survey JSON is ok. Introduce problems now...
+	//		invalidSurvey.put("name", new Integer(2)); // name must be string
+	//
+	//		ClientResponse result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("name", "Alcoholics Standard Survey"); //make valid again and introduce other problem
+	//		invalidSurvey.put("start", "20144-33-44T1000"); //introduce wrong time
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("start", "2014-05-08T12:00:00Z"); //make valid again and introduce other problem
+	//		invalidSurvey.put("end", "2014-04-01T00:00:00Z"); // end time before start time
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("end", "2014-06-08T00:00:00Z"); // make valid again and introduce other problem
+	//		invalidSurvey.put("logo","dbis"); // malformed logo URL
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg"); // make valid again and introduce other problem
+	//		invalidSurvey.put("resource","shitonashingle"); // malformed resource URL
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//		invalidSurvey.put("resource","http://dbis.rwth-aachen.de/nonexistingresource"); // non-existing resource URL
+	//
+	//		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString());
+	//		assertEquals(400, result.getHttpCode());
+	//
+	//	}
+	//
+	//	
+	//
 
-		} catch (ParseException e) {
-			fail("Could not parse service response to JSON Object!");
-			e.printStackTrace();
-		}
-	}
-	
-	//	
-	//		/**
-	//		 * Test the retrieval of questionnaire lists.
-	//		 */
-	//		@Test
-	//		public void testQuestionnaireListRetrieval(){
-	//			try {
-	//				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
-	//				assertEquals(200,result.getHttpCode());
-	//				Object o = JSONValue.parseWithException(result.getResponse().trim());
-	//				assertTrue(o instanceof JSONObject);
-	//				JSONObject jo = (JSONObject) o;
-	//				assertTrue(jo.get("questionnaires") != null);
-	//				o = jo.get("questionnaires");
-	//				assertTrue(o instanceof JSONArray);
-	//				//System.out.println(jo.toJSONString());
-	//	
-	//			} catch (ParseException e) {
-	//				fail("Could not parse service response to JSON Object!");
-	//				e.printStackTrace();
-	//			}
+	//	/**
+	//	 * Test the retrieval of survey lists.
+	//	 */
+	//	@Test
+	//	public void testSurveyListRetrieval(){
+	//		try {
+	//			ClientResponse result=c1.sendRequest("GET", "mobsos/surveys?full=1","");
+	//			assertEquals(200,result.getHttpCode());
+	//			Object o = JSONValue.parseWithException(result.getResponse().trim());
+	//			assertTrue(o instanceof JSONObject);
+	//			JSONObject jo = (JSONObject) o;
+	//			System.out.println(jo.toJSONString());
+	//			assertTrue(jo.get("surveys") != null);
+	//			o = jo.get("surveys");
+	//			assertTrue(o instanceof JSONArray);
+	//			System.out.println("List of Surveys: " + jo.toJSONString());
+	//
+	//		} catch (ParseException e) {
+	//			fail("Could not parse service response to JSON Object!");
+	//			e.printStackTrace();
 	//		}
-	//	
-	//		/**
-	//		 * Test the retrieval of a single survey.
-	//		 */
-	//		@Test
-	//		public void testSurveyRetrieval(){
-	//			try {
-	//				// add a couple of surveys
-	//				c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
-	//				c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
-	//	
-	//				// then get complete list and pick the first survey URL for subsequent testing
-	//				ClientResponse list = c1.sendRequest("GET", "mobsos/surveys","");
-	//				JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
-	//				String fullurl = (String) ((JSONArray) jo.get("surveys")).get(0);
-	//	
-	//				// check if first survey URL is a valid URL, then extract path
-	//				URL u = new URL(fullurl);
-	//				u.getPath();
-	//				String pathonly = u.getPath();
-	//	
-	//				// now check if survey retrieval works properly
-	//				ClientResponse result=c1.sendRequest("GET", pathonly,"");
-	//				assertEquals(200,result.getHttpCode());
-	//				Object o = JSONValue.parseWithException(result.getResponse().trim());
-	//				assertTrue(o instanceof JSONObject);
-	//				JSONObject rjo = (JSONObject) o;
-	//	
-	//				// check if all fields are contained in result
-	//				assertTrue(rjo.keySet().contains("id"));
-	//				assertTrue(rjo.keySet().contains("name"));
-	//				assertTrue(rjo.keySet().contains("organization"));
-	//				assertTrue(rjo.keySet().contains("logo"));
-	//				assertTrue(rjo.keySet().contains("description"));
-	//				assertTrue(rjo.keySet().contains("owner"));
-	//				assertTrue(rjo.keySet().contains("resource"));
-	//				assertTrue(rjo.keySet().contains("start"));
-	//				assertTrue(rjo.keySet().contains("end"));
+	//	}
 	//	
 	//	
-	//			} catch (ParseException e) {
-	//				e.printStackTrace();
-	//				fail("Could not parse service response to JSON Object!");
-	//			} catch (MalformedURLException e) {
-	//				e.printStackTrace();
-	//				fail("Detected invalid survey URL! " + e.getMessage());
+	//	
+	//		
+	//	
+	//			/**
+	//			 * Test the retrieval of a single survey.
+	//			 */
+	//			@Test
+	//			public void testSurveyRetrieval(){
+	//				try {
+	//					
+	//					// delete all surveys
+	//					c1.sendRequest("DELETE", "mobsos/surveys","");
+	//					
+	//					// add a couple of surveys with different owners
+	//					c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+	//					c2.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+	//					c3.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+	//					
+	//					// then get complete list and pick the first survey URL for subsequent testing
+	//					ClientResponse list = c1.sendRequest("GET", "mobsos/surveys?full=0","");
+	//					
+	//					JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
+	//					
+	//					assertTrue(jo.containsKey("surveys"));
+	//					
+	//					System.out.println("List of Surveys: " + jo.toJSONString());
+	//					
+	//					
+	//					String fullurl = (String) ((JSONArray) jo.get("surveys")).get(0);
+	//					
+	//		
+	//					// check if first survey URL is a valid URL, then extract path
+	//					URL u = new URL(fullurl);
+	//					u.getPath();
+	//					String pathonly = u.getPath();
+	//		
+	//					// now check if survey retrieval works properly
+	//					ClientResponse result=c1.sendRequest("GET", pathonly,"");
+	//					assertEquals(200,result.getHttpCode());
+	//					Object o = JSONValue.parseWithException(result.getResponse().trim());
+	//					assertTrue(o instanceof JSONObject);
+	//					JSONObject rjo = (JSONObject) o;
+	//		
+	//					// check if all fields are contained in result
+	//					assertTrue(rjo.keySet().contains("id"));
+	//					assertTrue(rjo.keySet().contains("name"));
+	//					assertTrue(rjo.keySet().contains("organization"));
+	//					assertTrue(rjo.keySet().contains("logo"));
+	//					assertTrue(rjo.keySet().contains("description"));
+	//					assertTrue(rjo.keySet().contains("owner"));
+	//					assertTrue(rjo.keySet().contains("resource"));
+	//					assertTrue(rjo.keySet().contains("start"));
+	//					assertTrue(rjo.keySet().contains("end"));
+	//		
+	//		
+	//				} catch (ParseException e) {
+	//					e.printStackTrace();
+	//					fail("Could not parse service response to JSON Object!");
+	//				} catch (MalformedURLException e) {
+	//					e.printStackTrace();
+	//					fail("Detected invalid survey URL! " + e.getMessage());
+	//				}
 	//			}
-	//		}
 	//	
 	//		/**
 	//		 * Test the retrieval of a single questionnaire.
@@ -943,35 +1039,7 @@ public class SurveyServiceTest {
 	//		} 
 	//	}
 
-	@Test
-	public void testSearchQuestionnaires(){
 
-		try
-		{
-			//first delete all questionnaires
-			c2.sendRequest("DELETE", "mobsos/questionnaires","");
-
-			// then generate two questionnaires, one to be searched
-			c2.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-			c2.sendRequest("POST", "mobsos/questionnaires",generateNeedleQuestionnaireJSON().toJSONString());
-
-			// retrieve full list of questionnaires for two different agents
-			ClientResponse c3result=c3.sendRequest("GET", "mobsos/questionnaires?full=1","");
-			ClientResponse c2result=c2.sendRequest("GET", "mobsos/questionnaires?full=1","");
-
-			assertEquals(200,c2result.getHttpCode());
-			assertEquals(200,c3result.getHttpCode());
-
-			// search for specific questionnaire with query string
-			ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
-			assertEquals(200,result.getHttpCode());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			fail ( "Exception: " + e );
-		}	
-	}
 
 	/*
 	@Test
