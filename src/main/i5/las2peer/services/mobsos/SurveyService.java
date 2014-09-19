@@ -149,22 +149,12 @@ public class SurveyService extends Service {
 		this.monitor = true;
 
 		try {
-			//initDatabaseConnection();
+			setupDataSource();
 			initXMLInfrastructure();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 
-		try {
-			Class.forName(jdbcDriverClassName);
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		// set up data source (as alternative to regular connection)
-		// TODO: move up, as soon as old init database obsolete
-		setupDataSource();
 		printDataSourceStats(dataSource);
 
 		// print out REST mapping for this service
@@ -442,6 +432,7 @@ public class SurveyService extends Service {
 				}
 
 				// if parsed content is ok, execute update
+				c = dataSource.getConnection();
 				s = c.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=? where id = ?");
 
 				s.setString(1, (String) o.get("organization") );
@@ -572,18 +563,15 @@ public class SurveyService extends Service {
 				stmt.setInt(1, id);
 
 				ResultSet rs = stmt.executeQuery();
+				rs.next();
+				String formXml = rs.getString(1);
 
-				// if questionnaire does not define a form yet, respond with not found
-				// this error should not occur in regular operation!
-				if (!rs.isBeforeFirst()){
+				// if form field is empty, respond with not found.
+				if(formXml.trim().isEmpty()){
 					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not define a form!");
 					result.setStatus(404);
 					return result;
 				}
-
-				// questionnaire defines a form; validate and respond to user
-				rs.next();
-				String formXml = rs.getString(1);
 
 				// before returning form, make sure it's still valid (TODO: think about removing check after testing)
 				try{
@@ -616,6 +604,13 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
+
+	/**
+	 * TODO: write documentation
+	 * @param id
+	 * @param formXml
+	 * @return
+	 */
 
 	/**
 	 * TODO: write documentation
@@ -708,6 +703,13 @@ public class SurveyService extends Service {
 	 * Retrieves a list of all surveys.
 	 * @return
 	 */
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param full
+	 * @param query
+	 * @return
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
@@ -780,6 +782,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
+
 
 	/**
 	 * TODO: write documentation
@@ -868,6 +871,7 @@ public class SurveyService extends Service {
 		}
 	}
 
+
 	/**
 	 * TODO: write documentation
 	 * Retrieves information for a given survey
@@ -928,6 +932,7 @@ public class SurveyService extends Service {
 		}
 
 	}
+
 
 	/**
 	 * TODO: write documentation
@@ -1015,6 +1020,7 @@ public class SurveyService extends Service {
 
 	}
 
+
 	/**
 	 * TODO: write documentation
 	 * Deletes a survey with a given id. The respective survey may only be deleted, if the active agent is the survey's owner.
@@ -1084,6 +1090,12 @@ public class SurveyService extends Service {
 	/**
 	 * TODO: write documentation
 	 * 
+	 * @param id
+	 * @return
+	 */
+
+	/**
+	 * TODO: write documentation
 	 * @param id
 	 * @return
 	 */
@@ -1295,6 +1307,7 @@ public class SurveyService extends Service {
 
 	}
 
+
 	/**
 	 * TODO: write documentation
 	 * 
@@ -1406,6 +1419,13 @@ public class SurveyService extends Service {
 	 * TODO: write documentation
 	 * 
 	 * For given survey retrieves all responses submitted by end-users in convenient CSV format
+	 * @param id
+	 * @return
+	 */
+
+	/**
+	 * TODO: write documentation
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -1529,6 +1549,14 @@ public class SurveyService extends Service {
 	 * @param answerJSON
 	 * @return
 	 */
+
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @param answerJSON
+	 * @return
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/responses")
@@ -1610,7 +1638,7 @@ public class SurveyService extends Service {
 
 				}
 				stmt.executeBatch();
-				
+
 				HttpResponse result = new HttpResponse("Response to survey " + id + " submitted successfully.");
 				result.setStatus(200);
 				return result;
@@ -1637,13 +1665,21 @@ public class SurveyService extends Service {
 	 * @param answerXml
 	 * @return
 	 */
+
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @param answerXml
+	 * @return
+	 */
 	@POST
 	@Consumes(MediaType.TEXT_XML)
 	@Path("surveys/{id}/responses")
 	public HttpResponse submitSurveyResponseXML(@PathParam("id") int id, @ContentParam String answerXml){
-		
+
 		String onAction = "submitting response to survey " + id;
-		
+
 		try{
 			Document answer;
 			// parse answer to XML document incl. validation
@@ -1663,7 +1699,6 @@ public class SurveyService extends Service {
 		}
 	}
 
-	
 	/**
 	 * TODO: write documentation
 	 * @param id
@@ -1706,6 +1741,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
+
 	// ============= COMMUNITY EXTENSIONS (TODO) ==============
 
 	/*
@@ -2206,9 +2242,9 @@ public class SurveyService extends Service {
 			return result;
 		}
 	}
-	*/
+	 */
 
-	// ---------------------------- private helper methods -----------------------
+	// ============= Private helper methods ===================
 
 	/**
 	 * Adapts a given questionnaire form before being administered to a requesting user in a given community context.
@@ -2526,7 +2562,7 @@ public class SurveyService extends Service {
 	 * Retrieves identifier of questionnaire for given survey or -1 if no questionnaire was defined, yet.
 	 */
 	private int getQuestionnaireIdForSurvey(int sid) throws SQLException{
-		
+
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -2537,14 +2573,14 @@ public class SurveyService extends Service {
 			stmt.setInt(1, sid);
 
 			rs = stmt.executeQuery();
-			
+
 			if(!rs.isBeforeFirst()){
 				return -1;
 			} else {
 				rs.next();
 				return rs.getInt("qid");
 			}
-			
+
 
 		} catch(SQLException | UnsupportedOperationException e) {
 			throw e;
@@ -2827,6 +2863,12 @@ public class SurveyService extends Service {
 		return doc;
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param answer
+	 * @return
+	 */
 	private JSONObject convertAnswerXMLtoJSON(Document answer){
 
 		JSONObject result = new JSONObject();
@@ -2842,6 +2884,13 @@ public class SurveyService extends Service {
 		return result;
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param form
+	 * @param answer
+	 * @return
+	 */
 	private JSONObject validateAnswer(Document form, JSONObject answer){
 		JSONObject result = new JSONObject();
 
@@ -3065,6 +3114,12 @@ public class SurveyService extends Service {
 		return questions;
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param onAction
+	 * @return
+	 */
 	private HttpResponse internalError(String onAction){
 		HttpResponse result = new HttpResponse("Internal error while " + onAction + "!");
 		result.setHeader("Content-Type", MediaType.TEXT_PLAIN);
@@ -3072,7 +3127,16 @@ public class SurveyService extends Service {
 		return result;
 	}
 
-	private void setupDataSource() {
+	/**
+	 * TODO: write documentation
+	 * @throws ClassNotFoundException 
+	 */
+	private void setupDataSource() throws ClassNotFoundException {
+
+		// request classloader to load JDBC driver class
+		Class.forName(jdbcDriverClassName);
+
+		// prepare and configure data source
 		dataSource = new BasicDataSource();
 		dataSource.setDefaultAutoCommit(true);
 		dataSource.setDriverClassName(jdbcDriverClassName);
@@ -3084,6 +3148,11 @@ public class SurveyService extends Service {
 		dataSource.setMaxConnLifetimeMillis(100000);
 	}
 
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param ds
+	 */
 	private static void printDataSourceStats(DataSource ds) {
 		System.out.println("Data Source Stats: ");
 		BasicDataSource bds = (BasicDataSource) ds;

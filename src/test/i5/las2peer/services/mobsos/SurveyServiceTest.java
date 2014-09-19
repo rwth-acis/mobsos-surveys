@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import i5.las2peer.p2p.LocalNode;
 import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.Agent;
@@ -45,6 +47,8 @@ import i5.las2peer.webConnector.client.ClientResponse;
 import i5.las2peer.webConnector.client.MiniClient;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -156,7 +160,7 @@ public class SurveyServiceTest {
 		try
 		{
 			System.out.println("waiting..");
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 		}
 		catch(InterruptedException e)
 		{
@@ -189,27 +193,8 @@ public class SurveyServiceTest {
 	}
 
 	/**
-	 * Test the retrieval of questionnaire lists.
+	 * Test search and retrieval of questionnaires 
 	 */
-	@Test
-	public void testQuestionnaireListRetrieval(){
-		try {
-			ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
-			assertEquals(200,result.getHttpCode());
-			Object o = JSONValue.parseWithException(result.getResponse().trim());
-			assertTrue(o instanceof JSONObject);
-			JSONObject jo = (JSONObject) o;
-			assertTrue(jo.get("questionnaires") != null);
-			o = jo.get("questionnaires");
-			assertTrue(o instanceof JSONArray);
-			//System.out.println(jo.toJSONString());
-
-		} catch (ParseException e) {
-			fail("Could not parse service response to JSON Object!");
-			e.printStackTrace();
-		}
-	}
-
 	@Test
 	public void testRetrieveSearchQuestionnaires(){
 
@@ -226,7 +211,7 @@ public class SurveyServiceTest {
 			try {
 				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
 				System.out.println("List of Questionnaire URLs: " + result.getResponse());
-				
+
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
@@ -237,17 +222,17 @@ public class SurveyServiceTest {
 				assertTrue(o instanceof JSONArray);
 				JSONArray a = (JSONArray) o;
 				assertEquals(2,a.size());
-				
+
 			} catch (ParseException e) {
 				fail("Could not parse service response to JSON Object!");
 				e.printStackTrace();
 			}
 
-			// search for specific questionnaire with query string
+			// search for specific questionnaires with query string
 			try {
 				ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
 				System.out.println("List of Questionnaires: " + result.getResponse());
-				
+
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
@@ -258,7 +243,7 @@ public class SurveyServiceTest {
 				assertTrue(o instanceof JSONArray);
 				JSONArray a = (JSONArray) o;
 				assertEquals(1,a.size());
-				
+
 			} catch (ParseException e) {
 				fail("Could not parse service response to JSON Object!");
 				e.printStackTrace();
@@ -278,7 +263,6 @@ public class SurveyServiceTest {
 	public void testQuestionnaireCreation()
 	{
 		try {
-
 			// first delete all questionnaires
 			c2.sendRequest("DELETE", "mobsos/questionnaires","");
 
@@ -295,6 +279,7 @@ public class SurveyServiceTest {
 			JSONObject jo = (JSONObject) o;
 			assertTrue(jo.keySet().contains("url"));
 			String urlStr = (String) jo.get("url");
+			// instantiate new URL to see if result field URL contains a valid URL (throws MalformedURLException if not)
 			URL url = new URL(urlStr);
 
 		} catch (ParseException e){
@@ -345,6 +330,279 @@ public class SurveyServiceTest {
 		assertEquals(400, result.getHttpCode());
 
 	}
+
+	/**
+	 * Test the deletion of all questionnaires at once.
+	 */
+	@Test
+	public void testDeleteAllQuestionnaires()
+	{
+		try {
+
+			// first add a couple of questionnaires
+			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+
+			ClientResponse create = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			assertEquals(201,create.getHttpCode());
+
+			// check if deletion of all questionnaires works
+			ClientResponse delete=c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			assertEquals(200,delete.getHttpCode());
+
+			// then check if questionnaire list retrieval retrieves an empty list.
+			ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
+			assertEquals(200,result.getHttpCode());
+			Object o = JSONValue.parseWithException(result.getResponse().trim());
+			assertTrue(o instanceof JSONObject);
+			JSONObject jo = (JSONObject) o;
+			assertTrue(jo.get("questionnaires") != null);
+			o = jo.get("questionnaires");
+			assertTrue(o instanceof JSONArray);
+			JSONArray ja = (JSONArray) o;
+			assertTrue(ja.isEmpty());
+
+			// check deletion again without any existing questionnaire. Should be idempotent trivially.
+			// check if deletion of all questionnaires works
+			delete=c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			assertEquals(200,delete.getHttpCode());
+
+			// then check if questionnaire list retrieval retrieves an empty list.
+			result=c1.sendRequest("GET", "mobsos/questionnaires","");
+			assertEquals(200,result.getHttpCode());
+			o = JSONValue.parseWithException(result.getResponse().trim());
+			assertTrue(o instanceof JSONObject);
+			jo = (JSONObject) o;
+			assertTrue(jo.get("questionnaires") != null);
+			o = jo.get("questionnaires");
+			assertTrue(o instanceof JSONArray);
+			ja = (JSONArray) o;
+			assertTrue(ja.isEmpty());
+
+		}  catch (ParseException e) {
+			fail("Could not parse service response to JSON Object!");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Test the retrieval of a single questionnaire.
+	 */
+	@Test
+	public void testQuestionnaireRetrieval(){
+		try {
+
+			// first delete all questionnaires
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// then add a couple of questionnaires
+			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+
+			// then get complete list and pick the first questionnaire URL for subsequent testing
+			ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
+			String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
+
+			// check if first questionnaire URL is a valid URL, then extract path
+			URL u = new URL(fullurl);
+			u.getPath();
+			String pathonly = u.getPath();
+
+			// now check if questionnaire retrieval works properly
+			ClientResponse result=c1.sendRequest("GET", pathonly,"");
+			assertEquals(200,result.getHttpCode());
+			Object o = JSONValue.parseWithException(result.getResponse().trim());
+			assertTrue(o instanceof JSONObject);
+			JSONObject rjo = (JSONObject) o;
+
+			// check if all fields are contained in result
+			assertTrue(rjo.keySet().contains("id"));
+			assertTrue(rjo.keySet().contains("name"));
+			assertTrue(rjo.keySet().contains("organization"));
+			assertTrue(rjo.keySet().contains("logo"));
+			assertTrue(rjo.keySet().contains("description"));
+			assertTrue(rjo.keySet().contains("owner"));
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Could not parse service response to JSON Object!");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Detected invalid questionnaire URL! " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Test the updating of an existing questionnaire.
+	 */
+	@Test
+	public void testUpdateExistingQuestionnaire(){
+
+
+		// first delete all questionnaires
+		c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+		// then add a questionnaire
+		ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+		assertTrue(r.getResponse()!=null);
+		assertTrue(r.getResponse().length()>0);
+		try{
+
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			assertTrue(o.keySet().contains("url"));
+
+			String fullurl = (String) o.get("url");
+
+			// check if first questionnaire URL is a valid URL, then extract path
+			URL u = new URL(fullurl);
+			String pathonly = u.getPath();
+
+			// use path to get the questionnaire
+			ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
+			assertEquals(200,result.getHttpCode()); // questionnaire should exist
+
+			JSONObject questionnaire = (JSONObject) JSONValue.parse(result.getResponse());
+
+			// change some fields in questionnaire
+			questionnaire.put("name","Changed Beerdrinker questionnaire");
+			questionnaire.put("description", "This questionnaire is for all those who like to drink changed beer.");
+
+			// then call service to update existing questionnaire
+			ClientResponse updateresult=c1.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
+			assertEquals(200, updateresult.getHttpCode());
+
+			ClientResponse updated=c1.sendRequest("GET", u.getPath(),"");
+			assertEquals(200,updated.getHttpCode()); // questionnaire should exist
+			JSONObject updatedQuestionnaire = (JSONObject) JSONValue.parse(updated.getResponse());
+
+			assertEquals(questionnaire,updatedQuestionnaire);
+
+			// try to update the existing questionnaire as another user, who is not the owner. This should fail with a 401.
+			questionnaire.put("name", "Ahole Questionnaire!");
+			questionnaire.put("description", "I destroy your work now!");
+
+			ClientResponse notowner = c3.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
+			System.out.println("Response: " + notowner.getResponse());
+			assertEquals(401, notowner.getHttpCode());
+
+			// try to update the existing questionnaire as owner, but with an undefined field. This should fail with a 400.
+			questionnaire.put("shibby", "shabby");
+
+			ClientResponse invalidupdate = c1.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
+			System.out.println("Response: " + invalidupdate.getResponse());
+			assertEquals(400, invalidupdate.getHttpCode());
+
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		}
+	}
+
+	/**
+	 * Test the deletion of an individual existing questionnaire.
+	 */
+	@Test
+	public void testDeleteExistingQuestionnaire(){
+		try {
+
+			// first delete all questionnaires
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// then add a questionnaire
+			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+
+			// then get complete list of questionnaire URLs and pick the first for subsequent testing
+			ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
+			String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
+
+			// check if first questionnaire URL is a valid URL, then extract path
+			URL u = new URL(fullurl);
+
+			// try to delete particular questionnaire with different user than owner. Should be forbidden.
+			ClientResponse delnown=c2.sendRequest("DELETE", u.getPath(),"");
+			assertEquals(401,delnown.getHttpCode());
+
+			// then check if questionnaire still exists.
+			ClientResponse stillthere=c1.sendRequest("GET", u.getPath(),"");
+			assertEquals(200,stillthere.getHttpCode());
+
+			// now check if deletion of particular questionnaire works
+			ClientResponse delete=c1.sendRequest("DELETE", u.getPath(),"");
+			assertEquals(200,delete.getHttpCode());
+
+			// then check if previously deleted questionnaire still exists.
+			ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
+			assertEquals(404,result.getHttpCode());
+
+		}  catch (ParseException e) {
+			e.printStackTrace();
+			fail("Could not parse service response to JSON Object!");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			fail("Detected invalid survey URL! " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testUploadQuestionnaireForm(){
+		try{
+			// first delete all questionnaires
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// then add a questionnaire
+			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires", generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+
+			// extract questionnaire URL for subsequent requests to up/download questionnaire form
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+			// try to download questionnaire form. Should result in not found, since no form was uploaded, yet.
+			ClientResponse downl = c1.sendRequest("GET", u.getPath() + "/form", "");
+			assertEquals(404, downl.getHttpCode());
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu1.xml"));
+
+			// now upload form XML
+			String url = u.getPath() + "/form";
+			ClientResponse result=c1.sendRequest("PUT", url,qform,"text/xml","*/*",new Pair[]{});
+			System.out.println("Response: " + result.getResponse());
+			assertEquals(200, result.getHttpCode());
+
+			// download form again. This should result in success.
+			downl = c1.sendRequest("GET", u.getPath() + "/form", "");
+			assertEquals("text/xml",downl.getHeader("Content-Type"));
+			assertEquals(200, downl.getHttpCode());
+
+			// try to upload form as different user than questionnaire owner. Should fail with unauthorized.
+			ClientResponse notown = c3.sendRequest("PUT", url,qform,"text/xml","*/*",new Pair[]{});
+			System.out.println("Response: " + notown.getResponse());
+			assertEquals(401, notown.getHttpCode());
+
+			// try to upload invalid form as questionnaire owner. Should fail with invalid request.
+			String invalidForm = "<invalid>This is an invalid questionnaire form.</invalid>";
+			ClientResponse invalid = c1.sendRequest("PUT", url,invalidForm,"text/xml","*/*",new Pair[]{});
+			System.out.println("Response: " + invalid.getResponse());
+			assertEquals(400, invalid.getHttpCode());
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+	}
+
 
 
 	//	/**
@@ -522,49 +780,7 @@ public class SurveyServiceTest {
 	//				}
 	//			}
 	//	
-	//		/**
-	//		 * Test the retrieval of a single questionnaire.
-	//		 */
-	//		@Test
-	//		public void testQuestionnaireRetrieval(){
-	//			try {
-	//				// add a couple of surveys
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//	
-	//				// then get complete list and pick the first questionnaire URL for subsequent testing
-	//				ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires","");
-	//				JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
-	//				String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
-	//	
-	//				// check if first survey URL is a valid URL, then extract path
-	//				URL u = new URL(fullurl);
-	//				u.getPath();
-	//				String pathonly = u.getPath();
-	//	
-	//				// now check if survey retrieval works properly
-	//				ClientResponse result=c1.sendRequest("GET", pathonly,"");
-	//				assertEquals(200,result.getHttpCode());
-	//				Object o = JSONValue.parseWithException(result.getResponse().trim());
-	//				assertTrue(o instanceof JSONObject);
-	//				JSONObject rjo = (JSONObject) o;
-	//	
-	//				// check if all fields are contained in result
-	//				assertTrue(rjo.keySet().contains("id"));
-	//				assertTrue(rjo.keySet().contains("name"));
-	//				assertTrue(rjo.keySet().contains("organization"));
-	//				assertTrue(rjo.keySet().contains("logo"));
-	//				assertTrue(rjo.keySet().contains("description"));
-	//				assertTrue(rjo.keySet().contains("owner"));
-	//	
-	//			} catch (ParseException e) {
-	//				e.printStackTrace();
-	//				fail("Could not parse service response to JSON Object!");
-	//			} catch (MalformedURLException e) {
-	//				e.printStackTrace();
-	//				fail("Detected invalid questionnaire URL! " + e.getMessage());
-	//			}
-	//		}
+
 	//	
 	//		/**
 	//		 * Test the deletion of all surveys at once.
@@ -601,39 +817,7 @@ public class SurveyServiceTest {
 	//			}
 	//		}
 	//	
-	//		/**
-	//		 * Test the deletion of all questionnaires at once.
-	//		 */
-	//		@Test
-	//		public void testDeleteAllQuestionnaires(){
-	//			try {
-	//	
-	//				// first add a couple of questionnaires
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//	
-	//				// check if deletion of all questionnaires works
-	//				ClientResponse delete=c1.sendRequest("DELETE", "mobsos/questionnaires","");
-	//				assertEquals(200,delete.getHttpCode());
-	//	
-	//				// then check if questionnaire list retrieval retrieves an empty list.
-	//				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
-	//				assertEquals(200,result.getHttpCode());
-	//				Object o = JSONValue.parseWithException(result.getResponse().trim());
-	//				assertTrue(o instanceof JSONObject);
-	//				JSONObject jo = (JSONObject) o;
-	//				assertTrue(jo.get("questionnaires") != null);
-	//				o = jo.get("questionnaires");
-	//				assertTrue(o instanceof JSONArray);
-	//				JSONArray ja = (JSONArray) o;
-	//				assertTrue(ja.isEmpty());
-	//	
-	//			}  catch (ParseException e) {
-	//				fail("Could not parse service response to JSON Object!");
-	//				e.printStackTrace();
-	//			}
-	//		}
+	//		
 	//	
 	//		/**
 	//		 * Test the deletion of an individual existing survey.
@@ -670,42 +854,7 @@ public class SurveyServiceTest {
 	//			}
 	//		}
 	//	
-	//		/**
-	//		 * Test the deletion of an individual existing questionnaire.
-	//		 */
-	//		@Test
-	//		public void testDeleteExistingQuestionnaire(){
-	//			try {
-	//	
-	//				// first add a survey
-	//				c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//	
-	//				// then get complete list and pick the first questionnaire URL for subsequent testing
-	//				ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires","");
-	//				JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
-	//				String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
-	//	
-	//				// check if first questionnaire URL is a valid URL, then extract path
-	//				URL u = new URL(fullurl);
-	//	
-	//				System.out.println("Path: " + u.getPath());
-	//	
-	//				// check if deletion of particular questionnaires works
-	//				ClientResponse delete=c1.sendRequest("DELETE", u.getPath(),"");
-	//				assertEquals(200,delete.getHttpCode());
-	//	
-	//				// then check if previously deleted questionnaire still exists.
-	//				ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
-	//				assertEquals(404,result.getHttpCode());
-	//	
-	//			}  catch (ParseException e) {
-	//				e.printStackTrace();
-	//				fail("Could not parse service response to JSON Object!");
-	//			} catch (MalformedURLException e) {
-	//				e.printStackTrace();
-	//				fail("Detected invalid survey URL! " + e.getMessage());
-	//			}
-	//		}
+	//		
 	//	
 	//		/**
 	//		 * Test the deletion of a non-existing survey.
@@ -773,85 +922,7 @@ public class SurveyServiceTest {
 	//				fail("Service returned malformed URL!");
 	//			}
 	//		}
-	//	
-	//		/**
-	//		 * Test the updating of an existing questionnaire.
-	//		 */
-	//		@Test
-	//		public void testUpdateExistingQuestionnaire(){
-	//			// first add a new questionnaire
-	//			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//			assertTrue(r.getResponse()!=null);
-	//			assertTrue(r.getResponse().length()>0);
-	//			try{
-	//				JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
-	//				assertTrue(o.keySet().contains("url"));
-	//	
-	//				String fullurl = (String) o.get("url");
-	//	
-	//				// check if first questionnaire URL is a valid URL, then extract path
-	//				URL u = new URL(fullurl);
-	//				String pathonly = u.getPath();
-	//	
-	//				// use path to get the questionnaire
-	//				ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
-	//				assertEquals(200,result.getHttpCode()); // questionnaire should exist
-	//	
-	//				JSONObject questionnaire = (JSONObject) JSONValue.parse(result.getResponse());
-	//	
-	//				// change some fields in questionnaire
-	//				questionnaire.put("name","Beerdrinker questionnaire");
-	//				questionnaire.put("description", "This questionnaire is for all those who like to drink beer.");
-	//	
-	//				// then call service to update existing questionnaire
-	//				ClientResponse updateresult=c1.sendRequest("POST", u.getPath(),questionnaire.toJSONString());
-	//				assertEquals(200, updateresult.getHttpCode());
-	//	
-	//				ClientResponse updated=c1.sendRequest("GET", u.getPath(),"");
-	//				assertEquals(200,updated.getHttpCode()); // questionnaire should exist
-	//				JSONObject updatedQuestionnaire = (JSONObject) JSONValue.parse(updated.getResponse());
-	//	
-	//				assertEquals(questionnaire,updatedQuestionnaire);
-	//	
-	//			} catch (ParseException e) {
-	//				e.printStackTrace();
-	//				fail("Service returned invalid JSON! " + e.getMessage());
-	//			} catch (MalformedURLException e){
-	//				e.printStackTrace();
-	//				fail("Service returned malformed URL!");
-	//			}
-	//		}
-	//	
-	//		@Test
-	//		public void testUploadQuestionnaireForm(){
-	//			try{
-	//				// first add a new questionnaire
-	//				ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//	
-	//				JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
-	//	
-	//				URL u = new URL((String) o.get("url"));
-	//	
-	//				// read content from example questionnaire XML file
-	//				String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu1.xml"));
-	//	
-	//				ClientResponse result=c1.sendRequest("POST", u.getPath() + "/form",qform);
-	//				assertEquals(200, result.getHttpCode());
-	//	
-	//				ClientResponse downl = c1.sendRequest("GET", u.getPath() + "/form", "");
-	//				assertEquals(200, downl.getHttpCode());
-	//	
-	//			} catch (MalformedURLException e){
-	//				e.printStackTrace();
-	//				fail("Service returned malformed URL!");
-	//			} catch (IOException e) {
-	//				e.printStackTrace();
-	//				fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
-	//			} catch (ParseException e) {
-	//				e.printStackTrace();
-	//				fail("Service returned invalid JSON! " + e.getMessage());
-	//			} 
-	//		}
+	//		
 
 	//	@Test
 	//	public void testSubmitQuestionnaireAnswerWithCommunity(){
