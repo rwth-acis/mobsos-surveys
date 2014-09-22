@@ -76,10 +76,10 @@ public class SurveyServiceTest {
 
 	private static LocalNode node;
 	private static WebConnector connector;
-	private static MiniClient c1, c2, c3;
+	private static MiniClient c1, c2, c3, ac;
 	private static ByteArrayOutputStream logStream;
 
-	private static UserAgent user1, user2, user3;
+	private static UserAgent user1, user2, user3, anon;
 	private static GroupAgent group1, group2;
 
 	private static final String testServiceClass = "i5.las2peer.services.mobsos.SurveyService";
@@ -101,6 +101,7 @@ public class SurveyServiceTest {
 		user1 = MockAgentFactory.getAdam();
 		user2 = MockAgentFactory.getAbel();
 		user3 = MockAgentFactory.getEve();
+		anon = MockAgentFactory.getAnonymous();
 
 
 		Agent[] as;
@@ -151,6 +152,10 @@ public class SurveyServiceTest {
 		c3 = new MiniClient();
 		c3.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
 		c3.setLogin(Long.toString(user3.getId()), "evespass");
+		
+		ac = new MiniClient();
+		ac.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
+
 
 		//String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
 		//System.out.println(xml);
@@ -190,6 +195,13 @@ public class SurveyServiceTest {
 
 		System.out.println(logStream.toString());
 
+	}
+	
+	@Test
+	public void testAnonymous(){
+		ClientResponse cr = c1.sendRequest("GET", "mobsos/questionnaires","","","text/html",new Pair[]{});
+		System.out.println(cr.getResponse());
+		System.out.println(cr.getHttpCode());
 	}
 
 	/**

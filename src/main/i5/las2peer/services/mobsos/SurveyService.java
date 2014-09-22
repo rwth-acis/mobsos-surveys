@@ -51,6 +51,7 @@ import i5.las2peer.security.UserAgent;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -163,6 +164,43 @@ public class SurveyService extends Service {
 
 	// ============= QUESTIONNAIRE-RELATED RESOURCES ==============
 
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("questionnaires")
+	public HttpResponse getQuestionnairesHTML(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
+		String onAction = "retrieving questionnaires HTML";
+
+		// only respond with template; nothing to be adapted
+		try {
+			String html = new Scanner(new File("./doc/xml/questionnaires-template.html")).useDelimiter("\\A").next();
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+	}
+
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("questionnaires/{id}")
+	public HttpResponse getQuestionnaireHTML(@PathParam("id") int id){
+		String onAction = "retrieving individual questionnaire HTML";
+
+		// adapt template to specific questionnaire
+		try {
+			String html = new Scanner(new File("./doc/xml/questionnaire-id-template.html")).useDelimiter("\\A").next();
+			html = fillPlaceHolder(html,"ID", ""+id);
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+	}
+
 	/**
 	 * TODO: write documentation
 	 * Retrieves a list of all questionnaires.
@@ -172,8 +210,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
-	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query)
-	{
+	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
 		String onAction = "retrieving questionnaires";
 
 		try{
@@ -1742,6 +1779,27 @@ public class SurveyService extends Service {
 		}
 	}
 
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("redirect")
+	public HttpResponse redirectCallback(){
+		String onAction = "processing OpenID Connect redirect Callback";
+
+		String html = "";
+		// start off with template
+		try {
+			html = new Scanner(new File("./doc/xml/redirect-callback.html")).useDelimiter("\\A").next();
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+
+		HttpResponse result = new HttpResponse(html);
+		result.setStatus(200);
+		return result;
+
+	}
+
+
 	// ============= COMMUNITY EXTENSIONS (TODO) ==============
 
 	/*
@@ -2246,6 +2304,23 @@ public class SurveyService extends Service {
 
 	// ============= Private helper methods ===================
 
+	private String fillPlaceHolder(String data, String placeholder, String value){
+		// detect all  tags used by questionnaire author throughout the form 
+		// and replace them by the respective values.
+		Pattern p = Pattern.compile("\\$\\{" + placeholder + "\\}");
+		Matcher m = p.matcher(data);
+
+		String adaptedform = new String(data);
+
+		// replace any occurring author tags within questionnaire form
+		Vector<String> foundTags = new Vector<String>();
+		while(m.find()){
+			String tag = m.group().substring(2,m.group().length()-1);
+			adaptedform = adaptedform.replaceAll("\\$\\{"+tag+"\\}",value);
+		}
+
+		return adaptedform;
+	} 
 	/**
 	 * Adapts a given questionnaire form before being administered to a requesting user in a given community context.
 	 * For adaptation purposes, questionnaire authors can make use of a set of author tags, which are replaced by this method.
