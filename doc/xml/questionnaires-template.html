@@ -65,14 +65,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		<div class="row">
 			<h2>Questionnaires</h2>
 			<div class="btn-group">
-				<button id="i_quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-				<button id="i_quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span>Create Questionnaire</button>
+				<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+				<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span>Create Questionnaire</button>
 		    </div>
 		</div>
 		<div class="row">
 			<ul id="questionnaires" class="list-group" >
 				<!-- questionnaire items inserted dynamically -->
 			</ul>
+		</div>
+	</div>
+	
+	<!-- Container for creating a new questionnaire -->
+	<div id="i_quest" class="container hidden">
+		<div>
+			<h1>Create Questionnaire</h1>
+		   
+			<form role="form" class="form">
+				<div class="form-group">
+					<label for="i_quest_name">Name</label>
+					<input type="text" class="form-control" id="i_quest_name" placeholder="Name" value="Standard MobSOS CIS Success Questionnaire"></input>
+				</div>
+				<div class="form-group">
+					<label for="i_quest_org">Organization</label>
+					<input type="text" class="form-control" id="i_quest_org" placeholder="Organization" value="Advanced Community Information Systems (ACIS), RWTH Aachen University, Germany"></input>
+				</div>
+				<div class="form-group">
+					<label for="i_quest_logo">Logo</label>
+					<span id="i_quest_lpic"></span><input type="text" class="form-control" id="i_quest_logo" placeholder="Logo Image URL (.jpg, .png)" value="http://dbis.rwth-aachen.de/cms/images/logo.jpg"></input>
+				</div>
+				<div class="form-group">
+					<label for="i_quest_desc">Description</label>
+					<textarea class="form-control" id="i_quest_desc" placeholder="Description">A questionnaire assessing the success of a software artifact being part of a Community Information System (CIS). Success is modeled as multi-dimensional formative indicator, containing the dimensions System Quality (SQ), Information Quality (IQ), Use (U), User Satisfaction (US), Individual Impact (II), and Community Impact (CI).</textarea>
+				</div>
+				<div class="form-group">
+					<label for="i_quest_file">Questionnaire XML</label>
+					<input class="form-control" name="file" type="file" id="i_quest_file" />
+				</div>
+				<div class="col-md-3 form-group">
+					<input id="i_quest_submit" class="form-control btn btn-default disabled" type="button" value="Submit" />
+				</div>
+				<div class="col-md-3 form-group">
+					<input id="i_quest_cancel" class="form-control btn btn-default" type="button" value="Cancel" />
+				</div>
+			</form>
 		</div>
 	</div>
 	
@@ -85,44 +121,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
 		
 		var las2peer_server = "http://localhost:8080/";
-		//var las2peer_server = "https://localhost/";
-		
-		function serviceCall(callback){
-			var ajaxObj = {
-				url: las2peer_server + "mobsos/questionnaires?access_token=" + window.localStorage["access_token"],
-				type: 'GET',
-				contentType: "application/json",
-				crossDomain: true,
-				error: function (xhr, errorType, error) {
-					var errorText = error;
-					if (xhr.responseText != null && xhr.responseText.trim().length > 0)
-						errorText = xhr.responseText;
-					console.log("Error: " + errorText);
-				},
-				success: function (data) {
-					callback(data);
-				}
-			};
-			
-			$.ajax(ajaxObj);
-		}
-		
-		function serviceCallback(r){
-			console.log("Result: ");
-			console.log(r);
-		}
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				console.log("signed in");
-				console.log(oidc_provider_config);
-				console.log(oidc_userinfo);
-				console.log(window.localStorage["access_token"]);
+				//console.log("signed in");
+				//console.log(oidc_provider_config);
+				//console.log(oidc_userinfo);
+				//console.log(window.localStorage["access_token"]);
 				
 				$("#quest").removeClass("hidden");
-				$("#i_quest_refresh").click(function(){
+				$("#quest_refresh").click(function(){
 					updateQuestionnaires("ality");
+				});
+				$("#quest_create").click(function(){
+					$("#i_quest").removeClass("hidden");
+				});
+				
+				$('#i_quest_file').change(function(e){
+					sfile = e.target.files[0];
+					var suffix = ".xml";
+					
+					var fname = sfile.name;
+					console.log(fname.indexOf(suffix, fname.length - suffix.length) !== -1);
+					$("#i_quest_submit").removeClass('disabled');
+				});
+				
+				$('#i_quest_logo').change(function(e){
+					console.log(encodeURI($(this).val()));
+					$('#i_quest_lpic').html("<img src='" + $(this).val() + "' height='30' style='margin:10px;'/>");
+				});
+				
+				$('#i_quest_submit').click(function(){
+					submitCreateQuestionnaireForm();
+				});
+				
+				$('#i_quest_cancel').click(function(){
+					$("#i_quest").addClass("hidden");
 				});
 				
 				updateQuestionnaires("");
@@ -167,6 +202,148 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			$.ajax(ajaxObj);
 			
+		}
+		
+		function submitCreateQuestionnaireForm(){
+			
+			var q = {
+				"name": encodeURIComponent($('#i_quest_name').val()),
+				"description" :encodeURIComponent($('#i_quest_desc').val()),
+				"organization": encodeURIComponent($('#i_quest_org').val()),
+				"logo": $('#i_quest_logo').val()
+			};
+			
+			if(q.name == '' || q.description == '' || q.organization == '' || q.logo == ''){
+				console.log("Questionnaire input incomplete");
+				return;
+			}
+			
+			// first upload questionnaire metadata and create new questionnaire resource.
+			// On successful creation of new questionnaire, attempt to upload questionnaire form.
+			
+			createQuestionnaire(JSON.stringify(q),sfile,
+				function(data,type){
+					
+					console.log("Questionnaire created")
+					console.log("Response MIME type: " + type);
+					console.log("Response Data");
+					console.log(data);
+					
+					window.location.href = data.url;
+					
+					/*
+					client.sendFile("POST", qurl + "/form", sfile,
+						function(data,type){
+							console.log("Questionnaire form uploaded");
+							updateQuestionnaires("");
+							$('#i_quest').find("input[type=text], input[type=file], textarea").val(null);
+							$('#i_quest_submit').addClass("disabled");
+							switchTo("questionnaire");
+						},
+						function(error){
+							console.log(error);
+						}
+					);
+					*/
+				},
+				function(e){
+					console.log("Questionnaire creation failed!")
+					console.log(e);
+				}
+			);
+			
+		}
+		
+		/**
+		* Sends an authenticated request to LAS2peer Web Connector. The request is specified by a HTTP method, a URI, 
+		* content data, a set of custom headers. Clients can process the outcome of this request via two separate
+		* callback functions 'callback' (success case) and 'errorCallback' (error case). 
+		*/
+		function sendRequest(method, URI, content, mime, customHeaders, callback, errorCallback) {
+			
+			var mtype = "text/plain; charset=UTF-8"
+			if(mime !== 'undefined'){
+				mtype = mime;
+			}
+			
+			var ajaxObj = {
+				url: URI,
+				type: method.toUpperCase(),
+				data: content,
+				contentType: mtype,
+				crossDomain: true,
+				headers: {},
+
+				error: function (xhr, errorType, error) {
+					var errorText = error;
+					if (xhr.responseText != null && xhr.responseText.trim().length > 0)
+						errorText = xhr.responseText;
+					outputError(xhr.status, method, requestURI, errorText);
+					errorCallback(errorText);
+				},
+				success: function (data, status, xhr) {
+					var type = xhr.getResponseHeader("Content-Type");
+					callback(data, type);
+				},
+			};
+		   
+			if (customHeaders !== undefined && customHeaders !== null) {
+				$.extend(ajaxObj.headers, customHeaders);
+			}
+			
+			$.ajax(ajaxObj);
+		}
+		
+		function sendFile(resource, file){
+		
+			
+			$.ajax({
+				url: resource,
+				type: 'POST',
+				data: data,
+				cache: false,
+				dataType: 'json',
+				processData: false, // Don't process the files
+				contentType: false, // Set content type to false as jQuery will tell the server its a query string request
+				success: function(data, textStatus, jqXHR)
+				{
+					if(typeof data.error === 'undefined')
+					{
+						// Success so call function to process the form
+						submitForm(event, data);
+					}
+					else
+					{
+						// Handle errors here
+						console.log('ERRORS: ' + data.error);
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown)
+				{
+					// Handle errors here
+					console.log('ERRORS: ' + textStatus);
+					// STOP LOADING SPINNER
+				}
+			});
+		}
+		
+		function createQuestionnaire(metadata, form, cb, error_cb){
+			sendRequest("POST",
+				las2peer_server + "mobsos/questionnaires?access_token=" + window.localStorage["access_token"],
+				metadata,
+				"application/json",
+				{},
+				function(data, type){
+					console.log(type);
+					console.log(data);
+					// another request uploading form
+					cb(data,type);
+				},
+				function(error){
+					console.log(error);
+					error_cb(error);
+				}
+			);
 		}
 		
 		

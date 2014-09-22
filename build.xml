@@ -72,8 +72,8 @@
     </target>
 	
 	
-	<target name="cleancache" description="cleans ivy cache">
-		<ivy-cleancache />
+	<target name="cleancache" description="cleans ivy cache" depends="install-ivy">
+		<ivy:cleancache />
 	</target>
 	
     <!-- Get Dependencies from our Maven Repository via Ivy -->
