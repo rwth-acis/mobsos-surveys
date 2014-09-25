@@ -312,6 +312,7 @@ public class SurveyService extends Service {
 
 			// respond to user with newly created id/URL
 			JSONObject r = new JSONObject();
+			r.put("id",qid);
 			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
 			HttpResponse result = new HttpResponse(r.toJSONString());
 			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
@@ -648,13 +649,6 @@ public class SurveyService extends Service {
 	 * @param formXml
 	 * @return
 	 */
-
-	/**
-	 * TODO: write documentation
-	 * @param id
-	 * @param formXml
-	 * @return
-	 */
 	@PUT
 	@Consumes(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
@@ -853,6 +847,7 @@ public class SurveyService extends Service {
 
 			// respond to user with newly generated survey id/URL
 			JSONObject r = new JSONObject();
+			r.put("id", sid);
 			r.put("url",epUrl + "mobsos/surveys/" + sid);
 
 			HttpResponse result = new HttpResponse(r.toJSONString());

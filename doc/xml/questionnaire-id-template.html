@@ -122,6 +122,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				success: function (data) {
 					console.log(data);
 					$("#info").append("<li>Logo: <img src='" + data.logo + "' width='100'></li>");
+					$("#info").append("<li>Organization: " + decodeURIComponent(data.organization) + "</li>");
 					$("#info").append("<li>Name: " + decodeURIComponent(data.name) + "</li>");
 					$("#info").append("<li>Description: " + decodeURIComponent(data.description) + "</li>");
 				}

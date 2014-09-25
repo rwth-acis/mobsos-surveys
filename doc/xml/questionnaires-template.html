@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>OpenID Connect Test Client</title>
+	<title>MobSOS Surveys - Questionnaires</title>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -60,28 +60,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</span>
 	</div>
 	
-	<!-- Container for operations on questionnaires -->
-	<div id="quest" class="container hidden">
-		<div class="row">
-			<h2>Questionnaires</h2>
-			<div class="btn-group">
-				<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-				<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span>Create Questionnaire</button>
-		    </div>
-		</div>
-		<div class="row">
-			<ul id="questionnaires" class="list-group" >
-				<!-- questionnaire items inserted dynamically -->
-			</ul>
-		</div>
-	</div>
-	
 	<!-- Container for creating a new questionnaire -->
 	<div id="i_quest" class="container hidden">
 		<div>
 			<h1>Create Questionnaire</h1>
 		   
-			<form role="form" class="form">
+			<form id="fcq" role="form" class="form">
 				<div class="form-group">
 					<label for="i_quest_name">Name</label>
 					<input type="text" class="form-control" id="i_quest_name" placeholder="Name" value="Standard MobSOS CIS Success Questionnaire"></input>
@@ -98,37 +82,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<label for="i_quest_desc">Description</label>
 					<textarea class="form-control" id="i_quest_desc" placeholder="Description">A questionnaire assessing the success of a software artifact being part of a Community Information System (CIS). Success is modeled as multi-dimensional formative indicator, containing the dimensions System Quality (SQ), Information Quality (IQ), Use (U), User Satisfaction (US), Individual Impact (II), and Community Impact (CI).</textarea>
 				</div>
-				<div class="form-group">
+				<div class="col-md3 form-group">
 					<label for="i_quest_file">Questionnaire XML</label>
 					<input class="form-control" name="file" type="file" id="i_quest_file" />
 				</div>
+				<div id="file-error" class="col-md3 alert alert-danger hidden">
+					
+				</div>
+				
 				<div class="col-md-3 form-group">
 					<input id="i_quest_submit" class="form-control btn btn-default disabled" type="button" value="Submit" />
 				</div>
 				<div class="col-md-3 form-group">
 					<input id="i_quest_cancel" class="form-control btn btn-default" type="button" value="Cancel" />
 				</div>
+				
 			</form>
 		</div>
 	</div>
 	
-	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<!-- Container for operations on questionnaires -->
+	<div id="quest" class="container hidden">
+		<div class="row">
+			<h2>Questionnaires</h2>
+			<div class="btn-group">
+				<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+				<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span>Create Questionnaire</button>
+		    </div>
+		</div>
+		<div class="row">
+			<ul id="questionnaires" class="list-group" >
+				<!-- questionnaire items inserted dynamically -->
+			</ul>
+		</div>
+	</div>
 	
-	<!-- import Bootstrap for responsive UI (must) -->
-	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<!-- import MobSOS Surveys lib -->
+	<script type="text/javascript" src="http://dbis.rwth-aachen.de/~renzel/mobsos/lib/js/mobsos-surveys.js"></script>
 		
 	<script type="text/javascript">
 		
 		var las2peer_server = "http://localhost:8080/";
+		var client = new MobSOSSurveysClient(las2peer_server);
+		var form = "";
+		
+		function alertSelectedFileError(msg){
+			$("#file-error").removeClass("hidden").html("<b>" + msg + "</b>");
+		}
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				//console.log("signed in");
-				//console.log(oidc_provider_config);
-				//console.log(oidc_userinfo);
-				//console.log(window.localStorage["access_token"]);
 				
 				$("#quest").removeClass("hidden");
 				$("#quest_refresh").click(function(){
@@ -139,12 +143,48 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				});
 				
 				$('#i_quest_file').change(function(e){
-					sfile = e.target.files[0];
-					var suffix = ".xml";
+					f = e.target.files[0];
 					
-					var fname = sfile.name;
-					console.log(fname.indexOf(suffix, fname.length - suffix.length) !== -1);
-					$("#i_quest_submit").removeClass('disabled');
+					// FileReader is a feature only available in HTML5!
+					var r = new FileReader();
+					
+					r.onload = (function (f) {
+						return function (e) {
+							var contents = e.target.result;
+							console.log(contents);
+							
+							// do simple client-side checks if selected file is a MobSOS Surveys compliant questionnaire form
+							//   - parse and check for well-formedness
+							//   - check for MobSOS Surveys namespace definition in document element
+							//   - check for document element being Questionnaire
+							//   - no validation here!
+							
+							// parse selected file content as XML
+							var oParser = new DOMParser();
+							var oDOM = oParser.parseFromString(contents, "text/xml");
+							
+							// first check content for parsing errors (not well-formed)
+							if(oDOM.documentElement.nodeName == "parsererror"){
+								alertSelectedFileError("Selected file is not a MobSOS Surveys questionnaire form!");
+							} else {
+								// if well-formed, check for xmlns attribute to contain MobSOS Surveys Schema URI
+								if(oDOM.documentElement.attributes.xmlns == null || oDOM.documentElement.attributes.xmlns.value !== "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"){
+									alertSelectedFileError("Selected file is not a MobSOS Surveys questionnaire form!");
+								} else {
+									// check if document element local name is "Questionnaire" (could also be "QuestionnaireAnswer" for responses)
+									if(oDOM.documentElement.localName !== "Questionnaire"){
+										alertSelectedFileError("Selected file is not a MobSOS Surveys questionnaire form!");
+									} else {
+										// everything ok for now; enable submit button
+										$("#file-error").addClass("hidden");
+										$("#i_quest_submit").removeClass("disabled");
+										form = contents;
+									}
+								}
+							}
+						};
+					})(f);
+					r.readAsText(f);
 				});
 				
 				$('#i_quest_logo').change(function(e){
@@ -160,7 +200,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#i_quest").addClass("hidden");
 				});
 				
-				updateQuestionnaires("");
+				updateQuestionnaires("III");
 			} else {
 				console.log("not signed in...");
 				console.log(result);
@@ -169,24 +209,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		function updateQuestionnaires(search){
 		
-			var q = "";
-			if(search !== ""){
-				q = "q=" + search + "&";
-			}
-			
-			var ajaxObj = {
-				url: las2peer_server + "mobsos/questionnaires?" + q + "access_token=" + window.localStorage["access_token"],
-				type: 'GET',
-				contentType: "application/json",
-				crossDomain: true,
-				error: function (xhr, errorType, error) {
-					var errorText = error;
-					if (xhr.responseText != null && xhr.responseText.trim().length > 0)
-						errorText = xhr.responseText;
-					console.log("Error: " + errorText);
-				},
-				success: function (data) {
-					console.log("Got Questionnaires");
+			client.getQuestionnaires(search,1,
+				function(data,type){
 					console.log(data);
 					qs = data.questionnaires;
 					
@@ -197,11 +221,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						var q = qs[i];
 						$('#questionnaires').append("<li class='list-group-item'><span style='margin-right: 10px;'><img src='" + q.logo + "' height='30px' alt='Logo for questionnaire '" + decodeURIComponent(q.name) + "/></span><span><b>" + decodeURIComponent(q.name) + "</b><i> by " + decodeURIComponent(q.owner) + ", " + decodeURIComponent(q.organization) + "</i></span></li>");
 					}
+				},
+				function(error){
+					console.log(error);
 				}
-			};
-			
-			$.ajax(ajaxObj);
-			
+			);
 		}
 		
 		function submitCreateQuestionnaireForm(){
@@ -221,30 +245,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			// first upload questionnaire metadata and create new questionnaire resource.
 			// On successful creation of new questionnaire, attempt to upload questionnaire form.
 			
-			createQuestionnaire(JSON.stringify(q),sfile,
+			client.createQuestionnaire(JSON.stringify(q),form,
 				function(data,type){
-					
 					console.log("Questionnaire created")
 					console.log("Response MIME type: " + type);
 					console.log("Response Data");
 					console.log(data);
-					
-					window.location.href = data.url;
-					
-					/*
-					client.sendFile("POST", qurl + "/form", sfile,
-						function(data,type){
-							console.log("Questionnaire form uploaded");
-							updateQuestionnaires("");
-							$('#i_quest').find("input[type=text], input[type=file], textarea").val(null);
-							$('#i_quest_submit').addClass("disabled");
-							switchTo("questionnaire");
-						},
-						function(error){
-							console.log(error);
-						}
-					);
-					*/
 				},
 				function(e){
 					console.log("Questionnaire creation failed!")
@@ -254,106 +260,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 		}
 		
-		/**
-		* Sends an authenticated request to LAS2peer Web Connector. The request is specified by a HTTP method, a URI, 
-		* content data, a set of custom headers. Clients can process the outcome of this request via two separate
-		* callback functions 'callback' (success case) and 'errorCallback' (error case). 
-		*/
-		function sendRequest(method, URI, content, mime, customHeaders, callback, errorCallback) {
-			
-			var mtype = "text/plain; charset=UTF-8"
-			if(mime !== 'undefined'){
-				mtype = mime;
-			}
-			
-			var ajaxObj = {
-				url: URI,
-				type: method.toUpperCase(),
-				data: content,
-				contentType: mtype,
-				crossDomain: true,
-				headers: {},
-
-				error: function (xhr, errorType, error) {
-					var errorText = error;
-					if (xhr.responseText != null && xhr.responseText.trim().length > 0)
-						errorText = xhr.responseText;
-					outputError(xhr.status, method, requestURI, errorText);
-					errorCallback(errorText);
-				},
-				success: function (data, status, xhr) {
-					var type = xhr.getResponseHeader("Content-Type");
-					callback(data, type);
-				},
-			};
-		   
-			if (customHeaders !== undefined && customHeaders !== null) {
-				$.extend(ajaxObj.headers, customHeaders);
-			}
-			
-			$.ajax(ajaxObj);
-		}
-		
-		function sendFile(resource, file){
-		
-			
-			$.ajax({
-				url: resource,
-				type: 'POST',
-				data: data,
-				cache: false,
-				dataType: 'json',
-				processData: false, // Don't process the files
-				contentType: false, // Set content type to false as jQuery will tell the server its a query string request
-				success: function(data, textStatus, jqXHR)
-				{
-					if(typeof data.error === 'undefined')
-					{
-						// Success so call function to process the form
-						submitForm(event, data);
-					}
-					else
-					{
-						// Handle errors here
-						console.log('ERRORS: ' + data.error);
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown)
-				{
-					// Handle errors here
-					console.log('ERRORS: ' + textStatus);
-					// STOP LOADING SPINNER
-				}
-			});
-		}
-		
-		function createQuestionnaire(metadata, form, cb, error_cb){
-			sendRequest("POST",
-				las2peer_server + "mobsos/questionnaires?access_token=" + window.localStorage["access_token"],
-				metadata,
-				"application/json",
-				{},
-				function(data, type){
-					console.log(type);
-					console.log(data);
-					// another request uploading form
-					cb(data,type);
-				},
-				function(error){
-					console.log(error);
-					error_cb(error);
-				}
-			);
-		}
-		
-		
 	</script>
-	  
+	
+	<!-- import jQuery for AJAX calls (must) -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	
+	<!-- import Bootstrap for responsive UI (must) -->
+	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	
+	
+	
 	<!-- add this script element right before closing tag </body> -->
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
+       po.src = 'http://dbis.rwth-aachen.de/~renzel/mobsos/lib/js/oidc/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>
