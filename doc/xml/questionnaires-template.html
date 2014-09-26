@@ -200,7 +200,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#i_quest").addClass("hidden");
 				});
 				
-				updateQuestionnaires("III");
+				updateQuestionnaires("");
 			} else {
 				console.log("not signed in...");
 				console.log(result);
@@ -251,6 +251,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					console.log("Response MIME type: " + type);
 					console.log("Response Data");
 					console.log(data);
+					
+					// redirect to questionnaire resource
+					window.location.href = data.url;
 				},
 				function(e){
 					console.log("Questionnaire creation failed!")
