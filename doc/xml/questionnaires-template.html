@@ -269,6 +269,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			client.createQuestionnaire(JSON.stringify(q),form,
 				function(data,type){
+<<<<<<< HEAD
+=======
+					console.log("Questionnaire created")
+					console.log("Response MIME type: " + type);
+					console.log("Response Data");
+					console.log(data);
+					
+					// redirect to questionnaire resource
+>>>>>>> 9cecc7d4d6323e5c038a19e5a87fe79c367d6f0b
 					window.location.href = data.url;
 				},
 				function(e){
