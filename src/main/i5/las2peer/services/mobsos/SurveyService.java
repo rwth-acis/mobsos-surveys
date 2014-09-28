@@ -1194,7 +1194,9 @@ public class SurveyService extends Service {
 
 			// adapt form template to concrete survey and user
 			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),null);
-
+			
+			//String adaptedFormXml = formXml;
+			
 			Document form;
 			// before returning form, make sure it's still valid (may be obsolete step...)
 			try{
@@ -1212,11 +1214,13 @@ public class SurveyService extends Service {
 			// now start to transform XML into ready-to-use HTML
 
 			// start off with template
-			String text = new Scanner(new File("./doc/xml/questionnaire-template.html")).useDelimiter("\\A").next();
+			String text = new Scanner(new File("./doc/xml/survey-form-template.html")).useDelimiter("\\A").next();
 
 			// do all adaptation to user and survey
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), null);
-
+			
+			//String adaptText = text;
+			
 			// add HTML elements for all questionnaire items accordingly
 			Vector<String> qpages = new Vector<String>();
 			Vector<String> navpills = new Vector<String>();
@@ -1261,7 +1265,7 @@ public class SurveyService extends Service {
 						if("qu:OrdinalScaleQuestionPageType".equals(qtype)){
 
 							// TODO: do something with default value, if set.
-							int defval = Integer.parseInt(e.getAttribute("defval"));
+							//int defval = Integer.parseInt(e.getAttribute("defval"));
 							String minlabel = e.getAttribute("minlabel");
 							String maxlabel = e.getAttribute("maxlabel");
 							int minval =  Integer.parseInt(e.getAttribute("minval"));
@@ -1280,7 +1284,7 @@ public class SurveyService extends Service {
 						} else if ("qu:DichotomousQuestionPageType".equals(qtype)){
 
 							// TODO: do something with default value, if set.
-							int defval = Integer.parseInt(e.getAttribute("defval"));
+							//int defval = Integer.parseInt(e.getAttribute("defval"));
 							String minlabel = e.getAttribute("minlabel");
 							String maxlabel = e.getAttribute("maxlabel");
 
@@ -1626,6 +1630,8 @@ public class SurveyService extends Service {
 			}
 
 			try{
+				System.out.println(answerJSON);
+				
 				answer = (JSONObject) JSONValue.parseWithException(answerJSON);	
 			} catch (ParseException e){
 				HttpResponse result = new HttpResponse("Survey response is not valid JSON! Cause: " + e.getMessage());
@@ -1639,6 +1645,7 @@ public class SurveyService extends Service {
 			try{
 				answerFieldTable = validateAnswer(form,answer);
 			} catch (IllegalArgumentException e){
+				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Survey response is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -2374,7 +2381,7 @@ public class SurveyService extends Service {
 					} 
 				} else if(tag.startsWith("SURVEY.")){
 					if (tag.endsWith("ID")){
-						value = (String) survey.get("id");
+						value = (String) (survey.get("id")+"");
 					} else if (tag.endsWith("NAME")){
 						value = (String) survey.get("name");
 					} else if (tag.endsWith("DESCRIPTION")){
@@ -3168,7 +3175,7 @@ public class SurveyService extends Service {
 					question.put("type", e.getAttribute("xsi:type"));
 
 					if("qu:OrdinalScaleQuestionPageType".equals(qtype) || "qu:DichotomousQuestionPageType".equals(qtype)){
-						question.put("defval",Integer.parseInt(e.getAttribute("defval")));
+						//question.put("defval",Integer.parseInt(e.getAttribute("defval")));
 						question.put("minlabel", e.getAttribute("minlabel"));
 						question.put("maxlabel", e.getAttribute("maxlabel"));
 

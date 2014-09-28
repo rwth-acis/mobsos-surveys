@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MobSOS Surveys - Questionnaire ${ID}</title>
+	<title>MobSOS Surveys - Survey Form </title>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -44,6 +44,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<![endif]-->
 	
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<style>
+		.page-header {
+			margin: 10px;
+		}
+		
+		table td {
+			padding: 10px;
+		}
+		table h2 {
+			padding: 0px;
+		}
+		.question {
+			padding: 10px;
+			font-size: 1.3em;
+		}
+	
+		.btn {
+			margin: 4px;
+		}
+	</style>
 </head>
 <body>
 
@@ -75,19 +95,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 	
-	<!-- Container for operations on questionnaires -->
-	<div id="quest" class="container hidden">
-		<div class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="qname" class="h2"></span> <button id="i_quest_edit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button></h2>
-			<h4 id="qorg"></h4>
-			<p>
-			<div id="qdesc" class="well"></div>
-			</p>
-			<p>
-				<b>Pages: <span id="pc" class="badge"></span><span id="ip" class="badge alert-info"></span><span id="qp" class="badge alert-success lg"></span></b>
-				<ul id="qitems" class="list-group"></ul>
-			</p>
+	<!-- Container for questionnaire form -->
+	<div id="form" class="container hidden">
+		<div class="container">
+		<div class="row">
+			<div class="col-xs-12" style="margin: 90px 0px 0px 0px;">
+				<ul class="nav nav-pills btn-small setup-panel">
+					<li class="active"><a href="#intro"><h4 class="list-group-item-heading">Introduction</h4></a></li>
+<!-- NAVPILLS -->
+					<li><a href="#submission"><h4 class="list-group-item-heading">Submission</h4></a></li>
+				</ul>
+			</div>
 		</div>
+		<div class="row setup-content" id="intro">
+			<div class="col-xs-12">
+				<div class="col-md-12 well text-center">
+					<h2>Introduction</h2>
+					<div style="text-align: left;">${SURVEY.DESCRIPTION}</div>
+				</div>
+			</div>
+		</div>
+<!-- QUESTIONPAGES -->
+		<div class="row setup-content" id="submission">
+			<div class="col-xs-12">
+				<div class="col-md-12 well text-center">
+					<h1 class="text-center">Submission</h1>
+					<span class="help-block question">Thank you very much for your participation!</span>
+					
+					<input class="btn btn-lg btn-success" id="submit" type="submit" />
+					<!-- ANSWERLINK -->
+					<span id="submit-msg" class="alert alert-success"></span>
+				</div>
+			</div>
+		</div>
+		<div>
+			<button id="prev-step" class="btn btn-primary btn-lg pull-left">Prev</button>
+			<button id="next-step" class="btn btn-primary btn-lg pull-right">Next</button>
+		</div>
+	</div>
 	</div>
 	
 	<!-- import jQuery for AJAX calls (must) -->
@@ -107,115 +152,83 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				//console.log("signed in");
-				//console.log(oidc_provider_config);
-				//console.log(oidc_userinfo);
-				//console.log(window.localStorage["access_token"]);
 				
-				$("#quest").removeClass("hidden");
-				$("#i_quest_refresh").click(function(){
-					updateQuestionnaire();
-				});
+				$("#form").removeClass("hidden");
+				update();
 				
-				updateQuestionnaire();
 			} else {
 				console.log("not signed in...");
 				console.log(result);
 			}
 		}
 		
-		function updateQuestionnaire(){
+		function update(){
+			var navListItems = $('ul.setup-panel li a'), allWells = $('.setup-content');
+			allWells.hide();
+
+			navListItems.click(function(e)
+			{
+				e.preventDefault();
+				var $target = $($(this).attr('href')),
+					$item = $(this).closest('li');
+				
+				var id=$(this).attr('href');
+				if(id == '#submission'){
+					$('#prev-step').removeClass('disabled');
+					$('#next-step').addClass('disabled');
+				} else if (id == '#intro'){
+					$('#prev-step').addClass('disabled');
+					$('#next-step').removeClass('disabled');
+				} else {
+					$('#next-step').removeClass('disabled');
+					$('#prev-step').removeClass('disabled');
+				}
+				
+				if (!$item.hasClass('disabled')) {
+					navListItems.closest('li').removeClass('active');
+					$item.addClass('active');
+					allWells.hide();
+					$target.show();
+				}
+			});
 			
-			client.getQuestionnaire(${ID},
-				function(data,type){
-					$("#qname").html(decodeURIComponent(data.name))
-					$("#qorg").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
-					$("#qdesc").html(""+decodeURIComponent(data.description));
-					
-					client.getQuestionnaireForm(data.id,
-						function(data,type){
-							//console.log("Questionnaire XML");
-							//console.log(data);
-							
-							var pages = data.getElementsByTagName("Page");
-							var ipages = 0;
-							var qpages = 0;
-							
-							for(i=0;i<pages.length;i++){
-							
-								var page = pages[i];
-								var p_name = page.getAttribute("name");
-								var p_type = page.getAttribute("xsi:type");
-								
-								if(p_type == "qu:InformationPageType"){
-								
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
-									
-									$('#qitems').append("<li class='list-group-item'><span class='glyphicon glyphicon-info-sign'/> <span class='list-group-item-heading h4'>" + p_name + "</span><p class='list-group-item-text'/>" + p_info + "</li>");
-									
-									ipages++;
-									
-								} else if (p_type == "qu:OrdinalScaleQuestionPageType") {
-									
-									var p_qid = page.getAttribute("qid");
-									var p_minval = page.getAttribute("minval");
-									var p_maxval = page.getAttribute("maxval");
-									var p_minlab = page.getAttribute("minlabel");
-									var p_maxlab = page.getAttribute("maxlabel");
-									var p_req = page.getAttribute("required");
-									
-									var p_style = "style='color:darkgreen;' ";
-									
-									if(p_req == "true"){
-										p_style = "style='color:darkred;' ";
-									}
-									
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
-									
-									$('#qitems').append("<li class='list-group-item'><span " + p_style + " class='glyphicon glyphicon-question-sign'/> <span class='list-group-item-heading h4'>" + p_qid + " - " + p_name + "</span><p class='list-group-item-text'/>" + p_info + " (" + p_minval + ": " + p_minlab + " - " + p_maxval + ": " + p_maxlab + ")</p></li>");
-									
-									qpages++;
-									
-								} else if (p_type == "qu:FreeTextQuestionPageType") {
-									
-									var p_qid = page.getAttribute("qid");
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
-									var p_req = page.getAttribute("required");
-									var p_style = "style='color:darkgreen;' ";
-									
-									if(p_req == "true"){
-										p_style = "style='color:darkred;' ";
-									}
-									
-									$('#qitems').append("<li class='list-group-item'><span " + p_style + " class='glyphicon glyphicon-question-sign'/> <span class='list-group-item-heading h4'>" + p_qid + " - " + p_name + "</span><p class='list-group-item-text'/>" + p_info + " (freetext)</p></li>");
-									
-									qpages++;
-									
-								} else {
-									$('#qitems').append("<li class='list-group-item'><span class='list-group-item-heading h4'>" + p_name + "</span></li>");
-								}
-								
-							}
-							
-							$("#pc").html(pages.length);
-							$("#ip").html(ipages);
-							$("#qp").html(qpages);
-						},
-						function(error){
-							console.log(error);
-						}
-					);
+			$('ul.setup-panel li.active a').trigger('click');
+			$('#prev-step').addClass('disabled');
+
+			$('#prev-step').on('click', function(e) {
+				$('ul.setup-panel li.active').prev().find('a').trigger('click');
+			});
+			
+			$('#next-step').on('click', function(e) {
+				$('ul.setup-panel li.active').next().find('a').trigger('click');
+			});
+			
+			$("#submit").click(collectAnswers);	
+		}
+		
+		function collectAnswers(e){
+			e.preventDefault();
+			var values = {};
+			// collect all input from form elements
+			var questions  = $("input[name]:checked, .freetext");
+			for(var i=0;i < questions.length; i++ ){
+				values[questions.eq(i).attr("name")] = questions.eq(i).val();
+			}
+			
+			console.log(JSON.stringify(values));
+			
+			client.submitSurveyResponse(${SURVEY.ID},JSON.stringify(values), 
+				function(data, type){
+					console.log("Submitted Response successfully!")
+					$("#submit-msg").html("Response submitted");
 				},
 				function(error){
+					console.log("Error");
 					console.log(error);
 				}
 			);
-			
 		}
 		
-		function appendMeta(meta){
-			$('#questionnaires').append("<li class='list-group-item'><span style='margin-right: 10px;'>" + meta + "</span></li>");
-		}
 		
 		
 	</script>

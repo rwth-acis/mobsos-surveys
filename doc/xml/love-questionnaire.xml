@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
+		  xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			For the assessment, please fill out the following questionnaire. Please remember: there is no right answer!
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Hair" 
+	      qid="M.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I love Mumpfi's hair.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Titties" 
+	      qid="M.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="true" 
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I love Mumpfi's titties.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Positive Aspects" 
+	      qid="M.P"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What else do you love about Mumpfi?
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>

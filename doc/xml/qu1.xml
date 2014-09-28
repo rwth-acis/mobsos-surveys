@@ -18,116 +18,64 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Stability I" 
+	<qu:Page name="Stability" 
 	      qid="SQ.1.1"
-	      defval="0"
-	      minlabel="no" 
-	      maxlabel="yes" 
-	      xsi:type="qu:DichotomousQuestionPageType">
-		<qu:Instructions>
-			${RESOURCE} is stable.	
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Stability II" 
-	      qid="SQ.1.2"
 	      minval="0" 
 	      maxval="10"
 	      defval="5"
-	      minlabel="low" 
-	      maxlabel="high" 
+	      minlabel="total disagree" 
+	      maxlabel="total agree" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Please rate the stability of service ${SERVICE.NAME} on a scale from 0 to 10.
+			Resource ${RESOURCE} is stable.
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Usefulness of Features - Yes/No" 
+	<qu:Page name="Usefulness" 
 		 qid="SQ.2.1"
 		 minval="0" 
 		 maxval="10"
 		 defval="5"
-		 minlabel="totally useless" 
-		 maxlabel="perfectly useful" 
+		 minlabel="total disagree" 
+		 maxlabel="total agree" 
 		 xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Please rate the general usefulness of the features provided by ${SERVICE.NAME} on a scale from 0 to 10.
+			The features of resource ${RESOURCE} are useful.
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Usefulness of Features - General" 
-		 qid="SQ.2.2"
-		 minval="0" 
-		 maxval="10"
-		 defval="5"
-		 minlabel="totally useless" 
-		 maxlabel="perfectly useful" 
-		 xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Please rate the general usefulness of the features provided by ${SERVICE.NAME} from totally useless to perfectly useful.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Usefulness of Features - Community" 
-		 qid="SQ.2.3"
-		 minval="0" 
-		 maxval="10"
-		 defval="5"
-		 minlabel="totally useless" 
-		 maxlabel="perfectly useful" 
-		 xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Please rate how useful you found ${SERVICE.NAME} features escpecially for your community ${COMMUNITY}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Usefulness of Features - Additional Comments" 
-		 qid="SQ.2.4"
+	<qu:Page name="User Experience" 
+		 qid="SQ.3.1"
 		 xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			If you have any comments or ideas for additional features to be supported by ${SERVICE.NAME}, please write them down here.
+			Additional comments regarding the user experience of resource ${RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Community Impact (CI)" 
-		 xsi:type="qu:InformationPageType">
-		<qu:Instructions>
-			In the upcoming section you will be asked questions intending to gain knowledge about how and to what degree service ${SERVICE.NAME} impacted resp. could impact your community ${COMMUNITY}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Community Awareness" 
-		 qid="CI.1.1"
+	<qu:Page name="Learning Effectiveness" 
+		 qid="II.1.1"
 		 minval="0" 
 		 maxval="10"
-		 defval="0"
-		 minlabel="not aware at all" 
-		 maxlabel="totally aware" 
+		 defval="5"
+		 minlabel="total disagree" 
+		 maxlabel="total agree" 
 		 xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			To what degree were you aware of the actions of other members 
-			of your community ${COMMUNITY} regarding ${SERVICE.NAME}?
+			Resource ${RESOURCE} helps me to effectively learn.
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="System Quality (SQ)" 
-		 xsi:type="qu:InformationPageType">
-		<qu:Instructions>
-			In the upcoming section you will be asked questions that intend to gain knowledge about the system quality of ${SERVICE.NAME}
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Overall Success of ${SERVICE.NAME}" 
+	<qu:Page name="Overall Success" 
 		 qid="OS"
 		 minval="0" 
 		 maxval="10"
 		 defval="5"
-		 minlabel="doomed to fail" 
+		 minlabel="" 
 		 maxlabel="predestined to succeed"
 		 required="true"
 		 xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Now, after you went through all the previous questions please finally give your personal ranking on the overall quality of ${SERVICE.NAME} from doomed to fail to predestined to succeed. 
+			In total, resource ${RESOURCE} is successful. 
 		</qu:Instructions>
 	</qu:Page>
 	

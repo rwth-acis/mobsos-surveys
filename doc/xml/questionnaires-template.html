@@ -47,28 +47,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </head>
 <body>
 
-	<div id="oidc">
-		<!-- OpenID Connect Button: add HTML element representing button -->
-		<span class="oidc-signin"
-			data-callback="signinCallback"
-			data-name="Learning Layers"
-			data-size="default"
-			data-logo="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"
-			data-server="http://api.learning-layers.eu/o/oauth2"
-			data-clientid="a34e4324-5f26-408d-8417-99b9b8045ac3"
-			data-scope="openid phone email address profile">
-		</span>
-	</div>
+	<!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
+          </div>
+          <div class="navbar-collapse collapse">
+				  
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+					data-callback="signinCallback"
+					data-name="Learning Layers"
+					data-size="sm"
+					data-logo="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"
+					data-server="http://api.learning-layers.eu/o/oauth2"
+					data-clientid="a34e4324-5f26-408d-8417-99b9b8045ac3"
+					data-scope="openid phone email address profile">
+              </span>
+			
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
 	
 	<!-- Container for creating a new questionnaire -->
 	<div id="i_quest" class="container hidden">
-		<div>
-			<h1>Create Questionnaire</h1>
-		   
+		<div class="row" style="margin:30px 0px 0px 0px;">
+			<h2 class="page-header">Create Questionnaire</h2>
+		    <p>
 			<form id="fcq" role="form" class="form">
 				<div class="form-group">
 					<label for="i_quest_name">Name</label>
-					<input type="text" class="form-control" id="i_quest_name" placeholder="Name" value="Standard MobSOS CIS Success Questionnaire"></input>
+					<input type="text" class="form-control" id="i_quest_name" placeholder="Name" value="USE Questionnaire"></input>
 				</div>
 				<div class="form-group">
 					<label for="i_quest_org">Organization</label>
@@ -80,7 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				</div>
 				<div class="form-group">
 					<label for="i_quest_desc">Description</label>
-					<textarea class="form-control" id="i_quest_desc" placeholder="Description">A questionnaire assessing the success of a software artifact being part of a Community Information System (CIS). Success is modeled as multi-dimensional formative indicator, containing the dimensions System Quality (SQ), Information Quality (IQ), Use (U), User Satisfaction (US), Individual Impact (II), and Community Impact (CI).</textarea>
+					<textarea class="form-control" id="i_quest_desc" placeholder="Description">A questionnaire for measuring Usability in terms of Usefulness, Ease of Use, Ease of Learning, and Satisfaction. The USE Questionnaire is based on: Lund, A.M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.</textarea>
 				</div>
 				<div class="col-md3 form-group">
 					<label for="i_quest_file">Questionnaire XML</label>
@@ -98,27 +113,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				</div>
 				
 			</form>
+			</p>
 		</div>
 	</div>
 	
 	<!-- Container for operations on questionnaires -->
 	<div id="quest" class="container hidden">
-		<div class="row">
-			<h2>Questionnaires</h2>
-			<div class="btn-group">
-				<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-				<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span>Create Questionnaire</button>
-		    </div>
+			
+		<div class="row" style="margin:30px 0px 0px 0px; ">
+			<h2 class="page-header">Questionnaires</h2>
+			<p>
+				<div class="btn-group">
+					<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+					<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Create Questionnaire</button>
+				</div>
+			</p>
+			<p>
+				<div id="questionnaires" class="list-group" >
+					<!-- questionnaire items inserted dynamically -->
+				</div>
+			</p>
 		</div>
-		<div class="row">
-			<ul id="questionnaires" class="list-group" >
-				<!-- questionnaire items inserted dynamically -->
-			</ul>
-		</div>
+		
 	</div>
 	
 	<!-- import MobSOS Surveys lib -->
-	<script type="text/javascript" src="http://dbis.rwth-aachen.de/~renzel/mobsos/lib/js/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
 		
 	<script type="text/javascript">
 		
@@ -136,10 +156,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				$("#quest").removeClass("hidden");
 				$("#quest_refresh").click(function(){
-					updateQuestionnaires("ality");
+					updateQuestionnaires("");
 				});
 				$("#quest_create").click(function(){
 					$("#i_quest").removeClass("hidden");
+					$("#quest").addClass("hidden");
 				});
 				
 				$('#i_quest_file').change(function(e){
@@ -198,9 +219,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				$('#i_quest_cancel').click(function(){
 					$("#i_quest").addClass("hidden");
+					$("#quest").removeClass("hidden");
 				});
 				
-				updateQuestionnaires("III");
+				updateQuestionnaires("");
 			} else {
 				console.log("not signed in...");
 				console.log(result);
@@ -211,7 +233,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 			client.getQuestionnaires(search,1,
 				function(data,type){
-					console.log(data);
+					
 					qs = data.questionnaires;
 					
 					$('#questionnaires').html("");
@@ -219,7 +241,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					for(i=0;i<qs.length;i++){
 						
 						var q = qs[i];
-						$('#questionnaires').append("<li class='list-group-item'><span style='margin-right: 10px;'><img src='" + q.logo + "' height='30px' alt='Logo for questionnaire '" + decodeURIComponent(q.name) + "/></span><span><b>" + decodeURIComponent(q.name) + "</b><i> by " + decodeURIComponent(q.owner) + ", " + decodeURIComponent(q.organization) + "</i></span></li>");
+						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + "</span><p class='list-group-item-text'>by " + decodeURIComponent(q.organization) + "</p></a>");
 					}
 				},
 				function(error){
@@ -247,10 +269,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			client.createQuestionnaire(JSON.stringify(q),form,
 				function(data,type){
-					console.log("Questionnaire created")
-					console.log("Response MIME type: " + type);
-					console.log("Response Data");
-					console.log(data);
+					window.location.href = data.url;
 				},
 				function(e){
 					console.log("Questionnaire creation failed!")

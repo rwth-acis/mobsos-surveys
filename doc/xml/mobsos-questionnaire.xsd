@@ -9,7 +9,7 @@
 	
 	<xsd:simpleType name="questionIdType">
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="[A-Z]*(\.[0-9]*)*"/>
+			<xsd:pattern value="[A-Z0-9]*(\.[A-Z0-9]*)*"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 	
@@ -97,7 +97,7 @@
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="qu:QuestionPageType">
-				<xsd:attribute name="defval" type="qu:zeroOrOneType" use="required"/>
+				<xsd:attribute name="defval" type="qu:zeroOrOneType" use="optional"/>
 				<xsd:attribute name="minlabel" type="xsd:string" use="required"/>
 				<xsd:attribute name="maxlabel" type="xsd:string" use="required"/>
 			</xsd:extension>
@@ -126,7 +126,7 @@
 			<xsd:extension base="qu:QuestionPageType">
 				<xsd:attribute name="minval" type="xsd:int" use="required"/>
 				<xsd:attribute name="maxval" type="xsd:int" use="required"/>
-				<xsd:attribute name="defval" type="xsd:int" use="required"/>
+				<xsd:attribute name="defval" type="xsd:int" use="optional"/>
 				<xsd:attribute name="minlabel" type="xsd:string" use="required"/>
 				<xsd:attribute name="maxlabel" type="xsd:string" use="required"/>
 			</xsd:extension>
