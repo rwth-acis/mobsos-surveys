@@ -1245,7 +1245,9 @@ public class SurveyService extends Service {
 						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 well text-center\">\n";
 
 						String name = e.getAttribute("name");
-						qpage += "\t\t\t<h2>" + name + "</h2>\n";
+						String qident = e.getAttribute("qid");
+						
+						qpage += "\t\t\t<h2>" + qident + " - " + name + "</h2>\n";
 
 						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
 

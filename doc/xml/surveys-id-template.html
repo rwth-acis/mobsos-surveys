@@ -95,45 +95,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 	
-	<!-- Container for questionnaire form -->
-	<div id="form" class="container hidden">
-		<div class="container">
-		<div class="row">
-			<div class="col-xs-12" style="margin: 90px 0px 0px 0px;">
-				<ul class="nav nav-pills btn-small setup-panel">
-					<li class="active"><a href="#intro"><h4 class="list-group-item-heading">Introduction</h4></a></li>
-<!-- NAVPILLS -->
-					<li><a href="#submission"><h4 class="list-group-item-heading">Submission</h4></a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="row setup-content" id="intro">
-			<div class="col-xs-12">
-				<div class="col-md-12 well text-center">
-					<h2>Introduction</h2>
-					<div style="text-align: left;">${SURVEY.DESCRIPTION}</div>
-				</div>
-			</div>
-		</div>
-<!-- QUESTIONPAGES -->
-		<div class="row setup-content" id="submission">
-			<div class="col-xs-12">
-				<div class="col-md-12 well text-center">
-					<h1 class="text-center">Submission</h1>
-					<span class="help-block question">Thank you very much for your participation!</span>
-					
-					<input class="btn btn-lg btn-success" id="submit" type="submit" />
-					<!-- ANSWERLINK -->
-					<br/><br/>
-					<p id="submit-msg" class="alert hidden"></p>
-				</div>
-			</div>
-		</div>
-		<div>
-			<button id="prev-step" class="btn btn-primary btn-lg pull-left">Prev</button>
-			<button id="next-step" class="btn btn-primary btn-lg pull-right">Next</button>
-		</div>
-	</div>
+	<!-- Container for survey  -->
+	<div id="survey" class="container hidden">
+		<h2>Survey ${ID}</h2>
 	</div>
 	
 	<!-- import jQuery for AJAX calls (must) -->
@@ -154,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		function signinCallback(result) {
 			if(result === "success"){
 				
-				$("#form").removeClass("hidden");
+				$("#survey").removeClass("hidden");
 				update();
 				
 			} else {
@@ -164,74 +128,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}
 		
 		function update(){
-			var navListItems = $('ul.setup-panel li a'), allWells = $('.setup-content');
-			allWells.hide();
-
-			navListItems.click(function(e)
-			{
-				e.preventDefault();
-				var $target = $($(this).attr('href')),
-					$item = $(this).closest('li');
-				
-				var id=$(this).attr('href');
-				if(id == '#submission'){
-					$('#prev-step').removeClass('disabled');
-					$('#next-step').addClass('disabled');
-				} else if (id == '#intro'){
-					$('#prev-step').addClass('disabled');
-					$('#next-step').removeClass('disabled');
-				} else {
-					$('#next-step').removeClass('disabled');
-					$('#prev-step').removeClass('disabled');
-				}
-				
-				if (!$item.hasClass('disabled')) {
-					navListItems.closest('li').removeClass('active');
-					$item.addClass('active');
-					allWells.hide();
-					$target.show();
-				}
-			});
-			
-			$('ul.setup-panel li.active a').trigger('click');
-			$('#prev-step').addClass('disabled');
-
-			$('#prev-step').on('click', function(e) {
-				$('ul.setup-panel li.active').prev().find('a').trigger('click');
-			});
-			
-			$('#next-step').on('click', function(e) {
-				$('ul.setup-panel li.active').next().find('a').trigger('click');
-			});
-			
-			$("#submit").click(collectAnswers);	
+			console.log("Updated");
 		}
-		
-		function collectAnswers(e){
-			e.preventDefault();
-			var values = {};
-			// collect all input from form elements
-			var questions  = $("input[name]:checked, .freetext");
-			for(var i=0;i < questions.length; i++ ){
-				values[questions.eq(i).attr("name")] = questions.eq(i).val();
-			}
-			
-			console.log(JSON.stringify(values));
-			
-			client.submitSurveyResponse(${SURVEY.ID},JSON.stringify(values), 
-				function(data, type){
-					console.log("Submitted Response successfully!")
-					$("#submit-msg").removeClass("hidden").removeClass("alert-danger").addClass("alert-success").html("Response submitted successfully.");
-				},
-				function(error){
-					console.log("Error");
-					console.log(error);
-					$("#submit-msg").removeClass("hidden").addClass("alert-danger").html("Submission failed. " + error);
-				}
-			);
-		}
-		
-		
 		
 	</script>
 	  
