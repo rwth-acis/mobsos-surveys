@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014 Dominik Renzel, Advanced Community Information Systems (ACIS) Group, 
+Chair of Computer Science 5 (Databases & Information Systems), RWTH Aachen University, Germany
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the ACIS Group nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MobSOS Surveys - Surveys </title>
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="https://dl.dropboxusercontent.com/u/17405777/mobsos/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	
+</head>
+<body>
+
+	<!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
+          </div>
+          <div class="navbar-collapse collapse">
+			  <ul class="nav navbar-nav">
+               <li><a href="http://localhost:8080/mobsos/questionnaires">Questionnaires</a></li>
+			   <li><a href="http://localhost:8080/mobsos/surveys">Surveys</a></li>
+             </ul>    
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+					data-callback="signinCallback"
+					data-name="Learning Layers"
+					data-size="sm"
+					data-logo="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"
+					data-server="http://api.learning-layers.eu/o/oauth2"
+					data-clientid="a34e4324-5f26-408d-8417-99b9b8045ac3"
+					data-scope="openid phone email address profile">
+              </span>
+			
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+	
+	<!-- Container for creating a new survey -->
+	<div id="i_survey" class="container hidden">
+		<div class="row" style="margin:30px 0px 0px 0px;">
+			<h2 class="page-header">Create Survey</h2>
+		
+		    <p>
+				<form role="form" class="form">
+					<div class="form-group">
+						<label for="i_survey_name">Name</label>
+						<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="Layers AchSo!@Construction Survey 2014/15">
+					</div>
+					<div class="form-group">
+						<label for="i_survey_org">Organization</label>
+						<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="Learning Layers Project">
+					</div>
+					<div class="form-group">
+						<label for="i_survey_logo">Logo</label>
+						<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"></input>
+					</div>
+					<div class="form-group">
+						<label for="i_survey_desc">Description</label>
+						<textarea class="form-control" id="i_survey_desc" placeholder="Description" >A survey on the user experience of AchSo! for the construction sector.</textarea>
+					</div>
+					
+					<div class="form-group">
+						<label for="i_survey_resource">Resource</label>
+						<textarea class="form-control" id="i_survey_resource" placeholder="Resource URI" >http://achso.aalto.fi/</textarea>
+					</div>
+					
+					<div class="col-md-6 form-group">
+						<label for="i_survey_start">Start Time</label>
+						<div class='input-group date' id='i_survey_start'>
+							<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2013-12-24T00:00:00"/>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+						</div>
+					</div>
+					<div class="col-md-6 form-group">
+						<label for="i_survey_end">End Time</label>
+						<div class='input-group date' id='i_survey_end'>
+							<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-12-24T00:00:00"/>
+							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</span>
+						</div>
+					</div>
+					
+					<body>
+					<div class="form-group">
+						<label for="i_survey_quest">Questionnaire</label>
+						<div id="i_survey_quest">
+							<input type="text" id="i_survey_qid" class="form-control" placeholder="Questionnaire ID">
+						</div>
+					</div>
+					
+					<div class="col-md-3 form-group">
+						<input id="i_survey_submit" class="form-control btn btn-default" type="button" value="Submit" />
+					</div>
+					<div class="col-md-3 form-group">
+						<input id="i_survey_cancel" class="form-control btn btn-default" type="button" value="Cancel" />
+					</div>
+				</form>
+			</p>
+		</div>
+	</div>
+	
+	<!-- Container for operations on questionnaires -->
+	<div id="surv" class="container hidden">
+		
+		<div class="row" style="margin:30px 0px 0px 0px; ">
+			<h2 class="page-header">Surveys</h2>
+			<p>
+				<div class="btn-group">
+					<button id="surveys_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+					<button id="surveys_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Create Survey</button>
+				</div>
+			</p>
+			<p>
+				<div id="surveys" class="list-group" >
+					<!-- survey items inserted dynamically -->
+				</div>
+			</p>
+		</div>
+		
+	</div>
+	
+	
+	<!-- import jQuery for AJAX calls (must) -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	
+	<!-- import Bootstrap for responsive UI (must) -->
+	<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	
+	<!-- import MobSOS Surveys lib -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
+	
+	<!-- import datetimepicker + deps -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/bootstrap-datetimepicker.js"></script>
+	
+		
+	<script type="text/javascript">
+		
+		var las2peer_server = "http://localhost:8080/";
+		var client = new MobSOSSurveysClient(las2peer_server);
+		
+		// OpenID Connect Button: implement a callback function
+		function signinCallback(result) {
+			
+			if(result === "success"){
+				
+				$("#surv").removeClass("hidden");
+				$("#surveys_refresh").click(function(){
+					updateSurveys("");
+				});
+				$("#surveys_create").click(function(){
+					$("#i_survey").removeClass("hidden");
+					$("#surv").addClass("hidden");
+				});
+				
+				$('#i_survey_start').datetimepicker({
+					useSeconds: true
+				});
+			
+				$('#i_survey_end').datetimepicker({
+					useSeconds: true
+				});
+			
+				$('#i_survey_logo').change(function(e){
+					console.log(encodeURI($(this).val()));
+					$('#i_survey_lpic').html("<img src='" + $(this).val() + "' height='30' style='margin:10px;'/>");
+				});
+				
+				$('#i_survey_submit').click(function(){
+					submitCreateSurveyForm();
+				});
+				
+				$('#i_survey_cancel').click(function(){
+					$("#i_survey").addClass("hidden");
+					$("#surv").removeClass("hidden");
+				});
+				updateSurveys("");
+				
+			} else {
+				console.log("not signed in...");
+				console.log(result);
+			}
+		}
+		
+		function updateSurveys(search){
+		
+			client.getSurveys(search,1,
+				function(data,type){
+					
+					qs = data.surveys;
+					
+					$('#surveys').html("");
+					
+					for(i=0;i<qs.length;i++){
+						
+						var q = qs[i];
+						console.log(q);
+						$('#surveys').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for survey " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + "</span><p class='list-group-item-text'>by " + decodeURIComponent(q.organization) + "</p></a>");
+					}
+				},
+				function(error){
+					console.log(error);
+				}
+			);
+		}
+		
+		function submitCreateSurveyForm(){
+			
+			var s = {
+				"name": encodeURIComponent($('#i_survey_name').val()),
+				"description" :encodeURIComponent($('#i_survey_desc').val()),
+				"organization": encodeURIComponent($('#i_survey_org').val()),
+				"logo": $('#i_survey_logo').val(),
+				"start": $("#i_survey_starttime").val(),
+				"end": $("#i_survey_endtime").val(),
+				"resource": $("#i_survey_resource").val()
+			};
+			
+			console.log(s);
+			
+			if(s.name == '' || s.description == '' || s.organization == '' || s.logo == '' || s.resource == '' || s.start == '' || s.end == ''){
+				console.log("Questionnaire input incomplete");
+				return;
+			}
+			
+			// first upload questionnaire metadata and create new questionnaire resource.
+			// On successful creation of new questionnaire, attempt to upload questionnaire form.
+			
+			client.createSurvey(JSON.stringify(s),
+				function(data,type){
+					// redirect to questionnaire resource
+					console.log(data);
+					
+					var qid = $("#i_survey_qid").val();
+					
+					// if questionnaire is directly provided, add it here, ...
+					if(qid !== ''){
+						var o = {"qid":qid};
+						client.setSurveyQuestionnaire(data.id,JSON.stringify(o), 
+							function(d, t){
+								console.log("Successfully connected survey and questionnaire");
+								//window.location.href = data.url;
+							},
+							function(e){
+								console.log(e);
+							}
+						);
+					} 
+					// else redirect to newly created survey resource.
+					else {
+						window.location.href = data.url;
+					}
+				},
+				function(e){
+					console.log("Questionnaire creation failed!")
+					console.log(e);
+				}
+			);
+			
+		}
+		
+	</script>
+	  
+	<!-- add this script element right before closing tag </body> -->
+	<script type="text/javascript">
+      (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+     })();
+    </script>
+</body>
+</html>

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 import i5.las2peer.api.Service;
+import i5.las2peer.p2p.AgentNotKnownException;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
@@ -182,25 +183,6 @@ public class SurveyService extends Service {
 		}
 	}
 
-	@GET
-	@Produces(MediaType.TEXT_HTML)
-	@Path("questionnaires/{id}")
-	public HttpResponse getQuestionnaireHTML(@PathParam("id") int id){
-		String onAction = "retrieving individual questionnaire HTML";
-
-		// adapt template to specific questionnaire
-		try {
-			String html = new Scanner(new File("./doc/xml/questionnaire-id-template.html")).useDelimiter("\\A").next();
-			html = fillPlaceHolder(html,"ID", ""+id);
-			// finally return resulting HTML
-			HttpResponse result = new HttpResponse(html);
-			result.setStatus(200);
-			return result;
-		} catch (FileNotFoundException e) {
-			return internalError(onAction);
-		}
-	}
-
 	/**
 	 * TODO: write documentation
 	 * Retrieves a list of all questionnaires.
@@ -288,6 +270,7 @@ public class SurveyService extends Service {
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
 
@@ -412,6 +395,42 @@ public class SurveyService extends Service {
 
 		catch (Exception e) {
 			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+	
+	/**
+	 * TODO: write documentation
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("questionnaires/{id}")
+	public HttpResponse getQuestionnaireHTML(@PathParam("id") int id){
+		
+		String onAction = "retrieving individual questionnaire HTML";
+		
+		try {
+			// if questionnaire does not exist, return 404.
+			if(checkExistenceOwnership(id,1) == -1){
+				HttpResponse result = new HttpResponse("Questionnaire does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+		} catch (SQLException e1) {
+			return internalError(onAction);
+		}
+		// adapt template to specific questionnaire
+		try {
+			String html = new Scanner(new File("./doc/xml/questionnaire-id-template.html")).useDelimiter("\\A").next();
+			html = fillPlaceHolder(html,"ID", ""+id);
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
 	}
@@ -729,6 +748,26 @@ public class SurveyService extends Service {
 
 	// ============= SURVEY-RELATED RESOURCES ==============
 
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("surveys")
+	public HttpResponse getSurveysHTML(@QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query){
+
+		String onAction = "retrieving surveys HTML";
+
+		// only respond with template; nothing to be adapted
+		try {
+			String html = new Scanner(new File("./doc/xml/surveys-template.html")).useDelimiter("\\A").next();
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+	}
+
+
 	/**
 	 * TODO: write documentation 
 	 * Retrieves a list of all surveys.
@@ -823,6 +862,7 @@ public class SurveyService extends Service {
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
 	public HttpResponse createSurvey(@ContentParam String data)
 	{
@@ -851,6 +891,7 @@ public class SurveyService extends Service {
 			r.put("url",epUrl + "mobsos/surveys/" + sid);
 
 			HttpResponse result = new HttpResponse(r.toJSONString());
+			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 			result.setStatus(201);
 			return result;
 
@@ -963,6 +1004,36 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("surveys/{id}")
+	public HttpResponse getSurveyHTML(@PathParam("id") int id){
+		String onAction = "retrieving individual survey HTML";
+
+		try {
+			// if survey does not exist, return 404.
+			if(checkExistenceOwnership(id,0) == -1){
+				HttpResponse result = new HttpResponse("Survey does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+		} catch (SQLException e1) {
+			return internalError(onAction);
+		}
+		
+		// adapt template to specific survey
+		try {
+			String html = new Scanner(new File("./doc/xml/survey-id-template.html")).useDelimiter("\\A").next();
+			html = fillPlaceHolder(html,"ID", ""+id);
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
 	}
 
 
@@ -1121,13 +1192,6 @@ public class SurveyService extends Service {
 
 	/**
 	 * TODO: write documentation
-	 * 
-	 * @param id
-	 * @return
-	 */
-
-	/**
-	 * TODO: write documentation
 	 * @param id
 	 * @return
 	 */
@@ -1137,7 +1201,18 @@ public class SurveyService extends Service {
 	public HttpResponse getSurveyQuestionnaireFormHTML(@PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
-
+		
+		try {
+			// if survey does not exist, return 404.
+			if(checkExistenceOwnership(id,0) == -1){
+				HttpResponse result = new HttpResponse("Survey does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+		} catch (SQLException e1) {
+			return internalError(onAction);
+		}
+		
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
@@ -1194,9 +1269,9 @@ public class SurveyService extends Service {
 
 			// adapt form template to concrete survey and user
 			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),null);
-			
+
 			//String adaptedFormXml = formXml;
-			
+
 			Document form;
 			// before returning form, make sure it's still valid (may be obsolete step...)
 			try{
@@ -1218,9 +1293,9 @@ public class SurveyService extends Service {
 
 			// do all adaptation to user and survey
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), null);
-			
+
 			//String adaptText = text;
-			
+
 			// add HTML elements for all questionnaire items accordingly
 			Vector<String> qpages = new Vector<String>();
 			Vector<String> navpills = new Vector<String>();
@@ -1246,7 +1321,7 @@ public class SurveyService extends Service {
 
 						String name = e.getAttribute("name");
 						String qident = e.getAttribute("qid");
-						
+
 						qpage += "\t\t\t<h2>" + qident + " - " + name + "</h2>\n";
 
 						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
@@ -1633,7 +1708,7 @@ public class SurveyService extends Service {
 
 			try{
 				System.out.println(answerJSON);
-				
+
 				answer = (JSONObject) JSONValue.parseWithException(answerJSON);	
 			} catch (ParseException e){
 				HttpResponse result = new HttpResponse("Survey response is not valid JSON! Cause: " + e.getMessage());
@@ -2437,7 +2512,7 @@ public class SurveyService extends Service {
 	 * 
 	 * @param id int survey or questionnaire id
 	 * @param type int 0 for survey, 1 for questionnaire
-	 * @return int -1 if survey does not exist, 0 if active agent is not owner, 1 if active agent is owner
+	 * @return int -1 if questionnaire/survey does not exist, 0 if active agent is not owner, 1 if active agent is owner
 	 * @throws SQLException 
 	 */
 	private int checkExistenceOwnership(int id, int type) throws SQLException{

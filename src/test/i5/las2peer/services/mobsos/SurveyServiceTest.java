@@ -422,7 +422,7 @@ public class SurveyServiceTest {
 			String pathonly = u.getPath();
 
 			// now check if questionnaire retrieval works properly
-			ClientResponse result=c1.sendRequest("GET", pathonly,"");
+			ClientResponse result=c1.sendRequest("GET", pathonly,"","","application/json",new Pair[]{});
 			assertEquals(200,result.getHttpCode());
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -471,11 +471,16 @@ public class SurveyServiceTest {
 			String pathonly = u.getPath();
 
 			// use path to get the questionnaire
-			ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
+			ClientResponse result=c1.sendRequest("GET", u.getPath(),"","","application/json",new Pair[]{});
 			assertEquals(200,result.getHttpCode()); // questionnaire should exist
-
-			JSONObject questionnaire = (JSONObject) JSONValue.parse(result.getResponse());
-
+			
+			JSONObject questionnaire = null;
+			
+			try{
+				questionnaire = (JSONObject) JSONValue.parseWithException(result.getResponse());
+			} catch (ParseException e){
+				fail(e.getMessage());
+			}
 			// change some fields in questionnaire
 			questionnaire.put("name","Changed Beerdrinker questionnaire");
 			questionnaire.put("description", "This questionnaire is for all those who like to drink changed beer.");
@@ -484,7 +489,7 @@ public class SurveyServiceTest {
 			ClientResponse updateresult=c1.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
 			assertEquals(200, updateresult.getHttpCode());
 
-			ClientResponse updated=c1.sendRequest("GET", u.getPath(),"");
+			ClientResponse updated=c1.sendRequest("GET", u.getPath(),"","","application/json",new Pair[]{});
 			assertEquals(200,updated.getHttpCode()); // questionnaire should exist
 			JSONObject updatedQuestionnaire = (JSONObject) JSONValue.parse(updated.getResponse());
 
@@ -535,13 +540,15 @@ public class SurveyServiceTest {
 
 			// check if first questionnaire URL is a valid URL, then extract path
 			URL u = new URL(fullurl);
+			
+			System.out.println("URL: " + u.toString());
 
 			// try to delete particular questionnaire with different user than owner. Should be forbidden.
 			ClientResponse delnown=c2.sendRequest("DELETE", u.getPath(),"");
 			assertEquals(401,delnown.getHttpCode());
 
 			// then check if questionnaire still exists.
-			ClientResponse stillthere=c1.sendRequest("GET", u.getPath(),"");
+			ClientResponse stillthere=c1.sendRequest("GET", u.getPath(),"", "","application/json",new Pair[]{});
 			assertEquals(200,stillthere.getHttpCode());
 
 			// now check if deletion of particular questionnaire works
@@ -549,7 +556,7 @@ public class SurveyServiceTest {
 			assertEquals(200,delete.getHttpCode());
 
 			// then check if previously deleted questionnaire still exists.
-			ClientResponse result=c1.sendRequest("GET", u.getPath(),"");
+			ClientResponse result=c1.sendRequest("GET", u.getPath(),"", "","application/json",new Pair[]{});
 			assertEquals(404,result.getHttpCode());
 
 		}  catch (ParseException e) {
