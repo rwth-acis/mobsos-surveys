@@ -970,7 +970,12 @@ public class SurveyService extends Service {
 			try{
 				// query for given survey
 				c = dataSource.getConnection();
-				s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
+				
+				// TODO: restore, as soon as resource information comes from an external source
+				//s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
+				
+				// TODO: replace by external source for retrieving resource information
+				s = c.prepareStatement("select s.*, r.name as rname, r.description as rdesc from " + jdbcSchema + ".survey s left join " + jdbcSchema + ".resource r on (s.resource = r.uri) where id = ?");
 				s.setInt(1,id);
 
 				rs = s.executeQuery();
@@ -985,6 +990,23 @@ public class SurveyService extends Service {
 				// if survey was found, respond to user with JSON result
 				rs.next();
 				r = readSurveyFromResultSet(rs);
+				
+				// TODO: replace by external resource information
+				String resource_name = rs.getString("rname");
+				String resource_description = rs.getString("rdesc");
+				
+				String resource_uri = (String) r.get("resource");
+			
+				JSONObject res = new JSONObject();
+				res.put("uri",resource_uri);
+				res.put("name", resource_name);
+				res.put("description", resource_description);
+				
+				r.put("resource", res);
+				
+				// before, try to retrieve information on resource
+				
+				
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setStatus(200);
 				return result;
@@ -1309,11 +1331,38 @@ public class SurveyService extends Service {
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element e = (Element) node;
 
+					// set first page and navpill item to active
+					String active = "";
+					
+					if(i==0){
+						active = " class='active'";
+					}
+					
 					// differentiate between possible item types and add HTML accordingly
-					if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
+					if(e.getAttribute("xsi:type").endsWith("InformationPageType")){
+						// first add navpill item
+						String navpill = "\t\t\t\t\t<li"+active+"><a href=\"#step-" + i +"\"><span class=\"list-group-item-heading\">" + i + "</span></a></li>\n";
+						navpills.add(navpill);
+						
+						// then add information page
+						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 well text-center\">\n";
+						
+						String name = e.getAttribute("name");
+
+						qpage += "\t\t\t<h2>" + name + "</h2>\n";
+						
+						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
+						
+						qpage += "\t\t\t<p>\n\t\t\t\t" + 
+								instr + "\n" +
+								"\t\t\t</p>\n";
+						qpage += "\t\t</div></div></div>\n";
+						qpages.add(qpage);
+						
+					} else if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
 
 						// first add nav pill item
-						String navpill = "\t\t\t\t\t<li><a href=\"#step-" + i +"\"><h4 class=\"list-group-item-heading\">" + i + "</h4></a></li>\n";
+						String navpill = "\t\t\t\t\t<li"+active+"><a href=\"#step-" + i +"\"><span class=\"list-group-item-heading\">" + i + "</span></a></li>\n";
 						navpills.add(navpill);
 
 						// then add question page
@@ -2075,7 +2124,7 @@ public class SurveyService extends Service {
 					if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
 
 						// first add nav pill item
-						String navpill = "\t\t\t\t\t<li><a href=\"#step-" + i +"\"><h4 class=\"list-group-item-heading\">" + i + "</h4></a></li>\n";
+						String navpill = "\t\t\t\t\t<li><a href=\"#step-" + i +"\"><h5 class=\"list-group-item-heading\">" + i + "</h5></a></li>\n";
 						navpills.add(navpill);
 
 						// then add question page
@@ -2464,7 +2513,10 @@ public class SurveyService extends Service {
 					} else if (tag.endsWith("DESCRIPTION")){
 						value = (String) survey.get("description");
 					} else if (tag.endsWith("RESOURCE")){
-						value = (String) survey.get("resource");
+						
+						JSONObject res = (JSONObject) survey.get("resource");
+						String res_name = (String) res.get("name");
+						value = res_name;
 					} else if (tag.endsWith("START")){
 						value = (String) survey.get("start");
 					} else if (tag.endsWith("END")){
