@@ -81,13 +81,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- Container for operations on questionnaires -->
 	<div id="survey" class="container hidden">
 		<div class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="qname" class="h2"></span> <button id="i_quest_edit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button></h2>
-			<h4 id="qorg"></h4>
-			<div><b>Start: </b><span id="s_start"></span>  <b>End:</b><span id="s_end"></span></div>
-			
-			<p>
-			<div id="qdesc" class="well"></div>
-			</p>
+			<h2 class="page-header"><span id="s_name" class="h2"></span> <button id="i_survey_edit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button></h2>
+			<h4 id="s_org"></h4>
+			<table class="table table-bordered">
+				<tr><td colspan="2" id="s_desc"></td></tr>
+				<tr><td><b>Resource</b></td><td><a id="s_resource"></a></td></tr>
+				<tr><td><b>Start</b></td><td id="s_start"></td></tr>
+				<tr><td><b>End</b></td><td id="s_end"></td></tr>
+			</table>
 			<p>
 				<button id="i_survey_part" class="btn btn-lg btn-success">Participate</button>
 			</p>
@@ -102,7 +103,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	
 	<!-- import MobSOS Surveys lib -->
 	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
-		
+	
+	<!-- import moment.js for displaying times and dates -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
+	
 	<script type="text/javascript">
 		
 		var las2peer_server = "http://localhost:8080/";
@@ -114,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				$("#survey").removeClass("hidden");
 				$("#i_survey_part").click(function(){
-					window.location.href = window.location.href + "/form";
+					window.location.href = window.location.href + "/form?access_token=" + window.localStorage["access_token"];
 				});
 				
 				updateSurvey();
@@ -129,19 +133,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			client.getSurvey(${ID},
 				function(data,type){
 					console.log(data);
-					$("#qname").html(decodeURIComponent(data.name))
-					$("#qorg").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
-					$("#qdesc").html(""+decodeURIComponent(data.description));
-					$("#s_start").html(data.start);
-					$("#s_end").html(data.end);
+					$("#s_name").html(decodeURIComponent(data.name))
+					$("#s_org").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
+					$("#s_desc").html(""+decodeURIComponent(data.description));
+					$("#s_resource").attr("href",data.resource.uri).html(data.resource.name);
+					
+					$("#s_start").html(moment.utc(data.start).format("llll"));
+					$("#s_end").html(moment.utc(data.end).format("llll"));
 					
 				},
 				function(error){
 					console.log(error);
 				}
 			);
-			
 		}
+	
 	</script>
 	  
 	<!-- add this script element right before closing tag </body> -->

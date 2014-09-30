@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
-		  xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
-	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<!-- A questionnaire for measuring Usability in terms of Usefulness, Ease of Use, Ease of Learning, and Satisfaction. The USE Questionnaire is based on: Lund, A.M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.-->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<qu:Page name="Instructions" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			For the assessment, please fill out the following questionnaire. The questionnaire consists of several blocks of 7-level Likert scales describing attributes applying to the resource. You can express your agreement with the attributes by ticking the value that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to the particular resource. Nevertheless, please make a selection on every item. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+			Dear ${USER.NAME}! For the assessment, please fill out the following questionnaire. You can express your agreement with the attributes by ticking the value that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to the particular resource. Nevertheless, please make a selection on every item. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -20,7 +18,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It helps me be more effective.
+			${SURVEY.RESOURCE} helps me be more effective.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -33,7 +31,7 @@
 		  required="true" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It helps me be more productive.
+			${SURVEY.RESOURCE} helps me be more productive.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -46,7 +44,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is useful.
+			${SURVEY.RESOURCE} is useful.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -59,7 +57,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It gives me more control over the activities in my life.
+			${SURVEY.RESOURCE} gives me more control over the activities in my life.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -72,7 +70,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It makes the things I want to accomplish easier to get done.
+			${SURVEY.RESOURCE} makes the things I want to accomplish easier to get done.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -85,7 +83,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It saves me time when I use it.
+			${SURVEY.RESOURCE} saves me time when I use it.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -98,7 +96,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It meets my needs.
+			${SURVEY.RESOURCE} meets my needs.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -111,7 +109,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It does everything I would expect it to do.
+			${SURVEY.RESOURCE} does everything I would expect it to do.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -124,7 +122,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is easy to use.
+			${SURVEY.RESOURCE} is easy to use.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -137,7 +135,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is simple to use.
+			${SURVEY.RESOURCE} is simple to use.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -150,7 +148,7 @@
 		  required="true" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is user friendly.
+			${SURVEY.RESOURCE} is user friendly.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -163,7 +161,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It requires the fewest steps possible to accomplish what I want to do with it.
+			${SURVEY.RESOURCE} requires the fewest steps possible to accomplish what I want to do with it.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -176,7 +174,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is flexible.
+			${SURVEY.RESOURCE} is flexible.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -189,7 +187,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Using it is effortless.
+			Using ${SURVEY.RESOURCE} is effortless.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -202,7 +200,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I can use it without written instructions.
+			I can use ${SURVEY.RESOURCE} without written instructions.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -215,7 +213,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I don't notice any inconsistencies as I use it.
+			I don't notice any inconsistencies as I use ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -228,7 +226,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Both occasional and regular users would like it.
+			Both occasional and regular users would like ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -241,7 +239,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I can recover from mistakes quickly and easily.
+			I can recover from mistakes in ${SURVEY.RESOURCE} quickly and easily.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -254,7 +252,7 @@
 		  required="true" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I can use it successfully every time.
+			I can use ${SURVEY.RESOURCE} successfully every time.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -267,7 +265,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I learned to use it quickly.
+			I learned to use ${SURVEY.RESOURCE} quickly.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -280,7 +278,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I easily remember how to use it.
+			I easily remember how to use ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -293,7 +291,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is easy to learn to use it.
+			${SURVEY.RESOURCE} is easy to learn to use it.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -306,7 +304,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I quickly became skillful with it.
+			I quickly became skillful with ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -319,7 +317,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I am satisfied with it.
+			I am satisfied with ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -332,7 +330,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I would recommend it to a friend.
+			I would recommend ${SURVEY.RESOURCE} to a friend.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -345,7 +343,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is fun to use.
+			${SURVEY.RESOURCE} is fun to use.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -358,7 +356,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It works the way I want it to work.
+			${SURVEY.RESOURCE} works the way I want it to work.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -371,7 +369,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is wonderful.
+			${SURVEY.RESOURCE} is wonderful.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -384,7 +382,7 @@
 		  required="true" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I feel I need to have it.
+			I feel I need to have ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -397,7 +395,7 @@
 		  required="true" 
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			It is pleasant to use.
+			${SURVEY.RESOURCE} is pleasant to use.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -410,7 +408,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Altogether, it is a success.
+			Altogether, ${SURVEY.RESOURCE} is a success.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -419,7 +417,7 @@
 		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			List the most negative aspects.
+			List the most negative aspects about ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -428,7 +426,7 @@
 		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			List the most positive aspects.
+			List the most positive aspects about ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	

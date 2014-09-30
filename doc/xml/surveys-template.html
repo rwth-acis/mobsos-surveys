@@ -89,15 +89,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<form role="form" class="form">
 					<div class="form-group">
 						<label for="i_survey_name">Name</label>
-						<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="Layers AchSo!@Construction Survey 2014/15">
+						<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="Layers AchSo!@Construction Survey 2014" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_org">Organization</label>
-						<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="Learning Layers Project">
+						<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="Learning Layers Project" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_logo">Logo</label>
-						<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"></input>
+						<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_desc">Description</label>
@@ -106,20 +106,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					<div class="form-group">
 						<label for="i_survey_resource">Resource</label>
-						<textarea class="form-control" id="i_survey_resource" placeholder="Resource URI" >http://achso.aalto.fi/</textarea>
+						<input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />
 					</div>
 					
 					<div class="col-md-6 form-group">
 						<label for="i_survey_start">Start Time</label>
 						<div class='input-group date' id='i_survey_start'>
-							<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2013-12-24T00:00:00"/>
+							<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-01-01T00:00:00Z"/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 						</div>
 					</div>
 					<div class="col-md-6 form-group">
 						<label for="i_survey_end">End Time</label>
 						<div class='input-group date' id='i_survey_end'>
-							<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-12-24T00:00:00"/>
+							<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-12-31T23:59:59Z"/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 							</span>
 						</div>
@@ -239,7 +239,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					for(i=0;i<qs.length;i++){
 						
 						var q = qs[i];
-						console.log(q);
+						
 						$('#surveys').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for survey " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + "</span><p class='list-group-item-text'>by " + decodeURIComponent(q.organization) + "</p></a>");
 					}
 				},
@@ -260,8 +260,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				"end": $("#i_survey_endtime").val(),
 				"resource": $("#i_survey_resource").val()
 			};
-			
-			console.log(s);
 			
 			if(s.name == '' || s.description == '' || s.organization == '' || s.logo == '' || s.resource == '' || s.start == '' || s.end == ''){
 				console.log("Questionnaire input incomplete");
@@ -284,7 +282,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						client.setSurveyQuestionnaire(data.id,JSON.stringify(o), 
 							function(d, t){
 								console.log("Successfully connected survey and questionnaire");
-								//window.location.href = data.url;
+								window.location.href = data.url;
 							},
 							function(e){
 								console.log(e);

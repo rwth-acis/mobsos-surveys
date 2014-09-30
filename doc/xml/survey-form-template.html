@@ -44,25 +44,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<![endif]-->
 	
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-	<!-- <style>
-		.page-header {
+	<style>
+		#form .page-header {
 			margin: 10px;
 		}
 		
-		table td {
+		#form table td {
 			padding: 10px;
 		}
-		table h2 {
+		#form table h2 {
 			padding: 0px;
 		}
-		.question {
+		#form .question {
 			padding: 10px;
 			font-size: 1.3em;
 		}
 	
-		.btn {
+		#form .btn {
 			margin: 4px;
-		} -->
+		}
 	</style>
 </head>
 <body>
@@ -102,22 +102,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<div id="form" class="container hidden">
 		<div class="container">
 		<div class="row">
-			<div class="col-xs-12" style="margin: 90px 0px 0px 0px;">
-				<ul class="nav nav-pills btn-small setup-panel">
-					<li class="active"><a href="#intro"><h4 class="list-group-item-heading">Introduction</h4></a></li>
+			<div class="col-xs-12" style="margin: 50px 0px 0px 0px;">
+				<ul class="nav nav-pills nav-pills-justified setup-panel">
+					<!-- <li class="active"><a href="#intro"><h4 class="list-group-item-heading">Introduction</h4></a></li>-->
 <!-- NAVPILLS -->
-					<li><a href="#submission"><h4 class="list-group-item-heading">Submission</h4></a></li>
+					<li><a href="#submission"><h5 class="list-group-item-heading"><span class="glyphicon glyphicon-cloud-upload"></span></h5></a></li>
 				</ul>
 			</div>
 		</div>
-		<div class="row setup-content" id="intro">
+		<!-- <div class="row setup-content" id="intro">
 			<div class="col-xs-12">
 				<div class="col-md-12 well text-center">
 					<h2>Introduction</h2>
 					<div style="text-align: left;">${SURVEY.DESCRIPTION}</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 <!-- QUESTIONPAGES -->
 		<div class="row setup-content" id="submission">
 			<div class="col-xs-12">
@@ -167,7 +167,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}
 		
 		function update(){
-			var navListItems = $('ul.setup-panel li a'), allWells = $('.setup-content');
+			var navListItems = $('ul.setup-panel li a'), 
+			allWells = $('.setup-content');
 			allWells.hide();
 
 			navListItems.click(function(e)
@@ -180,7 +181,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				if(id == '#submission'){
 					$('#prev-step').removeClass('disabled');
 					$('#next-step').addClass('disabled');
-				} else if (id == '#intro'){
+				} else if (id == '#step-0'){
 					$('#prev-step').addClass('disabled');
 					$('#next-step').removeClass('disabled');
 				} else {
@@ -218,8 +219,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			for(var i=0;i < questions.length; i++ ){
 				values[questions.eq(i).attr("name")] = questions.eq(i).val();
 			}
-			
-			console.log(JSON.stringify(values));
 			
 			client.submitSurveyResponse(${SURVEY.ID},JSON.stringify(values), 
 				function(data, type){

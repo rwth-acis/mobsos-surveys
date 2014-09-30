@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use. The TAM Questionnaire is based on: Davis, Fred D. (1989) "Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology ". MIS Quarterly 13, pp. 319-340. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}! For the assessment, please fill out the following questionnaire. You can express your agreement with the attributes by ticking the value that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to the particular resource. Nevertheless, please make a selection on every item. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} in my job would enable me to accomplish tasks more quickly.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} would improve my job performance.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} would increase my productivity.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} would enhance my effectiveness on the job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} would make it easier to do my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM.PU.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would find ${SURVEY.RESOURCE} useful in my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Learning to operate ${SURVEY.RESOURCE} would be easy for me.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would find it easy to get ${SURVEY.RESOURCE} to do what I want it to do.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			My interaction with ${SURVEY.RESOURCE} would be clear and understandable.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would find ${SURVEY.RESOURCE} to be flexible to interact with.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It would be easy for me to become skillful at using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease-of-Use" 
+	      qid="TAM.PEU.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="unlikely" 
+	      maxlabel="likely" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would find ${SURVEY.RESOURCE} easy to use.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="TAM.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether, ${SURVEY.RESOURCE} is a success.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Negative Aspects" 
+	      qid="TAM.N"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most negative aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Positive Aspects" 
+	      qid="TAM.P"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most positive aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>
