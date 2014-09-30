@@ -68,18 +68,19 @@ create table response (
 	constraint res_fk foreign key (sid) references survey(id)
 		on delete cascade
 		on update no action
-);	
-
-create table survey_context ( 
-	sid mediumint not null,
-	qid mediumint not null,
-	aid mediumint not null,
-	constraint struct_pk primary key (sid,qid,aid),
-	constraint struct_fk_sid foreign key (sid) references survey(id)
-		on delete cascade
-		on update no action,
-	constraint struct_fk_qid foreign key (qid) references questionnaire(id)
-		on delete cascade
-		on update no action 
 );
+
+create table resource (
+	uri varchar(200) not null,
+	name varchar(128) not null,
+	description varchar(2048),
+	constraint reso_pk primary key(uri)
+);
+
+insert into resource (uri,name,description) values ("http://achso.aalto.fi","AchSo!","A mobile application recording, sharing, and annotating videos");
+insert into resource (uri,name,description) values ("https://github.com/learning-layers/sevianno","SeViAnno!","A Web application for the semantic annotation of videos.");
+insert into resource (uri,name,description) values ("http://odl.learning-layers.eu/learning-toolbox","Learning Toolbox", "A mobile work-based learning aid.");
+
+
+
 
