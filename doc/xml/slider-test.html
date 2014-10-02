@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Range Slider Test</title>
+		<meta name="description" content="Simple, small and fast HTML5 input range slider element polyfill">
+		<meta name="keywords" content="rangeslider.js, rangesliderjs, polyfill, html5, input type range, range, slider">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="author" content="Dominik Renzel">
+		
+		<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+		
+	</head>
+	
+	<body>
+	
+		
+		<div class="container col-12">
+			<h3>Fucking Responsive Scale with Ticks</h3>
+			<div class="row well">
+				
+					<input class="col-md-12 col-xs-12 slider" name="SQ1" type="range" min="1" max="7" step="1" list="scale"/><br>
+					<datalist id="scale">
+						<option>0</option>
+						<option>1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+						<option>6</option>
+						<option>7</option>
+					</datalist>
+					
+					<span class="col-md-2 col-xs-4">Totally disagree with something longer</span><span class="col-md-2 col-xs-4 pull-right text-right">Totally agree with something longer</span>
+				
+			</div>
+		</div>
+		
+		<div class="container col-12">
+			<h3>Another Scale with Ticks</h3>
+			<div class="row well">
+				
+					<input class="col-md-12 col-xs-12 slider" name="SQ2" type="range" min="1" max="7" step="1" list="scale"/><br>
+					<datalist id="scale">
+						<option>0</option>
+						<option>1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+						<option>6</option>
+						<option>7</option>
+					</datalist>
+					
+					<span class="col-md-2 col-xs-4">Totally disagree</span><span class="col-md-2 col-xs-4 pull-right text-right">Totally agree</span>
+				
+			</div>
+		</div>
+		
+		<div class="container col-12">
+			<button id="collect" class="btn btn-default btn-lg">Collect</button>
+		</div>
+		
+		<!-- import jQuery for AJAX calls (must) -->
+		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	
+		<!-- import Bootstrap for responsive UI (must) -->
+		<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	
+		<script>
+		
+			$( document ).ready(function() {
+				$('.slider').change(function() {
+					console.log($(this).val());
+				});
+				
+				$('#collect').click(function(){
+					var values = {};
+					// collect all input from form elements
+					var questions  = $(".slider");
+					for(var i=0;i < questions.length; i++ ){
+						values[questions.eq(i).attr("name")] = questions.eq(i).val();
+					}
+					
+					console.log(values);
+				});
+			});
+	
+		</script>
+	</body>
+</html>
