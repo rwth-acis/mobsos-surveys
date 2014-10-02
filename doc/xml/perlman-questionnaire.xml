@@ -5,7 +5,7 @@
 	<qu:Page name="Instructions" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			Dear ${USER.NAME}! Please fill out the following check list to assess the usability of ${SURVEY.RESOURCE}. The checklist presents a list of items, each presenting a usability heuristic coupled with a good vs. bad 7-point scale. Please state how well the heuristic was realized in ${SURVEY.RESOURCE}.  
+			Dear ${USER.NAME}! Please fill out the following check list to assess the usability of ${SURVEY.RESOURCE}. The checklist presents a list of items, each presenting a usability heuristic coupled with a good vs. bad 7-point scale. Please state how well each heuristic was realized in ${SURVEY.RESOURCE}. 
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -61,7 +61,7 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Learning" 
+	<qu:Page name="Lear" 
 	      qid="PUH.LE.4"
 	      minval="1" 
 	      maxval="7"
