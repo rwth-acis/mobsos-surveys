@@ -1396,7 +1396,9 @@ public class SurveyService extends Service {
 							String maxlabel = e.getAttribute("maxlabel");
 							int minval =  Integer.parseInt(e.getAttribute("minval"));
 							int maxval = Integer.parseInt(e.getAttribute("maxval"));
-
+							
+							// do UI in a button style (not really nice in terms of responsive design)
+							/*
 							qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
 							qpage += "\t\t\t\t<span class=\"btn\">" + minlabel + "</span>\n";
 							for(int k=minval;k<=maxval;k++){
@@ -1406,6 +1408,16 @@ public class SurveyService extends Service {
 							}
 							qpage += "\t\t\t\t<span class=\"btn\">" + maxlabel + "</span>\n";
 							qpage += "\t\t\t</div>\n";
+							*/
+							// --- end UI button style
+							
+							// do UI in range slider style (better responsive design)
+							qpage += "\t\t\t<div class='row'>\n";
+							qpage += "\t\t\t\t<input class='col-md-12' type='range' min='" + minval + "' max='" + maxval + "' step='1'/><br/>\n";
+							qpage += "\t\t\t\t<span class='col-md-2'>" + minlabel + "</span><span class='col-md-8'/><span class='col-md-2'>" + maxlabel + "</span>\n";
+									
+							qpage += "\t\t\t</div>\n";
+							// --- end UI range slider style
 
 						} else if ("qu:DichotomousQuestionPageType".equals(qtype)){
 

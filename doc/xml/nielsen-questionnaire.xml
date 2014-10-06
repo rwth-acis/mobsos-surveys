@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A questionnaire for measuring Usability in terms of Usefulness, Ease of Use, Ease of Learning, and Satisfaction. The USE Questionnaire is based on: Lund, A.M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.-->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}! For the assessment, please fill out the following questionnaire. You can express your agreement with the attributes by ticking the value that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to the particular resource. Nevertheless, please make a selection on every item. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+		</qu:Instructions>
+	</qu:Page>
+	
+
+4.	Consistency Comment	bad								good	
+5.	Feedback Comment	bad								good	
+6.	Clearly Marked Exits Comment	bad								good	
+7.	Shortcuts Comment	bad								good	
+8.	Good Error Messages Comment	bad								good	
+9.	Prevent Errors Comment	bad								good	
+10.	Help and Documentation Comment	bad								good	
+	
+	<qu:Page name="Usability Heuristics" 
+	      qid="NUH.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Simple and Natural Dialogue
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usability Heuristics" 
+	      qid="NUH.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Speak the Users' Language
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usability Heuristics" 
+	      qid="NUH.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Minimize User Memory Load
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Usability Heuristics" 
+	      qid="NUH.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Consistency
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="USE.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether, ${SURVEY.RESOURCE} is a success.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Negative Aspects" 
+	      qid="USE.N"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most negative aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Positive Aspects" 
+	      qid="USE.P"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most positive aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>
