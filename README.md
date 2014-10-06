@@ -30,12 +30,12 @@ Start
 
 To start MobSOS Surveys, use one of the available start scripts:
   
-  * bin/startNetwork.bat (Win)
-  * bin/startNetwork.sh (Unix, Mac)
+  * `bin/startNetwork.bat (Win)`
+  * `bin/startNetwork.sh (Unix, Mac)`
 
 After successful start, MobSOS Surveys is available under
 
-  (http://localhost:8080/mobsos/surveys)
+  [http://localhost:8080/mobsos/surveys](http://localhost:8080/mobsos/surveys)
   
 License
 --
