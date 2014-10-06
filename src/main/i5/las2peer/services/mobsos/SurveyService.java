@@ -104,24 +104,24 @@ import org.xml.sax.SAXException;
  * 
  * MobSOS Survey Service
  * 
- * A RESTful service for the management, conduction and processing of online surveys. 
+ * A simple RESTful service for online survey management. 
  * 
  * The data model behind this service consists of three main entities: surveys, questionnaires and responses. 
- * A questionnaire is described by basic metadata and most essentially a form. Any questionnaire 
- * can be re-used in an arbitrary number of surveys. Surveys serve as management contexts for the collection 
- * of responses to a given questionnaire. A survey is described by basic metadata, a start and optional end-time, 
- * a subject URI linking to an arbitrary resource being target of the survey, a reference to a predefined questionnaire, 
- * and a number of responses. A response is described by an optional identifier of the survey participant, the time of 
- * submitting the response, and a completed questionnaire form. For questionnaire forms, MobSOS comes with an XML Schema
- * defining scale, dichotomous, and free-text items, but - given the inherent extensibility of XML - being open for 
- * further extensions.
+ * A questionnaire is described by basic metadata and most essentially a form. Any questionnaire can be re-used 
+ * in an arbitrary number of surveys. Surveys serve as management contexts for the collection of responses to a 
+ * given questionnaire. A survey is described by basic metadata, a start and optional end-time, a subject URI 
+ * linking to an arbitrary resource being target of the survey, a reference to a predefined questionnaire, and a 
+ * number of responses. A response is described by an optional identifier of the survey participant, the time of 
+ * submitting the response, and a completed questionnaire form. For questionnaire forms, MobSOS comes with an 
+ * XML Schema defining scale, dichotomous, and free-text items, but - given the inherent extensibility of XML -
+ * being open for further extensions.
  * 
- * This service is part of the MobSOS collection of services, which is mainly dedicated to 
- * exploring, modeling, and measuring Community Information System Success (CISS) as a complex 
- * construct established by multiple dimensions and factors. As part of MobSOS, the Survey Service 
- * enables to collect subjective data on CISS, that is not retrievable from automatically monitored data.
+ * This service is part of the MobSOS toolset dedicated to exploring, modeling, and measuring 
+ * Community Information System (CIS) Success as a complex construct established by multiple dimensions and factors. 
+ * As part of MobSOS, this service enables to collect subjective data enabling qualitative and quantitative measurements of
+ * CIS Success.
  * 
- * However, the design of this service and its underlying data model is deliberately kept as 
+ * However, the design of MobSOS Survey Service and its underlying data model is deliberately kept as 
  * generic and independent as possible and should thus be applicable for any kind of online survey.
  * 
  * @author Dominik Renzel
@@ -1366,12 +1366,12 @@ public class SurveyService extends Service {
 						navpills.add(navpill);
 
 						// then add question page
-						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 well text-center\">\n";
+						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 text-center\">\n";
 
 						String name = e.getAttribute("name");
-						String qident = e.getAttribute("qid");
+						String quid = e.getAttribute("qid");
 
-						qpage += "\t\t\t<h2>" + qident + " - " + name + "</h2>\n";
+						qpage += "\t\t\t<h2>" + quid + " - " + name + "</h2>\n";
 
 						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
 
@@ -1385,8 +1385,6 @@ public class SurveyService extends Service {
 						qpage +="\t\t\t<div class=\"" + cssClass + "\" >" + instr + "</div>\n";
 
 						String qtype = e.getAttribute("xsi:type");
-
-						String quid = e.getAttribute("qid");
 
 						if("qu:OrdinalScaleQuestionPageType".equals(qtype)){
 
@@ -1412,31 +1410,36 @@ public class SurveyService extends Service {
 							// --- end UI button style
 							
 							// do UI in range slider style (better responsive design)
-							qpage += "\t\t\t<div class='row'>\n";
-							qpage += "\t\t\t\t<input class='col-md-12' type='range' min='" + minval + "' max='" + maxval + "' step='1'/><br/>\n";
-							qpage += "\t\t\t\t<span class='col-md-2'>" + minlabel + "</span><span class='col-md-8'/><span class='col-md-2'>" + maxlabel + "</span>\n";
+							/*
+							<div class="row well">
+							
+									<input class="col-md-12 col-xs-12 scale" name="SQ.N.1" type="range" min="1" max="7" step="1" list="SQ.N.1-scale"/><br>
+									<datalist id="SQ.N.1-scale">
+										<option>1</option>
+										<option>2</option>
+										<option>3</option>
+										<option>4</option>
+										<option>5</option>
+										<option>6</option>
+										<option>7</option>
+									</datalist>
 									
+									<span class="col-md-4 col-xs-4">Totally disagree</span><span name="SQ.N.1" class="col-md-4 col-xs-4 text-center h4 response scale-response alert" data-toggle="tooltip" data-placement="left" title="Click to reset to n/a.">n/a</span> <span class="col-md-4 col-xs-4 pull-right text-right">Totally agree</span>
+								
+							</div>*/
+							qpage += "\t\t\t<div class='row well'>\n";
+							qpage += "\t\t\t\t<input class='col-md-12 col-xs-12 scale' name='" + quid + "' type='range' min='" + minval + "' max='" + maxval + "' step='1' list='" + quid.replace(".","-") + "-scale'/><br>\n";
+							qpage += "\t\t\t\t<datalist id='" + quid.replace(".","-") + "-scale'>\n";
+							for(int k = minval; k <= maxval; k++){
+								qpage +="\t\t\t\t\t<option>" + k + "</option>\n";
+							}		
+							qpage += "\t\t\t\t</datalist>";
+							qpage += "<span class='col-md-4 col-xs-5 text-left'>" + minlabel + "</span><span name='" + quid + "' class='col-md-4 col-xs-2 text-center h2 response scale-response' data-toggle='tooltip' data-placement='left' title='Click to reset to n/a.'>n/a</span> <span class='col-md-4 col-xs-5 pull-right text-right'>" + maxlabel + "</span>";
 							qpage += "\t\t\t</div>\n";
 							// --- end UI range slider style
 
-						} else if ("qu:DichotomousQuestionPageType".equals(qtype)){
-
-							// TODO: do something with default value, if set.
-							//int defval = Integer.parseInt(e.getAttribute("defval"));
-							String minlabel = e.getAttribute("minlabel");
-							String maxlabel = e.getAttribute("maxlabel");
-
-							qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
-							qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
-							qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"0\">" + minlabel + "\n";
-							qpage += "\t\t\t\t</label>\n";
-							qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
-							qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"1\">" + maxlabel + "\n";
-							qpage += "\t\t\t\t</label>\n";
-							qpage += "\t\t\t</div>\n";
-
 						} else if ("qu:FreeTextQuestionPageType".equals(qtype)){
-							qpage += "\t\t\t<textarea name=\"" +quid + "\" class=\"freetext\" rows=\"3\"></textarea>\n";
+							qpage += "\t\t\t<textarea name=\"" +quid + "\" class=\"form-control response freetext-response\" rows=\"3\"></textarea>\n";
 						}
 
 						qpage += "\t\t</div></div></div>\n";

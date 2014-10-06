@@ -15,15 +15,13 @@
 	</head>
 	
 	<body>
-	
 		
 		<div class="container col-12">
-			<h3>Fucking Responsive Scale with Ticks</h3>
+			<h3>Scale with Ticks</h3>
 			<div class="row well">
 				
-					<input class="col-md-12 col-xs-12 slider" name="SQ1" type="range" min="1" max="7" step="1" list="scale"/><br>
-					<datalist id="scale">
-						<option>0</option>
+					<input class="col-md-12 col-xs-12 scale" name="SQ.N.1" type="range" min="1" max="7" step="1" list="SQ.N.1-scale"/><br>
+					<datalist id="SQ.N.1-scale">
 						<option>1</option>
 						<option>2</option>
 						<option>3</option>
@@ -33,28 +31,34 @@
 						<option>7</option>
 					</datalist>
 					
-					<span class="col-md-2 col-xs-4">Totally disagree with something longer</span><span class="col-md-2 col-xs-4 pull-right text-right">Totally agree with something longer</span>
+					<span class="col-md-4 col-xs-4">Totally disagree</span><span name="SQ.N.1" class="col-md-4 col-xs-4 text-center h4 response scale-response alert" data-toggle="tooltip" data-placement="left" title="Click to reset to n/a.">n/a</span> <span class="col-md-4 col-xs-4 pull-right text-right">Totally agree</span>
 				
 			</div>
 		</div>
 		
 		<div class="container col-12">
-			<h3>Another Scale with Ticks</h3>
+			<h3>Another Scale with Other Ticks</h3>
 			<div class="row well">
 				
-					<input class="col-md-12 col-xs-12 slider" name="SQ2" type="range" min="1" max="7" step="1" list="scale"/><br>
-					<datalist id="scale">
-						<option>0</option>
+					<input class="col-md-12 col-xs-12 scale" name="SQ.N.2" type="range" min="1" max="5" step="1" list="SQ.N.2-scale"/><br>
+					<datalist id="SQ.N.2-scale">
 						<option>1</option>
 						<option>2</option>
 						<option>3</option>
 						<option>4</option>
 						<option>5</option>
-						<option>6</option>
-						<option>7</option>
 					</datalist>
 					
-					<span class="col-md-2 col-xs-4">Totally disagree</span><span class="col-md-2 col-xs-4 pull-right text-right">Totally agree</span>
+					<span class="col-md-4 col-xs-4">Totally disagree</span><span name="SQ.N.2" class="col-md-4 col-xs-4 text-center h4 response scale-response alert" data-toggle="tooltip" data-placement="left" title="Click to reset to n/a.">n/a</span> <span class="col-md-4 col-xs-4 pull-right text-right">Totally agree</span>
+				
+			</div>
+		</div>
+		
+		<div class="container col-12">
+			<h3>A Freetext Item </h3>
+			<div class="row well">
+				
+				<textarea name="SQ.U.1" class="response freetext-response form-control" rows="3"></textarea>
 				
 			</div>
 		</div>
@@ -70,18 +74,49 @@
 		<script type="text/javascript" src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	
 		<script>
-		
+			
+			function transferValue(scale){
+				var qid = scale.attr("name");
+				var val = scale.val();
+				$(".scale-response[name='"+qid+"']").html(""+val);
+				$(".scale-response[name='"+qid+"']").addClass("alert-success");
+			}
+			
 			$( document ).ready(function() {
-				$('.slider').change(function() {
-					console.log($(this).val());
+				$('.scale').change(function(){
+					transferValue($(this));
+				}).mousemove(function(e) {
+					if(e.which == 1){
+						transferValue($(this));
+					}
+				});
+				
+				$('.scale-response').click(function(){
+					$(this).html("n/a");
+					$(this).removeClass("alert-success");
 				});
 				
 				$('#collect').click(function(){
 					var values = {};
 					// collect all input from form elements
-					var questions  = $(".slider");
-					for(var i=0;i < questions.length; i++ ){
-						values[questions.eq(i).attr("name")] = questions.eq(i).val();
+					
+					var scresp  = $(".response[name]");
+					
+					for(var i=0;i < scresp.length; i++ ){
+						
+						var key = scresp.eq(i).attr("name");
+						
+						var val = "n/a";
+						
+						if(scresp.eq(i).hasClass("freetext-response") && (scresp.eq(i).val() != "")){
+							val = scresp.eq(i).val();
+						} else if(scresp.eq(i).hasClass("scale-response") && (scresp.eq(i).html() != "n/a")){
+							val = parseInt(scresp.eq(i).html());
+						}
+						
+						if(val !== 'n/a'){
+							values[key] = val;
+						}
 					}
 					
 					console.log(values);
