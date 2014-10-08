@@ -40,6 +40,7 @@ import i5.las2peer.restMapper.annotations.Consumes;
 import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
 import i5.las2peer.restMapper.annotations.GET;
+import i5.las2peer.restMapper.annotations.HttpHeaders;
 import i5.las2peer.restMapper.annotations.POST;
 import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
@@ -161,6 +162,16 @@ public class SurveyService extends Service {
 
 		// print out REST mapping for this service
 		//System.out.println(getRESTMapping());
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("hdr")
+	public HttpResponse getLang(@HttpHeaders String headers){
+		
+		HttpResponse r = new HttpResponse(headers);
+		r.setStatus(200);
+		return r;
 	}
 
 	// ============= QUESTIONNAIRE-RELATED RESOURCES ==============
