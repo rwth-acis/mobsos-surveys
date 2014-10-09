@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- A simple questionnaire for measuring Usability and Learnability. The SUS Questionnaire is based on: Brooke, J. (1996) "SUS: A quick and dirty usability scale". In: Usability Evaluation in Industry. -->
+<!-- A simple questionnaire for measuring Usability and Learnability. The SUS Questionnaire is based on: Brooke, J. (1996) "SUS: A quick and dirty usability scale". In: Usability Evaluation in Industry. The two different factors of usability and learnability stem from a study by Lewis, J. R. & Sauro, J. (2009) "The Factor Structure of the System Usability Scale". -->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<qu:Page name="Instructions" 
@@ -126,7 +126,7 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Usability" 
+	<qu:Page name="Learnability" 
 	      qid="SUS.10"
 	      minval="1" 
 	      maxval="5"
