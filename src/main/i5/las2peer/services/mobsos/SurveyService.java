@@ -40,6 +40,7 @@ import i5.las2peer.restMapper.annotations.Consumes;
 import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
 import i5.las2peer.restMapper.annotations.GET;
+import i5.las2peer.restMapper.annotations.HeaderParam;
 import i5.las2peer.restMapper.annotations.HttpHeaders;
 import i5.las2peer.restMapper.annotations.POST;
 import i5.las2peer.restMapper.annotations.PUT;
@@ -167,7 +168,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("hdr")
-	public HttpResponse getLang(@HttpHeaders String headers){
+	public HttpResponse getLang(@HeaderParam(name="accept-language",defaultValue = "") String lang, @HttpHeaders String headers){
 		
 		HttpResponse r = new HttpResponse(headers);
 		r.setStatus(200);
@@ -721,13 +722,18 @@ public class SurveyService extends Service {
 						result.setStatus(400);
 						return result;
 					}
-
+					
+					String lang = form.getDocumentElement().getAttribute("xml:lang");
+					System.out.println("Language detected: " + lang);
+					
 				} catch (SAXException e){
 					e.printStackTrace();
 					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 					result.setStatus(400);
 					return result;
 				}
+				
+				
 
 				// store valid form to database
 				conn = dataSource.getConnection();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use. The TAM Questionnaire is based on: Davis, Fred D. (1989) "Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology ". MIS Quarterly 13, pp. 319-340. -->
-<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xml="http://www.w3.org/XML/1998/namespace" xml:lang="en-US">
 	
 	<qu:Page name="Instructions" 
 		 xsi:type="qu:InformationPageType">

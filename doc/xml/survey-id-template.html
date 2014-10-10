@@ -115,7 +115,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				
+			
+				client.getHeaders(
+					function(d,t){
+						console.log("headers:" + d);
+					},
+					function(e){
+						console.log(e);
+					}
+				);
+			
 				$("#survey").removeClass("hidden");
 				$("#i_survey_part").click(function(){
 					window.location.href = window.location.href + "/form?access_token=" + window.localStorage["access_token"];
