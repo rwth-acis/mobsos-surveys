@@ -31,8 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package i5.las2peer.services.mobsos;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 import i5.las2peer.api.Service;
-import i5.las2peer.p2p.AgentNotKnownException;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
@@ -70,8 +70,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -102,6 +105,8 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
+import com.mysql.jdbc.EscapeTokenizer;
+
 /**
  * 
  * MobSOS Survey Service
@@ -125,6 +130,8 @@ import org.xml.sax.SAXException;
  * 
  * However, the design of MobSOS Survey Service and its underlying data model is deliberately kept as 
  * generic and independent as possible and should thus be applicable for any kind of online survey.
+ * 
+ * Survey service allows for i18n in its HTML resource representations.
  * 
  * @author Dominik Renzel
  *
@@ -164,28 +171,23 @@ public class SurveyService extends Service {
 		// print out REST mapping for this service
 		//System.out.println(getRESTMapping());
 	}
-	
-	@GET
-	@Produces(MediaType.TEXT_HTML)
-	@Path("hdr")
-	public HttpResponse getLang(@HeaderParam(name="accept-language",defaultValue = "") String lang, @HttpHeaders String headers){
-		
-		HttpResponse r = new HttpResponse(headers);
-		r.setStatus(200);
-		return r;
-	}
 
 	// ============= QUESTIONNAIRE-RELATED RESOURCES ==============
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires")
-	public HttpResponse getQuestionnairesHTML(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
+	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
 		String onAction = "retrieving questionnaires HTML";
 
 		// only respond with template; nothing to be adapted
 		try {
-			String html = new Scanner(new File("./doc/xml/questionnaires-template.html")).useDelimiter("\\A").next();
+			// load template
+			String html = new Scanner(new File("./etc/html/questionnaires-template.html")).useDelimiter("\\A").next();
+
+			// localize template
+			html = i18n(html, lang);
+
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
@@ -303,17 +305,29 @@ public class SurveyService extends Service {
 			}
 
 			// store valid questionnaire to database
-			int qid = storeNewQuestionnaire(o);
+			try{
+				int qid = storeNewQuestionnaire(o);
 
-			// respond to user with newly created id/URL
-			JSONObject r = new JSONObject();
-			r.put("id",qid);
-			r.put("url",epUrl + "mobsos/questionnaires/" + qid);
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-			result.setStatus(201);
+				// respond to user with newly created id/URL
+				JSONObject r = new JSONObject();
+				r.put("id",qid);
+				r.put("url",epUrl + "mobsos/questionnaires/" + qid);
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+				result.setStatus(201);
 
-			return result;
+				return result;}
+			catch(SQLException e) {
+				if(0<=e.getMessage().indexOf("Duplicate")){
+					HttpResponse result = new HttpResponse("Questionnaire already exists.");
+					result.setStatus(409);
+					return result;
+				} else {
+					e.printStackTrace();
+					return internalError(onAction);
+				}
+			}
+
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -378,7 +392,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select id, owner, name, description, organization, logo from " + jdbcSchema + ".questionnaire where id = ?");
+				stmt = conn.prepareStatement("select id, owner, name, description, organization, logo, lang from " + jdbcSchema + ".questionnaire where id = ?");
 				stmt.setInt(1, id);
 
 				rset = stmt.executeQuery();
@@ -410,7 +424,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
-	
+
 	/**
 	 * TODO: write documentation
 	 * 
@@ -420,10 +434,10 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires/{id}")
-	public HttpResponse getQuestionnaireHTML(@PathParam("id") int id){
-		
+	public HttpResponse getQuestionnaireHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+
 		String onAction = "retrieving individual questionnaire HTML";
-		
+
 		try {
 			// if questionnaire does not exist, return 404.
 			if(checkExistenceOwnership(id,1) == -1){
@@ -436,7 +450,13 @@ public class SurveyService extends Service {
 		}
 		// adapt template to specific questionnaire
 		try {
-			String html = new Scanner(new File("./doc/xml/questionnaire-id-template.html")).useDelimiter("\\A").next();
+			// load template from file
+			String html = new Scanner(new File("./etc/html/questionnaire-id-template.html")).useDelimiter("\\A").next();
+
+			// localize template
+			html = i18n(html, lang);
+
+			// fill in placeholders with values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -502,13 +522,14 @@ public class SurveyService extends Service {
 
 				// if parsed content is ok, execute update
 				c = dataSource.getConnection();
-				s = c.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=? where id = ?");
+				s = c.prepareStatement("update "+ jdbcSchema + ".questionnaire set organization=?, logo=?, name=?, description=?, lang=? where id = ?");
 
 				s.setString(1, (String) o.get("organization") );
 				s.setString(2, (String) o.get("logo") );
 				s.setString(3, (String) o.get("name") );
 				s.setString(4, (String) o.get("description") );
-				s.setInt(5, id);
+				s.setString(5, (String) o.get("lang") );
+				s.setInt(6, id);
 
 				s.executeUpdate();
 
@@ -635,8 +656,9 @@ public class SurveyService extends Service {
 				rs.next();
 				String formXml = rs.getString(1);
 
+
 				// if form field is empty, respond with not found.
-				if(formXml.trim().isEmpty()){
+				if(formXml == null || formXml.trim().isEmpty()){
 					HttpResponse result = new HttpResponse("Questionnaire " + id + " does not define a form!");
 					result.setStatus(404);
 					return result;
@@ -722,18 +744,18 @@ public class SurveyService extends Service {
 						result.setStatus(400);
 						return result;
 					}
-					
+
 					String lang = form.getDocumentElement().getAttribute("xml:lang");
 					System.out.println("Language detected: " + lang);
-					
+
 				} catch (SAXException e){
 					e.printStackTrace();
 					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 					result.setStatus(400);
 					return result;
 				}
-				
-				
+
+
 
 				// store valid form to database
 				conn = dataSource.getConnection();
@@ -768,13 +790,18 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys")
-	public HttpResponse getSurveysHTML(@QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query){
+	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query){
 
 		String onAction = "retrieving surveys HTML";
 
 		// only respond with template; nothing to be adapted
 		try {
-			String html = new Scanner(new File("./doc/xml/surveys-template.html")).useDelimiter("\\A").next();
+			// load template from file
+			String html = new Scanner(new File("./etc/html/surveys-template.html")).useDelimiter("\\A").next();
+
+			// localize template
+			html = i18n(html, lang);
+
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
@@ -782,6 +809,43 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
+	}
+
+	/**
+	 * localizes the given String t according to locale l. If no resource bundle exists for locale l, fall back to English.
+	 * Input string t is expected to contain placeholders ${k}, where k is a key defined in the ResourceBundle.
+	 * 
+	 * @param t a String to be localized
+	 * @param l a Locale
+	 * @return
+	 */
+	private String i18n(String t, String lang){
+
+		// now parse locales from accept-language header
+		Pattern p = Pattern.compile("[a-z]+-[A-Z]+");
+		Matcher m = p.matcher(lang);
+
+		// do not iterate over all locales found, but only use first option with highest preference.
+
+		Locale l= null;
+
+		if(m.find()){
+			String[] tokens = m.group().split("-");
+			l = new Locale(tokens[0], tokens[1]);
+			System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
+		}
+
+		ResourceBundle messages = ResourceBundle.getBundle("MessageBundle", l);
+		Enumeration<String> e = messages.getKeys();
+
+		while(e.hasMoreElements()){
+
+			String key = e.nextElement();
+			String translation = messages.getString(key);
+			t = t.replaceAll("\\$\\{"+key+"\\}",escapeHtml4(translation));
+		}
+
+		return t;
 	}
 
 
@@ -899,6 +963,7 @@ public class SurveyService extends Service {
 				return result;
 			}
 
+			try{
 			// if passed content is valid, store as new survey
 			int sid = storeNewSurvey(o);
 
@@ -911,6 +976,17 @@ public class SurveyService extends Service {
 			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 			result.setStatus(201);
 			return result;
+			} catch(SQLException e) {
+
+				if(0<=e.getMessage().indexOf("Duplicate")){
+					HttpResponse result = new HttpResponse("Survey already exists.");
+					result.setStatus(409);
+					return result;
+				} else {
+					e.printStackTrace();
+					return internalError(onAction);
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -987,10 +1063,10 @@ public class SurveyService extends Service {
 			try{
 				// query for given survey
 				c = dataSource.getConnection();
-				
+
 				// TODO: restore, as soon as resource information comes from an external source
 				//s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
-				
+
 				// TODO: replace by external source for retrieving resource information
 				s = c.prepareStatement("select s.*, r.name as rname, r.description as rdesc from " + jdbcSchema + ".survey s left join " + jdbcSchema + ".resource r on (s.resource = r.uri) where id = ?");
 				s.setInt(1,id);
@@ -1007,23 +1083,23 @@ public class SurveyService extends Service {
 				// if survey was found, respond to user with JSON result
 				rs.next();
 				r = readSurveyFromResultSet(rs);
-				
+
 				// TODO: replace by external resource information
 				String resource_name = rs.getString("rname");
 				String resource_description = rs.getString("rdesc");
-				
+
 				String resource_uri = (String) r.get("resource");
-			
+
 				JSONObject res = new JSONObject();
 				res.put("uri",resource_uri);
 				res.put("name", resource_name);
 				res.put("description", resource_description);
-				
+
 				r.put("resource", res);
-				
+
 				// before, try to retrieve information on resource
-				
-				
+
+
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setStatus(200);
 				return result;
@@ -1044,11 +1120,11 @@ public class SurveyService extends Service {
 		}
 
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}")
-	public HttpResponse getSurveyHTML(@PathParam("id") int id){
+	public HttpResponse getSurveyHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
 		String onAction = "retrieving individual survey HTML";
 
 		try {
@@ -1061,11 +1137,17 @@ public class SurveyService extends Service {
 		} catch (SQLException e1) {
 			return internalError(onAction);
 		}
-		
+
 		// adapt template to specific survey
 		try {
-			String html = new Scanner(new File("./doc/xml/survey-id-template.html")).useDelimiter("\\A").next();
+			String html = new Scanner(new File("./etc/html/survey-id-template.html")).useDelimiter("\\A").next();
+
+			// localize template
+			html = i18n(html, lang);
+
+			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
+
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
@@ -1128,7 +1210,7 @@ public class SurveyService extends Service {
 				}
 
 				c = dataSource.getConnection();
-				s = c.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=? where id = ?");
+				s = c.prepareStatement("update "+ jdbcSchema + ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=?, lang=? where id = ?");
 
 				s.setString(1, (String) o.get("organization"));
 				s.setString(2, (String) o.get("logo"));
@@ -1137,7 +1219,8 @@ public class SurveyService extends Service {
 				s.setString(5, (String) o.get("resource"));
 				s.setTimestamp(6, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("start")).getTimeInMillis()));
 				s.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)o.get("end")).getTimeInMillis()));
-				s.setInt(8, id);
+				s.setString(8, (String) o.get("lang") );
+				s.setInt(9, id);
 
 				s.executeUpdate();
 
@@ -1237,10 +1320,10 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/form")
-	public HttpResponse getSurveyQuestionnaireFormHTML(@PathParam("id") int id){
+	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
-		
+
 		try {
 			// if survey does not exist, return 404.
 			if(checkExistenceOwnership(id,0) == -1){
@@ -1251,7 +1334,7 @@ public class SurveyService extends Service {
 		} catch (SQLException e1) {
 			return internalError(onAction);
 		}
-		
+
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
@@ -1328,10 +1411,14 @@ public class SurveyService extends Service {
 			// now start to transform XML into ready-to-use HTML
 
 			// start off with template
-			String text = new Scanner(new File("./doc/xml/survey-form-template.html")).useDelimiter("\\A").next();
+			String text = new Scanner(new File("./etc/html/survey-form-template.html")).useDelimiter("\\A").next();
+
+
 
 			// do all adaptation to user and survey
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), null);
+
+			adaptText = i18n(adaptText, lang);
 
 			//String adaptText = text;
 
@@ -1350,32 +1437,32 @@ public class SurveyService extends Service {
 
 					// set first page and navpill item to active
 					String active = "";
-					
+
 					if(i==0){
 						active = " class='active'";
 					}
-					
+
 					// differentiate between possible item types and add HTML accordingly
 					if(e.getAttribute("xsi:type").endsWith("InformationPageType")){
 						// first add navpill item
 						String navpill = "\t\t\t\t\t<li"+active+"><a href=\"#step-" + i +"\"><span class=\"list-group-item-heading\">" + i + "</span></a></li>\n";
 						navpills.add(navpill);
-						
+
 						// then add information page
 						String qpage = "\t\t<div class=\"row setup-content\" id=\"step-" + i + "\"><div class=\"col-xs-12\"><div class=\"col-md-12 well text-center\">\n";
-						
+
 						String name = e.getAttribute("name");
 
-						qpage += "\t\t\t<h2>" + name + "</h2>\n";
-						
-						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
-						
+						qpage += "\t\t\t<h4><b>" + name + "</b></h4>\n";
+
+						String instr = escapeHtml4(e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim());
+
 						qpage += "\t\t\t<p>\n\t\t\t\t" + 
 								instr + "\n" +
 								"\t\t\t</p>\n";
 						qpage += "\t\t</div></div></div>\n";
 						qpages.add(qpage);
-						
+
 					} else if(e.getAttribute("xsi:type").endsWith("QuestionPageType")){
 
 						// first add nav pill item
@@ -1388,18 +1475,18 @@ public class SurveyService extends Service {
 						String name = e.getAttribute("name");
 						String quid = e.getAttribute("qid");
 
-						qpage += "\t\t\t<h2>" + quid + " - " + name + "</h2>\n";
+						qpage += "\t\t\t<h4><b>" + name + " (" + quid + ")</b></h4>\n";
 
-						String instr = e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim();
+						String instr = escapeHtml4(e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Instructions").item(0).getTextContent().trim());
 
 						String cssClass = "question";
 
 						if(e.getAttribute("required") != null && e.getAttribute("required").equals("true")){
 							cssClass += " required";
-							instr += " <i>(required)</i>";
+							instr += " (<i>" + i18n("${required}", lang) + "</i>)";
 						}
 
-						qpage +="\t\t\t<div class=\"" + cssClass + "\" >" + instr + "</div>\n";
+						qpage +="\t\t\t<div class=\"" + cssClass + "\" style='text-align: justify;'>" + instr + "</div><p/>\n";
 
 						String qtype = e.getAttribute("xsi:type");
 
@@ -1407,11 +1494,11 @@ public class SurveyService extends Service {
 
 							// TODO: do something with default value, if set.
 							//int defval = Integer.parseInt(e.getAttribute("defval"));
-							String minlabel = e.getAttribute("minlabel");
-							String maxlabel = e.getAttribute("maxlabel");
+							String minlabel = escapeHtml4(e.getAttribute("minlabel"));
+							String maxlabel = escapeHtml4(e.getAttribute("maxlabel"));
 							int minval =  Integer.parseInt(e.getAttribute("minval"));
 							int maxval = Integer.parseInt(e.getAttribute("maxval"));
-							
+
 							// do UI in a button style (not really nice in terms of responsive design)
 							/*
 							qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
@@ -1423,13 +1510,13 @@ public class SurveyService extends Service {
 							}
 							qpage += "\t\t\t\t<span class=\"btn\">" + maxlabel + "</span>\n";
 							qpage += "\t\t\t</div>\n";
-							*/
+							 */
 							// --- end UI button style
-							
+
 							// do UI in range slider style (better responsive design)
 							/*
 							<div class="row well">
-							
+
 									<input class="col-md-12 col-xs-12 scale" name="SQ.N.1" type="range" min="1" max="7" step="1" list="SQ.N.1-scale"/><br>
 									<datalist id="SQ.N.1-scale">
 										<option>1</option>
@@ -1440,9 +1527,9 @@ public class SurveyService extends Service {
 										<option>6</option>
 										<option>7</option>
 									</datalist>
-									
+
 									<span class="col-md-4 col-xs-4">Totally disagree</span><span name="SQ.N.1" class="col-md-4 col-xs-4 text-center h4 response scale-response alert" data-toggle="tooltip" data-placement="left" title="Click to reset to n/a.">n/a</span> <span class="col-md-4 col-xs-4 pull-right text-right">Totally agree</span>
-								
+
 							</div>*/
 							qpage += "\t\t\t<div class='row well'>\n";
 							qpage += "\t\t\t\t<input class='col-md-12 col-xs-12 scale' name='" + quid + "' type='range' min='" + minval + "' max='" + maxval + "' step='1' list='" + quid.replace(".","-") + "-scale'/><br>\n";
@@ -1948,7 +2035,7 @@ public class SurveyService extends Service {
 		String html = "";
 		// start off with template
 		try {
-			html = new Scanner(new File("./doc/xml/redirect-callback.html")).useDelimiter("\\A").next();
+			html = new Scanner(new File("./etc/html/redirect-callback.html")).useDelimiter("\\A").next();
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
@@ -2138,7 +2225,7 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			String text = new Scanner(new File("./doc/xml/questionnaire-template.html")).useDelimiter("\\A").next();
+			String text = new Scanner(new File("./etc/html/questionnaire-template.html")).useDelimiter("\\A").next();
 
 			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), community);
 
@@ -2545,7 +2632,7 @@ public class SurveyService extends Service {
 					} else if (tag.endsWith("DESCRIPTION")){
 						value = (String) survey.get("description");
 					} else if (tag.endsWith("RESOURCE")){
-						
+
 						JSONObject res = (JSONObject) survey.get("resource");
 						String res_name = (String) res.get("name");
 						value = res_name;
@@ -2764,6 +2851,7 @@ public class SurveyService extends Service {
 
 		o.put("start",d_start);
 		o.put("end",d_end);
+		o.put("lang", rs.getString("lang"));
 
 		return o;
 	}
@@ -2781,6 +2869,7 @@ public class SurveyService extends Service {
 		o.put("owner",rs.getString("owner"));
 		o.put("organization", rs.getString("organization"));
 		o.put("logo", rs.getString("logo"));
+		o.put("lang", rs.getString("lang"));
 
 		return o;
 	}
@@ -2837,7 +2926,7 @@ public class SurveyService extends Service {
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
 
 		// check result for unknown illegal fields. If so, parsing fails.
-		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end"};
+		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end", "lang"};
 		for (Object key: o.keySet()){
 			if(!Arrays.asList(fields).contains(key)){
 
@@ -2893,9 +2982,27 @@ public class SurveyService extends Service {
 					try{
 						DatatypeConverter.parseDateTime((String)o.get("end"));
 					} catch (IllegalArgumentException e){
-						throw new IllegalArgumentException("Illegal value for survey field 'start'. Should be an ISO-8601 formatted time string.");
+						throw new IllegalArgumentException("Illegal value for survey field 'end'. Should be an ISO-8601 formatted time string.");
 					}
 				} 
+				else if(key.equals("lang")){
+
+					String lang = (String) o.get(key);
+
+					Pattern p = Pattern.compile("[a-z]+-[A-Z]+");
+					Matcher m = p.matcher(lang);
+
+					// do not iterate over all locales found, but only use first option with highest preference.
+
+					Locale l= null;
+
+					if(m.find()){
+						String[] tokens = m.group().split("-");
+						l = new Locale(tokens[0], tokens[1]);
+					} else {
+						throw new IllegalArgumentException("Illegal value for survey field 'lang'. Should be a valid locale such as 'en-US' or 'de-DE'.");
+					}
+				}
 			}
 		}
 
@@ -2906,8 +3013,9 @@ public class SurveyService extends Service {
 				o.get("description") == null || 
 				o.get("resource") == null || 
 				o.get("start") == null ||
-				o.get("end") == null){
-			throw new IllegalArgumentException("Survey data incomplete! All fields name, organization, logo, description, resource, start, and end must be defined!");
+				o.get("end") == null ||
+				o.get("lang") == null){
+			throw new IllegalArgumentException("Survey data incomplete! All fields name, organization, logo, description, resource, start, end, and lang must be defined!");
 		}
 
 		// finally check time integrity constraint: start must be before end (possibly not enforced by database; mySQL does not support this check)
@@ -2929,7 +3037,7 @@ public class SurveyService extends Service {
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
 
 		// check result for unknown illegal fields. If so, parsing fails.
-		String[] fields = {"id","owner","organization","logo", "name","description"};
+		String[] fields = {"id","owner","organization","logo", "name","description", "lang"};
 		for (Object key: o.keySet()){
 			if(!Arrays.asList(fields).contains(key)){
 
@@ -2961,6 +3069,26 @@ public class SurveyService extends Service {
 						throw new IllegalArgumentException("Illegal value for questionnaire field 'logo'. Should be a valid URL to an image resource.");
 					}
 				}
+				else if(key.equals("lang")){
+
+					String lang = (String) o.get(key);
+
+					Pattern p = Pattern.compile("[a-z]+-[A-Z]+");
+					Matcher m = p.matcher(lang);
+
+					// do not iterate over all locales found, but only use first option with highest preference.
+
+					Locale l= null;
+
+					if(m.find()){
+						String[] tokens = m.group().split("-");
+						//l = new Locale(tokens[0], tokens[1]);
+						l = new Locale("zz","ZZ");
+						System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
+					} else {
+						throw new IllegalArgumentException("Illegal value for questionnaire field 'lang'. Should be a valid locale such as en-US or de-DE");
+					}
+				}
 			}
 		}
 
@@ -2968,9 +3096,10 @@ public class SurveyService extends Service {
 		if(	o.get("name") == null || 
 				o.get("organization") == null ||
 				o.get("logo") == null ||
-				o.get("description") == null
+				o.get("description") == null ||
+				o.get("lang") == null
 				){
-			throw new IllegalArgumentException("Questionnaire data incomplete! All fields name, organization, logo, and description must be defined!");
+			throw new IllegalArgumentException("Questionnaire data incomplete! All fields name, organization, logo, description, and lang must be defined!");
 		}
 
 		return o;
@@ -2988,7 +3117,7 @@ public class SurveyService extends Service {
 
 		try {
 			conn = dataSource.getConnection();
-			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end ) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end, lang ) values (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
 			stmt.clearParameters();
 			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
@@ -2999,6 +3128,7 @@ public class SurveyService extends Service {
 			stmt.setString(6, (String) survey.get("resource"));
 			stmt.setTimestamp(7, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("start")).getTimeInMillis()));
 			stmt.setTimestamp(8, new Timestamp(DatatypeConverter.parseDateTime((String)survey.get("end")).getTimeInMillis()));
+			stmt.setString(9, (String) survey.get("lang"));
 
 			stmt.executeUpdate();
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -3009,8 +3139,6 @@ public class SurveyService extends Service {
 				throw new NoSuchElementException("No new survey was created!");
 			}
 
-		} catch(SQLException e) {
-			e.printStackTrace();
 		} catch(UnsupportedOperationException e){
 			e.printStackTrace();
 		} 
@@ -3019,7 +3147,7 @@ public class SurveyService extends Service {
 			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace();}
 			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); }
 		}
-		return -1;
+		throw new NoSuchElementException("No new survey was created!");
 	}
 
 	/**
@@ -3034,7 +3162,7 @@ public class SurveyService extends Service {
 
 		try {
 			conn = dataSource.getConnection();
-			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description,form) values (?,?,?,?,?,\"\")", Statement.RETURN_GENERATED_KEYS);
+			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description, lang) values (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
 			stmt.clearParameters();
 			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
@@ -3042,6 +3170,8 @@ public class SurveyService extends Service {
 			stmt.setString(3, (String) questionnaire.get("logo"));
 			stmt.setString(4, (String) questionnaire.get("name"));
 			stmt.setString(5, (String) questionnaire.get("description"));
+			stmt.setString(6, (String) questionnaire.get("lang"));
+
 
 			stmt.executeUpdate();
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -3052,8 +3182,6 @@ public class SurveyService extends Service {
 				throw new NoSuchElementException("No new questionnaire was created!");
 			}
 
-		} catch(SQLException e) {
-			e.printStackTrace();
 		} catch(UnsupportedOperationException e){
 			e.printStackTrace();
 		} 
@@ -3062,7 +3190,7 @@ public class SurveyService extends Service {
 			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace();}
 			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); }
 		}
-		return -1;
+		throw new NoSuchElementException("No new questionnaire was created!");
 	}
 
 	/**

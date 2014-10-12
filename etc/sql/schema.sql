@@ -15,6 +15,7 @@ create table questionnaire (
 	logo varchar(200) not null,
 	name varchar(128) not null,
 	description varchar(2048) not null,
+	lang varchar(32) not null,
 	form mediumtext,
 	constraint questionnaire_pk primary key (id),
 	constraint questionnaire_uk unique key (name)
@@ -35,6 +36,7 @@ create table survey (
 	name varchar(128) not null,
 	description varchar(2048) not null,
 	resource varchar(200) not null,
+	lang varchar(32) not null,
 	start datetime(6) not null,
 	end datetime(6) not null,
 	qid mediumint,

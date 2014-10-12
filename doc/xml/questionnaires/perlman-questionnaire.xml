@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A questionnaire for measuring Usability in terms of Usefulness, Ease of Use, Ease of Learning, and Satisfaction. The USE Questionnaire is based on: Lund, A.M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.-->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}! Please fill out the following check list to assess the usability of ${SURVEY.RESOURCE}. The checklist presents a list of items, each presenting a usability heuristic coupled with a good vs. bad 7-point scale. Please state how well each heuristic was realized in ${SURVEY.RESOURCE}. 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Learning" 
+	      qid="PUH.LE.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Help and Documentation: Design for use without documentation. Provide easy-to-use task-oriented help.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Learning" 
+	      qid="PUH.LE.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Adopt the User's Viewpoint: Speak the user's language (avoid jargon). Make use of existing knowledge (familiar mental models).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Learning" 
+	      qid="PUH.LE.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Simple and Natural Dialogue: Avoid extraneous information, steps, actions. Information should be in a logical, natural order.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Learning" 
+	      qid="PUH.LE.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Design for Advancement: Provide shortcuts (quick keys, customization).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Lear" 
+	      qid="PUH.LE.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="bad" 
+	      maxlabel="good" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Design for Advancement: Provide shortcuts (quick keys, customization).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="PUH.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether, ${SURVEY.RESOURCE} is a success.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Negative Aspects" 
+	      qid="USE.N"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most negative aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Positive Aspects" 
+	      qid="USE.P"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most positive aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>

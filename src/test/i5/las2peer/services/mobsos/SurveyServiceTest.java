@@ -481,6 +481,8 @@ public class SurveyServiceTest {
 			} catch (ParseException e){
 				fail(e.getMessage());
 			}
+			
+			System.out.println(questionnaire.toJSONString());
 			// change some fields in questionnaire
 			questionnaire.put("name","Changed Beerdrinker questionnaire");
 			questionnaire.put("description", "This questionnaire is for all those who like to drink changed beer.");
@@ -583,6 +585,7 @@ public class SurveyServiceTest {
 
 			// try to download questionnaire form. Should result in not found, since no form was uploaded, yet.
 			ClientResponse downl = c1.sendRequest("GET", u.getPath() + "/form", "");
+			System.out.println("Error: " + downl.getResponse());
 			assertEquals(404, downl.getHttpCode());
 
 			// read content from example questionnaire XML file
@@ -1295,6 +1298,7 @@ public class SurveyServiceTest {
 		obj.put("resource", "http://wikipedia.org"); 
 		obj.put("start","2014-06-06T00:00:00Z");
 		obj.put("end", "2014-08-06T23:59:59Z");
+		obj.put("lang", "en-US");
 
 		return obj;
 	}
@@ -1310,6 +1314,7 @@ public class SurveyServiceTest {
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
 		obj.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description","A questionnaire designed to ask for quality");
+		obj.put("lang", "en-US");
 
 		return obj;
 	}
@@ -1321,11 +1326,12 @@ public class SurveyServiceTest {
 	private static JSONObject generateNeedleQuestionnaireJSON(){
 
 		JSONObject obj = new JSONObject(); 
-		obj.put("name","Needle in the Haystack " + (new Date()).getTime());
-		obj.put("organization", "Searchers of the Holy Needle");
+		obj.put("name","Nadel im Heuhaufen " + (new Date()).getTime());
+		obj.put("organization", "Sucher der heiligen Nadel");
 		obj.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg");
-		obj.put("description","A questionnaire to act as a needle in the haystack");
-
+		obj.put("description","Ein Fragebogen wie die Nadel im Heuhaufen (Needle in the Haystack)");
+		obj.put("lang", "de-DE");
+		
 		return obj;
 	}
 }
