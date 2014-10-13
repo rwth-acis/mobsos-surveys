@@ -69,6 +69,7 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -746,7 +747,7 @@ public class SurveyService extends Service {
 					}
 
 					String lang = form.getDocumentElement().getAttribute("xml:lang");
-					System.out.println("Language detected: " + lang);
+					//System.out.println("Language detected: " + lang);
 
 				} catch (SAXException e){
 					
@@ -832,7 +833,7 @@ public class SurveyService extends Service {
 		if(m.find()){
 			String[] tokens = m.group().split("-");
 			l = new Locale(tokens[0], tokens[1]);
-			System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
+			//System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
 		}
 
 		ResourceBundle messages = ResourceBundle.getBundle("MessageBundle", l);
@@ -1289,7 +1290,7 @@ public class SurveyService extends Service {
 				int r = s.executeUpdate();
 
 				// TODO: check return value of update to see if deletion really occurred
-				System.out.println("Result: " + r);
+				//System.out.println("Result: " + r);
 
 				HttpResponse result = new HttpResponse("Survey " + id + " deleted successfully.");
 				result.setStatus(200);
@@ -1789,7 +1790,7 @@ public class SurveyService extends Service {
 
 			sql += " from " + jdbcSchema + ".response where sid ="+ id + " group by uid, cid;";
 
-			System.out.println("SQL for retrieving survey responses: \n" + sql);
+			//System.out.println("SQL for retrieving survey responses: \n" + sql);
 
 			// execute generated query
 			Connection conn = null;
@@ -1841,12 +1842,38 @@ public class SurveyService extends Service {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/responses")
 	public HttpResponse submitSurveyResponseJSON(@PathParam("id") int id, @ContentParam String answerJSON){
+		Date now = new Date();
 		String onAction = "submitting response to survey " + id;
 		try{
 
-			// retrieve survey id;
-			int qid = getQuestionnaireIdForSurvey(id);
+			// retrieve survey by id;
+			HttpResponse rs = getSurvey(id);
+			if(rs.getStatus() != 200){
+				return rs;
+			}
+			
+			JSONObject s = (JSONObject) JSONValue.parse(rs.getResult());
+			
+			// check if survey expired/not started
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			df.setTimeZone(TimeZone.getTimeZone("GMT"));
 
+			Date start = df.parse((String) s.get("start"));
+			Date end = df.parse((String) s.get("end"));
+			
+			if(now.getTime() > end.getTime()){
+				HttpResponse resp = new HttpResponse("Cannot submit response. Survey expired.");
+				resp.setStatus(403);
+				return resp;
+			} else if (now.getTime() < start.getTime()){
+				HttpResponse resp = new HttpResponse("Cannot submit response. Survey has not begun, yet.");
+				resp.setStatus(403);
+				return resp;
+			}
+			
+			// check for questionnaire form
+			int qid = Integer.parseInt(s.get("qid")+"");
+			
 			if(qid == -1){
 				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
 				result.setStatus(404);
@@ -1874,7 +1901,7 @@ public class SurveyService extends Service {
 			}
 
 			try{
-				System.out.println(answerJSON);
+				//System.out.println(answerJSON);
 
 				answer = (JSONObject) JSONValue.parseWithException(answerJSON);	
 			} catch (ParseException e){
@@ -2631,10 +2658,10 @@ public class SurveyService extends Service {
 					} else if (tag.endsWith("DESCRIPTION")){
 						value = (String) survey.get("description");
 					} else if (tag.endsWith("RESOURCE")){
-
-						JSONObject res = (JSONObject) survey.get("resource");
-						String res_name = (String) res.get("name");
-						value = res_name;
+						value = (String) survey.get("resource");
+						//JSONObject res = (JSONObject) survey.get("resource");
+						//String res_name = (String) res.get("name");
+						//value = res_name;
 					} else if (tag.endsWith("START")){
 						value = (String) survey.get("start");
 					} else if (tag.endsWith("END")){
@@ -2756,7 +2783,6 @@ public class SurveyService extends Service {
 			if(i<cols) headline += ";";
 		}
 		res += headline + "\n";
-		System.out.println(headline);
 
 		// now compile answer data
 		String data = "";
@@ -3081,9 +3107,9 @@ public class SurveyService extends Service {
 
 					if(m.find()){
 						String[] tokens = m.group().split("-");
-						//l = new Locale(tokens[0], tokens[1]);
-						l = new Locale("zz","ZZ");
-						System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
+						l = new Locale(tokens[0], tokens[1]);
+						//l = new Locale("zz","ZZ");
+						//System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
 					} else {
 						throw new IllegalArgumentException("Illegal value for questionnaire field 'lang'. Should be a valid locale such as en-US or de-DE");
 					}

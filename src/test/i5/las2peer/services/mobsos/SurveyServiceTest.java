@@ -52,7 +52,10 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -216,7 +219,7 @@ public class SurveyServiceTest {
 			// list only questionnaire URLs
 			try {
 				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
-				System.out.println("List of Questionnaire URLs: " + result.getResponse());
+				//System.out.println("List of Questionnaire URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
@@ -237,7 +240,7 @@ public class SurveyServiceTest {
 			// search for specific questionnaires with query string
 			try {
 				ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
-				System.out.println("List of Questionnaires: " + result.getResponse());
+				//System.out.println("List of Questionnaires: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
@@ -278,7 +281,7 @@ public class SurveyServiceTest {
 			assertEquals(201, result.getHttpCode());
 			assertEquals("application/json",result.getHeader("Content-Type"));
 
-			System.out.println("Newly created questionnaire response: " + result.getResponse());
+			//System.out.println("Newly created questionnaire response: " + result.getResponse());
 
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -477,7 +480,7 @@ public class SurveyServiceTest {
 				fail(e.getMessage());
 			}
 
-			System.out.println(questionnaire.toJSONString());
+			//System.out.println(questionnaire.toJSONString());
 			// change some fields in questionnaire
 			questionnaire.put("name","Changed Beerdrinker questionnaire");
 			questionnaire.put("description", "This questionnaire is for all those who like to drink changed beer.");
@@ -497,14 +500,14 @@ public class SurveyServiceTest {
 			questionnaire.put("description", "I destroy your work now!");
 
 			ClientResponse notowner = c3.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
-			System.out.println("Response: " + notowner.getResponse());
+			//System.out.println("Response: " + notowner.getResponse());
 			assertEquals(401, notowner.getHttpCode());
 
 			// try to update the existing questionnaire as owner, but with an undefined field. This should fail with a 400.
 			questionnaire.put("shibby", "shabby");
 
 			ClientResponse invalidupdate = c1.sendRequest("PUT", u.getPath(),questionnaire.toJSONString(), "application/json","*/*",new Pair[]{});
-			System.out.println("Response: " + invalidupdate.getResponse());
+			//System.out.println("Response: " + invalidupdate.getResponse());
 			assertEquals(400, invalidupdate.getHttpCode());
 
 
@@ -538,7 +541,7 @@ public class SurveyServiceTest {
 			// check if first questionnaire URL is a valid URL, then extract path
 			URL u = new URL(fullurl);
 
-			System.out.println("URL: " + u.toString());
+			//System.out.println("URL: " + u.toString());
 
 			// try to delete particular questionnaire with different user than owner. Should be forbidden.
 			ClientResponse delnown=c2.sendRequest("DELETE", u.getPath(),"");
@@ -580,7 +583,7 @@ public class SurveyServiceTest {
 
 			// try to download questionnaire form. Should result in not found, since no form was uploaded, yet.
 			ClientResponse downl = c1.sendRequest("GET", u.getPath() + "/form", "");
-			System.out.println("Error: " + downl.getResponse());
+			//System.out.println("Error: " + downl.getResponse());
 			assertEquals(404, downl.getHttpCode());
 
 			// read content from example questionnaire XML file
@@ -589,7 +592,7 @@ public class SurveyServiceTest {
 			// now upload form XML
 			String url = u.getPath() + "/form";
 			ClientResponse result=c1.sendRequest("PUT", url,qform,"text/xml","*/*",new Pair[]{});
-			System.out.println("Response: " + result.getResponse());
+			//System.out.println("Response: " + result.getResponse());
 			assertEquals(200, result.getHttpCode());
 
 			// download form again. This should result in success.
@@ -599,13 +602,13 @@ public class SurveyServiceTest {
 
 			// try to upload form as different user than questionnaire owner. Should fail with unauthorized.
 			ClientResponse notown = c3.sendRequest("PUT", url,qform,"text/xml","*/*",new Pair[]{});
-			System.out.println("Response: " + notown.getResponse());
+			//System.out.println("Response: " + notown.getResponse());
 			assertEquals(401, notown.getHttpCode());
 
 			// try to upload invalid form as questionnaire owner. Should fail with invalid request.
 			String invalidForm = "<invalid>This is an invalid questionnaire form.</invalid>";
 			ClientResponse invalid = c1.sendRequest("PUT", url,invalidForm,"text/xml","*/*",new Pair[]{});
-			System.out.println("Response: " + invalid.getResponse());
+			//System.out.println("Response: " + invalid.getResponse());
 			assertEquals(400, invalid.getHttpCode());
 
 		} catch (MalformedURLException e){
@@ -638,7 +641,7 @@ public class SurveyServiceTest {
 			// list only survey URLs
 			try {
 				ClientResponse result=c1.sendRequest("GET", "mobsos/surveys?full=0","");
-				System.out.println("List of Survey URLs: " + result.getResponse());
+				//System.out.println("List of Survey URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
@@ -659,7 +662,7 @@ public class SurveyServiceTest {
 			// search for specific surveys with query string
 			try {
 				ClientResponse result=c2.sendRequest("GET", "mobsos/surveys?q=Needle in the Haystack","");
-				System.out.println("List of surveys: " + result.getResponse());
+				//System.out.println("List of surveys: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
 				assertEquals("application/json", result.getHeader("Content-Type"));
@@ -700,7 +703,7 @@ public class SurveyServiceTest {
 			assertEquals(201, result.getHttpCode());
 			assertEquals("application/json",result.getHeader("Content-Type"));
 
-			System.out.println("Newly created survey response: " + result.getResponse());
+			//System.out.println("Newly created survey response: " + result.getResponse());
 
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -939,14 +942,14 @@ public class SurveyServiceTest {
 			survey.put("description", "I destroy your work now!");
 
 			ClientResponse notowner = c3.sendRequest("PUT", u.getPath(),survey.toJSONString(), "application/json","*/*",new Pair[]{});
-			System.out.println("Response: " + notowner.getResponse());
+			//System.out.println("Response: " + notowner.getResponse());
 			assertEquals(401, notowner.getHttpCode());
 
 			// try to update the existing survey as owner, but with an undefined field. This should fail with a 400.
 			survey.put("shibby", "shabby");
 
 			ClientResponse invalidupdate = c1.sendRequest("PUT", u.getPath(),survey.toJSONString(), "application/json","*/*",new Pair[]{});
-			System.out.println("Response: " + invalidupdate.getResponse());
+			//System.out.println("Response: " + invalidupdate.getResponse());
 			assertEquals(400, invalidupdate.getHttpCode());
 
 
@@ -981,7 +984,7 @@ public class SurveyServiceTest {
 			// check if first survey URL is a valid URL, then extract path
 			URL u = new URL(fullurl);
 
-			System.out.println("URL: " + u.toString());
+			//System.out.println("URL: " + u.toString());
 
 			// try to delete particular survey with different user than owner. Should be forbidden.
 			ClientResponse delnown=c2.sendRequest("DELETE", u.getPath(),"");
@@ -1007,13 +1010,13 @@ public class SurveyServiceTest {
 			fail("Detected invalid survey URL! " + e.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void testSubmitQuestionnaireAnswer(){
 		try{
 			// first add a new questionnaire
 			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
-			
+
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
 
@@ -1030,11 +1033,11 @@ public class SurveyServiceTest {
 			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 			URL su = new URL((String) svu.get("url"));
 
-			System.out.println("Survey URL:" + su);
-			System.out.println("Questionnaire URL: " + u);
+			//System.out.println("Survey URL:" + su);
+			//System.out.println("Questionnaire URL: " + u);
 
 			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
-			System.out.println("Questionnaire id: " + qid);
+			//System.out.println("Questionnaire id: " + qid);
 
 			// now set questionnaire to survey
 			JSONObject qidset = new JSONObject();
@@ -1066,7 +1069,7 @@ public class SurveyServiceTest {
 			// now try to get results
 			ClientResponse ga=c1.sendRequest("GET", su.getPath() + "/responses","");
 			assertEquals(200, ga.getHttpCode());
-			System.out.println(ga.getResponse());
+			//System.out.println(ga.getResponse());
 
 		} catch (MalformedURLException e){
 			e.printStackTrace();
@@ -1079,6 +1082,245 @@ public class SurveyServiceTest {
 			fail("Service returned invalid JSON! " + e.getMessage());
 		} 
 	}
+
+	@Test
+	public void testSubmitInvalidQuestionnaireAnswer(){
+		try{
+			// first delete all surveys & questionnaires
+			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// first add a new questionnaire
+			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+
+			// upload questionnaire XML content
+			ClientResponse result=c1.sendRequest("PUT", u.getPath() + "/form",qform,"text/xml","*/*", new Pair[]{});
+			assertEquals(200, result.getHttpCode());
+
+			// then create survey using the previously created questionnaire and form
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
+			URL su = new URL((String) svu.get("url"));
+
+			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
+
+			// now set questionnaire to survey
+			JSONObject qidset = new JSONObject();
+			qidset.put("qid", qid);
+
+			ClientResponse ares=c1.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString(),"application/json","*/*", new Pair[]{});
+			assertEquals(200, ares.getHttpCode());
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer1 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-mandatory-question.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares1=c1.sendRequest("POST", su.getPath() + "/responses",qanswer1,"application/json","*/*", new Pair[]{});
+
+			assertEquals(400, ares1.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares1.getResponse().contains("The mandatory question A.2.3 was not answered!"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer2 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-wrong-answertype.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares2=c1.sendRequest("POST", su.getPath() + "/responses",qanswer2,"application/json","*/*", new Pair[]{});
+
+			assertEquals(400, ares2.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares2.getResponse().contains("is expected to be parseable as an integer!"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer3 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-undefined-question.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares3=c1.sendRequest("POST", su.getPath() + "/responses", qanswer3,"application/json","*/*", new Pair[]{});
+
+			assertEquals(400, ares3.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares3.getResponse().contains("some string in error message"));
+
+			// read content from sample invalid questionnaire answer XML file
+			String qanswer4 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-question-answertime.xml"));
+			// submit questionnaire answer XML content
+			ClientResponse ares4=c1.sendRequest("POST", su.getPath() + "/responses",qanswer4,"application/json","*/*", new Pair[]{});
+
+			assertEquals(400, ares4.getHttpCode());
+			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
+			// TODO: uncomment, when issue is resolved.
+			//assertTrue(ares4.getResponse().contains("some string in error message"));
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+	}
+
+	@Test
+	public void testSubmitSurveyResponseEarlyLate(){
+		try{
+
+			// generate some relative timepoints to now
+			Calendar cal = Calendar.getInstance();
+			Date today = cal.getTime();
+			cal.add(Calendar.DAY_OF_YEAR,-1);
+			Date yesterday = cal.getTime();
+			cal.add(Calendar.DAY_OF_YEAR,2);
+			Date tomorrow = cal.getTime();
+			cal.add(Calendar.YEAR, 1);
+			Date nextyear = cal.getTime();
+			cal.add(Calendar.YEAR, -2);
+			Date lastyear = cal.getTime();
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+			String lastyearUTC = df.format(lastyear);
+			String yesterdayUTC = df.format(yesterday);
+			String nowUTC = df.format(today);
+			String tomorrowUTC = df.format(tomorrow);
+			String nextyearUTC = df.format(nextyear);
+
+			/*
+			System.out.println("Last Year: " + lastyearUTC);
+			System.out.println("Yesterday: " + yesterdayUTC);
+			System.out.println("Now: " + nowUTC);
+			System.out.println("Tomorrow: " + tomorrowUTC);
+			System.out.println("Next Year: " + nextyearUTC);
+			 */
+			
+			// first delete all surveys & questionnaires
+			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// first add a new questionnaire
+			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+
+			// upload questionnaire XML content
+			ClientResponse result=c1.sendRequest("PUT", u.getPath() + "/form",qform,"text/xml","*/*", new Pair[]{});
+			assertEquals(200, result.getHttpCode());
+
+			// then create survey that is already expired
+			ClientResponse csvres_exp=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON(lastyearUTC,yesterdayUTC).toJSONString(),"application/json","*/*", new Pair[]{});
+			JSONObject svu_exp = (JSONObject) JSONValue.parseWithException(csvres_exp.getResponse().trim());
+			URL su_exp = new URL((String) svu_exp.get("url"));
+
+			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
+
+			// now set questionnaire to survey
+			JSONObject qidset = new JSONObject();
+			qidset.put("qid", qid);
+
+			ClientResponse ares=c1.sendRequest("POST", su_exp.getPath() + "/questionnaire",qidset.toJSONString(),"application/json","*/*", new Pair[]{});
+			assertEquals(200, ares.getHttpCode());
+
+			// then create survey starting in the future
+			ClientResponse csvres_fut=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON(tomorrowUTC, nextyearUTC).toJSONString(),"application/json","*/*", new Pair[]{});
+			JSONObject svu_fut = (JSONObject) JSONValue.parseWithException(csvres_fut.getResponse().trim());
+			URL su_fut = new URL((String) svu_fut.get("url"));
+
+			ares=c1.sendRequest("POST", su_fut.getPath() + "/questionnaire",qidset.toJSONString(),"application/json","*/*", new Pair[]{});
+			assertEquals(200, ares.getHttpCode());
+
+			// now we are ready to submit a response for given survey.
+
+			// read content from example questionnaire response XML file
+			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2.xml"));
+
+			// submit survey response to expired survey. Should result in forbidden.
+			ares=c1.sendRequest("POST", su_exp.getPath() + "/responses",qanswer,"text/xml","*/*",new Pair[]{});
+			assertEquals(403, ares.getHttpCode());
+			//assertEquals("Cannot submit response. Survey expired.", ares.getResponse());
+
+			// submit survey response to expired survey. Should result in forbidden.
+			ares=c1.sendRequest("POST", su_fut.getPath() + "/responses",qanswer,"text/xml","*/*",new Pair[]{});
+			assertEquals(403, ares.getHttpCode());
+			//assertEquals("Cannot submit response. Survey has not begun, yet.", ares.getResponse());
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+	}
+
+	@Test
+	public void testGetSurveyQuestionnaireForm(){
+		try{
+			// first delete all surveys & questionnaires
+			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+
+			// first add a new questionnaire
+			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+
+			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
+			URL u = new URL((String) o.get("url"));
+
+
+			// read content from example questionnaire XML file
+			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
+
+			// upload questionnaire XML content
+			ClientResponse result=c1.sendRequest("PUT", u.getPath() + "/form",qform,"text/xml","*/*", new Pair[]{});
+			assertEquals(200, result.getHttpCode());
+
+			// then create survey using the previously created questionnaire and form
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
+			URL su = new URL((String) svu.get("url"));
+
+			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
+
+			// now set questionnaire to survey
+			JSONObject qidset = new JSONObject();
+			qidset.put("qid", qid);
+
+			ClientResponse ares=c1.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString(),"application/json","*/*", new Pair[]{});
+			assertEquals(200, ares.getHttpCode());
+
+			// now we are ready to download questionnaire form for given survey.
+			Pair lang = new Pair("accept-language","de-DE"); 
+			ClientResponse qsfres=c1.sendRequest("GET", su.getPath() + "/form","","","text/html",new Pair[]{lang});
+			assertEquals(200, qsfres.getHttpCode());
+
+
+		} catch (MalformedURLException e){
+			e.printStackTrace();
+			fail("Service returned malformed URL!");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail("Service returned invalid JSON! " + e.getMessage());
+		} 
+	}
+
 
 
 
@@ -1145,61 +1387,8 @@ public class SurveyServiceTest {
 	//		} 
 	//	}
 
-	//	@Test
-	//	public void testGetSurveyQuestionnaireFormNoCommunity(){
-	//		try{
-	//			// first add a new questionnaire
-	//			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-	//			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
-	//			URL u = new URL((String) o.get("url"));
-	//
-	//			// read content from example questionnaire XML file
-	//			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
-	//
-	//			// upload questionnaire XML content
-	//			ClientResponse result=c1.sendRequest("POST", u.getPath() + "/form",qform);
-	//			assertEquals(200, result.getHttpCode());
-	//
-	//			// then create survey using the previously created questionnaire and form
-	//			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
-	//			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
-	//			URL su = new URL((String) svu.get("url"));
-	//
-	//			System.out.println("Survey URL:" + su);
-	//			System.out.println("Questionnaire URL: " + u);
-	//
-	//			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
-	//			System.out.println("Questionnaire id: " + qid);
-	//
-	//			// now set questionnaire to survey
-	//			JSONObject qidset = new JSONObject();
-	//			qidset.put("qid", qid);
-	//
-	//			ClientResponse ares=c1.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString());
-	//			assertEquals(200, ares.getHttpCode());
-	//
-	//			String npath = su.getPath() + "/questionnaire/" + group1.getId();
-	//			System.out.println("GET " + npath);
-	//			// now we are ready to download questionnaire form for given survey in a given community context.
-	//			ClientResponse qsfres=c1.sendRequest("GET", su.getPath() + "/questionnaire","","",MediaType.TEXT_HTML,new Pair[]{});
-	//			
-	//			//System.out.println("Status: " + qsfres.getHttpCode());
-	//			//System.out.println("Response: " + qsfres.getResponse());
-	//			
-	//
-	//		} catch (MalformedURLException e){
-	//			e.printStackTrace();
-	//			fail("Service returned malformed URL!");
-	//		} catch (IOException e) {
-	//			e.printStackTrace();
-	//			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
-	//		} catch (ParseException e) {
-	//			e.printStackTrace();
-	//			fail("Service returned invalid JSON! " + e.getMessage());
-	//		} 
-	//	}
-	//	
-	
+
+
 
 
 
@@ -1259,99 +1448,7 @@ public class SurveyServiceTest {
 	}
 	 */
 
-	/*
-	@Test
-	public void testSubmitInvalidQuestionnaireAnswer(){
-		try{
-			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
-			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
-			URL u = new URL((String) o.get("url"));
 
-			// read content from example questionnaire XML file
-			String qform = IOUtils.getStringFromFile(new File("./doc/xml/qu2.xml"));
-
-			// upload questionnaire XML content
-			ClientResponse result=c1.sendRequest("POST", u.getPath() + "/form",qform);
-			assertEquals(200, result.getHttpCode());
-
-			// then create survey using the previously created questionnaire and form
-			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
-			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
-			URL su = new URL((String) svu.get("url"));
-
-			System.out.println("Survey URL:" + su);
-			System.out.println("Questionnaire URL: " + u);
-
-			int qid = Integer.parseInt(u.getPath().substring(u.getPath().lastIndexOf("/")+1));
-			System.out.println("Questionnaire id: " + qid);
-
-			// now set questionnaire to survey
-			JSONObject qidset = new JSONObject();
-			qidset.put("qid", qid);
-
-			ClientResponse ares=c1.sendRequest("POST", su.getPath() + "/questionnaire",qidset.toJSONString());
-			assertEquals(200, ares.getHttpCode());
-
-			// read content from sample invalid questionnaire answer XML file
-			String qanswer1 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-mandatory-question.xml"));
-			// submit questionnaire answer XML content
-			ClientResponse ares1=c1.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer1);
-
-			assertEquals(400, ares1.getHttpCode());
-			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
-			// TODO: uncomment, when issue is resolved.
-			//assertTrue(ares1.getResponse().contains("The mandatory question A.2.3 was not answered!"));
-
-			// read content from sample invalid questionnaire answer XML file
-			String qanswer2 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-wrong-answertype.xml"));
-			// submit questionnaire answer XML content
-			ClientResponse ares2=c1.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer2);
-
-			assertEquals(400, ares2.getHttpCode());
-			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
-			// TODO: uncomment, when issue is resolved.
-			//assertTrue(ares2.getResponse().contains("is expected to be parseable as an integer!"));
-
-			// read content from sample invalid questionnaire answer XML file
-			String qanswer3 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-undefined-question.xml"));
-			// submit questionnaire answer XML content
-			ClientResponse ares3=c1.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer3);
-
-			assertEquals(400, ares3.getHttpCode());
-			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
-			// TODO: uncomment, when issue is resolved.
-			//assertTrue(ares3.getResponse().contains("some string in error message"));
-
-			// read content from sample invalid questionnaire answer XML file
-			String qanswer4 = IOUtils.getStringFromFile(new File("./doc/xml/qa2-invalid-question-answertime.xml"));
-			// submit questionnaire answer XML content
-			ClientResponse ares4=c1.sendRequest("POST", su.getPath() + "/answers/"+group1.getId(),qanswer4);
-
-			assertEquals(400, ares4.getHttpCode());
-			// currently, the following assertion will fail due to issue LAS-49 (http://layers.dbis.rwth-aachen.de/jira/browse/LAS-49).
-			// TODO: uncomment, when issue is resolved.
-			//assertTrue(ares4.getResponse().contains("some string in error message"));
-
-			// finally try to submit valid questionnaire results for a non-existing community
-
-			// read content from example questionnaire answer XML file
-			String qanswer = IOUtils.getStringFromFile(new File("./doc/xml/qa2.xml"));
-			// submit questionnaire answer XML content
-			ares=c1.sendRequest("POST", su.getPath() + "/answers/1",qanswer);
-			assertEquals(404, ares.getHttpCode());
-
-		} catch (MalformedURLException e){
-			e.printStackTrace();
-			fail("Service returned malformed URL!");
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
-		} catch (ParseException e) {
-			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
-		} 
-	}
 
 	/**
 	 * Generates a valid survey JSON representation.
@@ -1359,14 +1456,35 @@ public class SurveyServiceTest {
 	@SuppressWarnings("unchecked")
 	private static JSONObject generateSurveyJSON(){
 
+		// generate some relative timepoints to now
+		Calendar cal = Calendar.getInstance();
+		Date today = cal.getTime();
+		cal.add(Calendar.DAY_OF_YEAR,-1);
+		Date yesterday = cal.getTime();
+		cal.add(Calendar.DAY_OF_YEAR,2);
+		Date tomorrow = cal.getTime();
+		cal.add(Calendar.YEAR, 1);
+		Date nextyear = cal.getTime();
+		cal.add(Calendar.YEAR, -2);
+		Date lastyear = cal.getTime();
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+		String lastyearUTC = df.format(lastyear);
+		String yesterdayUTC = df.format(yesterday);
+		String nowUTC = df.format(today);
+		String tomorrowUTC = df.format(tomorrow);
+		String nextyearUTC = df.format(nextyear);
+
 		JSONObject obj = new JSONObject(); 
 		obj.put("name","Wikipedia Survey " + (new Date()).getTime());
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
 		obj.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description","A sample survey on Wikipedia.");
 		obj.put("resource", "http://wikipedia.org"); 
-		obj.put("start","2014-06-06T00:00:00Z");
-		obj.put("end", "2014-08-06T23:59:59Z");
+		obj.put("start",lastyearUTC);
+		obj.put("end", nextyearUTC);
 		obj.put("lang", "en-US");
 
 		return obj;
@@ -1386,6 +1504,21 @@ public class SurveyServiceTest {
 		obj.put("resource", "http://wikipedia.org"); 
 		obj.put("start","2014-06-06T00:00:00Z");
 		obj.put("end", "2014-08-06T23:59:59Z");
+		obj.put("lang", "de-DE");
+
+		return obj;
+	}
+
+	private static JSONObject generateSurveyJSON(String start, String end){
+
+		JSONObject obj = new JSONObject(); 
+		obj.put("name","Nadel im Heuhaufen " + start);
+		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
+		obj.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("description","Eine schwer auffindbare Umfrage (Needle in the Haystack).");
+		obj.put("resource", "http://wikipedia.org"); 
+		obj.put("start",start);
+		obj.put("end", end);
 		obj.put("lang", "de-DE");
 
 		return obj;
