@@ -749,7 +749,7 @@ public class SurveyService extends Service {
 					System.out.println("Language detected: " + lang);
 
 				} catch (SAXException e){
-					e.printStackTrace();
+					
 					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 					result.setStatus(400);
 					return result;
@@ -957,7 +957,7 @@ public class SurveyService extends Service {
 				o = parseSurvey(data);
 			} catch (IllegalArgumentException | ParseException e){
 				// if passed content is invalid for some reason, notify user
-				e.printStackTrace();
+				
 				HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -1065,10 +1065,10 @@ public class SurveyService extends Service {
 				c = dataSource.getConnection();
 
 				// TODO: restore, as soon as resource information comes from an external source
-				//s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
+				s = c.prepareStatement("select * from " + jdbcSchema + ".survey where id = ?");
 
 				// TODO: replace by external source for retrieving resource information
-				s = c.prepareStatement("select s.*, r.name as rname, r.description as rdesc from " + jdbcSchema + ".survey s left join " + jdbcSchema + ".resource r on (s.resource = r.uri) where id = ?");
+				//s = c.prepareStatement("select s.*, r.name as rname, r.description as rdesc from " + jdbcSchema + ".survey s left join " + jdbcSchema + ".resource r on (s.resource = r.uri) where id = ?");
 				s.setInt(1,id);
 
 				rs = s.executeQuery();
@@ -1085,20 +1085,19 @@ public class SurveyService extends Service {
 				r = readSurveyFromResultSet(rs);
 
 				// TODO: replace by external resource information
-				String resource_name = rs.getString("rname");
-				String resource_description = rs.getString("rdesc");
+				//String resource_name = rs.getString("rname");
+				//String resource_description = rs.getString("rdesc");
 
-				String resource_uri = (String) r.get("resource");
+				//String resource_uri = (String) r.get("resource");
 
-				JSONObject res = new JSONObject();
-				res.put("uri",resource_uri);
-				res.put("name", resource_name);
-				res.put("description", resource_description);
+				//JSONObject res = new JSONObject();
+				//res.put("uri",resource_uri);
+				//res.put("name", resource_name);
+				//res.put("description", resource_description);
 
-				r.put("resource", res);
+				//r.put("resource", res);
 
 				// before, try to retrieve information on resource
-
 
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setStatus(200);
@@ -2926,7 +2925,7 @@ public class SurveyService extends Service {
 		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
 
 		// check result for unknown illegal fields. If so, parsing fails.
-		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end", "lang"};
+		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end", "lang", "qid"};
 		for (Object key: o.keySet()){
 			if(!Arrays.asList(fields).contains(key)){
 

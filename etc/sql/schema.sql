@@ -82,7 +82,7 @@ create table resource (
 insert into resource (uri,name,description) values ("http://achso.aalto.fi","AchSo!","A mobile application recording, sharing, and annotating videos");
 insert into resource (uri,name,description) values ("https://github.com/learning-layers/sevianno","SeViAnno!","A Web application for the semantic annotation of videos.");
 insert into resource (uri,name,description) values ("http://odl.learning-layers.eu/learning-toolbox","Learning Toolbox", "A mobile work-based learning aid.");
-
+insert into resource (uri,name,description) values ("http://wikipedia.org","Wikipedia", "A crowdsourced online encyclopedia.");
 
 
 
