@@ -220,7 +220,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				});
 			
 				$('#i_survey_logo').change(function(e){
-					console.log(encodeURI($(this).val()));
 					$('#i_survey_lpic').html("<img src='" + $(this).val() + "' height='30' style='margin:10px;'/>");
 				});
 				
@@ -255,7 +254,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						var q = qs[i];
 						
 						var lang = q.lang.split("-")[0];
-						console.log(q);
 						
 						$('#surveys').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for survey " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /></span><p class='list-group-item-text'>by " + decodeURIComponent(q.organization) + "</p></a>");
 					}
@@ -290,7 +288,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			client.createSurvey(JSON.stringify(s),
 				function(data,type){
 					// redirect to questionnaire resource
-					console.log(data);
+					//console.log(data);
 					
 					var qid = $("#i_survey_qid").val();
 					
@@ -308,8 +306,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					} 
 					// else redirect to newly created survey resource.
 					else {
-						console.log(data);
-						//window.location.href = data.url;
+						//console.log(data);
+						window.location.href = data.url;
 					}
 				},
 				function(e){

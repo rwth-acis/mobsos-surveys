@@ -1320,6 +1320,13 @@ public class SurveyServiceTest {
 			fail("Service returned invalid JSON! " + e.getMessage());
 		} 
 	}
+	
+	@Test
+	public void testResourceMeta(){
+		ClientResponse res=c1.sendRequest("POST", "mobsos/resource-meta","http://wikipedia.org","text/plain","*/*",new Pair[]{});
+		System.out.println("Resource Meta: " + res.getResponse());
+		assertEquals(200, res.getHttpCode());
+	}
 
 
 

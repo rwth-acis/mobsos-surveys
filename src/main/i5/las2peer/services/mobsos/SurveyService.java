@@ -1914,9 +1914,8 @@ public class SurveyService extends Service {
 
 			// validate if answer matches form.
 			try{
-				answerFieldTable = validateAnswer(form,answer);
+				answerFieldTable = validateResponse(form,answer);
 			} catch (IllegalArgumentException e){
-				e.printStackTrace();
 				HttpResponse result = new HttpResponse("Survey response is invalid! Cause: " + e.getMessage());
 				result.setStatus(400);
 				return result;
@@ -2001,7 +2000,7 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			return submitSurveyResponseJSON(id, convertAnswerXMLtoJSON(answer).toJSONString());
+			return submitSurveyResponseJSON(id, convertResponseXMLtoJSON(answer).toJSONString());
 
 		} catch(Exception e){
 			e.printStackTrace();
@@ -2071,6 +2070,68 @@ public class SurveyService extends Service {
 		return result;
 
 	}
+	
+	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
+	
+	// For now, MobSOS Surveys maintains its own database tables for metadata on subject resources, i.e. those resources that are
+	// subjects of a survey. A resource can thereby be a tool, a service, a piece of content, a document, etc. The only prerequisite 
+	// is that such a resource is available publicly under a given URI. Metadata for such a resource currently maintained by MobSOS Surveys
+	// is name and description. In future, such information should be queried from an external Web service or maybe from the meta tags 
+	// available from the resource's HTML representation.
+	
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("resource-meta")
+	public HttpResponse getResourceMetadata(@ContentParam String uri){
+		
+		System.out.println("Resource URI: " + uri);
+		String onAction = "retrieving resource metadata for URI " + uri ;
+
+		try {
+
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".resource where uri = ?");
+				stmt.setString(1, uri);
+
+				rset = stmt.executeQuery();
+
+				if (!rset.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("No metadata found for resource " + uri + "!");
+					result.setStatus(404);
+					return result;
+				}
+				rset.next();
+				
+				JSONObject meta = new JSONObject();
+				
+				meta.put("name",rset.getString("name"));
+				meta.put("description",rset.getString("description"));
+
+				HttpResponse result = new HttpResponse(meta.toJSONString());
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+	
 
 
 	// ============= COMMUNITY EXTENSIONS (TODO) ==============
@@ -2658,7 +2719,15 @@ public class SurveyService extends Service {
 					} else if (tag.endsWith("DESCRIPTION")){
 						value = (String) survey.get("description");
 					} else if (tag.endsWith("RESOURCE")){
-						value = (String) survey.get("resource");
+						String uri = (String) survey.get("resource");
+						HttpResponse r = getResourceMetadata(uri);
+						if(r.getStatus() == 200){
+							JSONObject meta = (JSONObject) JSONValue.parse(r.getResult());
+							value = (String) meta.get("name");
+						} else {
+							value = uri;
+						}
+						
 						//JSONObject res = (JSONObject) survey.get("resource");
 						//String res_name = (String) res.get("name");
 						//value = res_name;
@@ -3257,14 +3326,14 @@ public class SurveyService extends Service {
 	/**
 	 * TODO: write documentation
 	 * 
-	 * @param answer
+	 * @param response
 	 * @return
 	 */
-	private JSONObject convertAnswerXMLtoJSON(Document answer){
+	private JSONObject convertResponseXMLtoJSON(Document response){
 
 		JSONObject result = new JSONObject();
 
-		NodeList qs = answer.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
+		NodeList qs = response.getDocumentElement().getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS,"Question");
 
 		for (int i = 0; i < qs.getLength(); i++) {
 			Element q = (Element) qs.item(i);
@@ -3279,10 +3348,10 @@ public class SurveyService extends Service {
 	 * TODO: write documentation
 	 * 
 	 * @param form
-	 * @param answer
+	 * @param response
 	 * @return
 	 */
-	private JSONObject validateAnswer(Document form, JSONObject answer){
+	private JSONObject validateResponse(Document form, JSONObject response){
 		JSONObject result = new JSONObject();
 
 		JSONObject questions = extractQuestionInformation(form);
@@ -3290,11 +3359,11 @@ public class SurveyService extends Service {
 		// then iterate over all question items in the submitted answer and check, if 
 		// they fulfill all constraints.
 
-		Iterator<String> ait = answer.keySet().iterator();
+		Iterator<String> ait = response.keySet().iterator();
 		while(ait.hasNext()){
 
 			String qid = ait.next();
-			String qval = (String) answer.get(qid);
+			String qval = (String) response.get(qid);
 
 			//System.out.println("Submitted Question ID: "+q.getAttribute("qid"));
 

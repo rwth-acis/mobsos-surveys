@@ -5,7 +5,7 @@
 	<qu:Page name="Instructions" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			Hallo, ${USER.NAME}! Bitte fülle folgenden Fragebogen zur System-Gebrauchstauglichkeit von ${SURVEY.RESOURCE} aus.
+			Hallo, ${USER.NAME}! Bitte fülle folgenden Fragebogen zur System-Gebrauchstauglichkeit von ${SURVEY.RESOURCE} aus. Das Ausfüllen wird ca. 5 Minuten dauern.
 		</qu:Instructions>
 	</qu:Page>
 	
