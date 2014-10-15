@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AchSo! usability questionnaire -->
+<!-- A questionnaire for measuring the usability of AchSo!, a mobile application for video capturing and annotation, developed in the context of the EU FP7 Integrating Project Learning Layers. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Hi, ${USER.NAME}! Thank you for participating in this survey. This questionnaire regards the usability of Ach So! Android application. Your responses will be used to improve the application’s user interface and make it more efficient and user friendly. Filling in this questionnaire will take approximately 15 minutes.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<!-- TODO: Demographics here -->
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Think about your experience with the Ach So! application and evaluate the following statements. There is a space at the end of the questionnaire for you to elaborate and specify your answers and give feedback for further improvements.
+		</qu:Instructions>
+	</qu:Page>
+	
+
+	<qu:Page name="Shooting Video" 
+	      qid="ACHSO.SV.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Recording function reacts fast enough.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Shooting Video" 
+	      qid="ACHSO.SV.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			After I finish recording a video, it makes sense to me to choose a category for it right away.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Shooting Video" 
+	      qid="ACHSO.SV.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I understood what the different categories for the videos mean and it was easy to choose the right one for my video.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Shooting Video" 
+	      qid="ACHSO.SV.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			After I have chosen a category for the video, it’s logical that the application goes back to My videos.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The timeline slider reacts well to my dragging.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			When annotating a video, the marker appears fast enough when I press the screen.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			When adding text to an annotation, the keyboard appears when I need it to.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			When dragging an annotation marker, it moves fast enough and according to my touch.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.5"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			When watching an annotated video I can pause the video when an annotation is on the screen.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Viewing Videos and Annotating" 
+	      qid="ACHSO.VVA.6"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Editing and deleting an annotation is easy.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall in general the application is easy to use.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			In general the functions are placed in the right places.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Controls like buttons and text fields are appropriately sized.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It was easy to use the app with a single hand. I did not struggle to reach any buttons.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.5"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It’s easy to understand what the different icons mean. 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.6"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Usually I could predict what would happen if I pressed a button or did something else.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.7"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The app behaved like I expected.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.8"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Moving from different areas of the application to another is clear and not disorienting.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.9"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The workflow is clear: I always knew what to do next to perform a specific task.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.10"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I quickly learned how to use the application. 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General User Experience" 
+	      qid="ACHSO.UX.11"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The interface is aesthetically pleasing.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="ACHSO.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether I think AchSo! is a full success.
+		</qu:Instructions>
+	</qu:Page>
+	 	
+	<qu:Page name="Improvements and Comments" 
+	      qid="ACHSO.IC"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What can be improved in Ach So!? How would you change the functions/structure/appearance of the application to make it better? You can specify your answers to the previous statements or bring up any new matters this questionnaire did not mention.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>

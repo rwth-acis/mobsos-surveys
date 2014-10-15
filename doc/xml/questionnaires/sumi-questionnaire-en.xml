@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Software Usability Measurement Inventory (SUMI EN 4.0) -->
+<!-- An extensive questionnaire on software usability. The SUMI Questionnaire is based on: Kirakowski, J. (1996) "The software usability measurement inventory: background and usage". In: Usability Evaluation in Industry. Its use is proposed in ISO 9241, a multi-part standard from the International Organization for Standardization (ISO) covering ergonomics of human-computer interaction. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			This questionnaire has 50 statements. Please answer them all. After each statement there are three boxes. Check the first box if you generally AGREE with the statement. Check the middle box if you are UNDECIDED, or if the statement has no relevance to your software or to your situation. Check the right box if you generally DISAGREE with the statement. In checking the left or right box you are not necessarily indicating strong agreement or disagreement but just your general feeling most of the time. There are also five general questions at the end.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.1"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} responds too slowly to inputs.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.2"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would recommend ${SURVEY.RESOURCE} to my colleagues.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.3"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The instructions and prompts are helpful.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.4"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has at some time stopped unexpectedly.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.5"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Learning to operate ${SURVEY.RESOURCE} initially is full of problems.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.6"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I sometimes don't know what to do next with ${SURVEY.RESOURCE}.	
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.7"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I enjoy the time I spend using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.8"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I find that the help information given by ${SURVEY.RESOURCE} is not very useful.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.9"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			If ${SURVEY.RESOURCE} stops it is not easy to restart it.		
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 1-10 of 50" 
+	      qid="SUMI.10"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It takes too long to learn the ${SURVEY.RESOURCE} functions.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.11"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I sometimes wonder if I am using the right function.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.12"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Working with ${SURVEY.RESOURCE} is satisfying.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.13"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The way that system information is presented is clear and understandable.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.14"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I feel safer if I use only a few familiar functions.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.15"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The ${SURVEY.RESOURCE} documentation is very informative.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.16"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} seems to disrupt the way I normally like to arrange my work.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.17"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Working with ${SURVEY.RESOURCE} is mentally stimulating.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.18"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			There is never enough information on the screen when it's needed.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.19"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I feel in command of ${SURVEY.RESOURCE} when I am using it.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 11-20 of 50" 
+	      qid="SUMI.20"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I prefer to stick to the functions that I know best.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.21"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I think ${SURVEY.RESOURCE} is inconsistent.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.22"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would not like to use ${SURVEY.RESOURCE} every day.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.23"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I can understand and act on the information provided by ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.24"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is awkward when I want to do something which is not standard.	 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.25"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			There is too much to read before you can use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.26"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Tasks can be performed in a straight forward manner using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.27"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} is frustrating. 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.28"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has helped me overcome any problems I have had in using it.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.29"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The speed of ${SURVEY.RESOURCE} is fast enough. 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 21-30 of 50" 
+	      qid="SUMI.30"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I keep having to go back to look at the guides.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.31"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It is obvious that user needs have been fully taken into consideration.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.32"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			There have been times in using ${SURVEY.RESOURCE} when I have felt quite tense.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.33"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The organisation of the menus seems quite logical.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<!-- this item seems outdated, since it assumes keyboards as the only input modality -->
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.34"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} allows the user to be economic of keystrokes.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.35"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Learning how to use new functions is difficult.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.36"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			There are too many steps required to get something to work.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.37"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I think this software has sometimes given me a headache.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.38"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Error messages are not adequate.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.39"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It is easy to make ${SURVEY.RESOURCE} do exactly what you want.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 31-40 of 50" 
+	      qid="SUMI.40"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I will never learn to use all that is offered in ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.41"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} hasn't always done what I was expecting.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.42"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} presents itself in a very attractive way.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.43"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Either the amount or quality of the help information varies across ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.44"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It is relatively easy to move from one part of a task to another.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.45"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It is easy to forget how to do things with ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.46"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} occasionally behaves in a way which can't be understood.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.47"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is really very awkward.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.48"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It is easy to see at a glance what the options are at each stage.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<!-- item seems outdated, since data comes over the Web in most cases. However, still applicable to applications with data import/export functionality -->
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.49"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Getting data files in and out of ${SURVEY.RESOURCE} is not easy.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Statements 41-50 of 50" 
+	      qid="SUMI.50"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I have to look for assistance most times when I use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General Questions" 
+	      qid="SUMI.GQ.1"
+		  required="true"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What, in general, do you use ${SURVEY.RESOURCE} for?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General Questions" 
+	      qid="SUMI.GQ.2"
+	      minval="1" 
+	      maxval="4"
+	      minlabel="extremely important" 
+	      maxlabel="not important at all" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			How important for you is the kind of software you have just been rating?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General Questions" 
+	      qid="SUMI.GQ.3"
+	      minval="1" 
+	      maxval="4"
+	      minlabel="Very experienced and technical" 
+	      maxlabel="I find most software difficult to use" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			How would you rate your software skills and knowledge?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General Questions" 
+	      qid="SUMI.GQ.4"
+		  required="true"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What do you think is the best aspect of ${SURVEY.RESOURCE}, and why?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="General Questions" 
+	      qid="SUMI.GQ.5"
+		  required="true"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What do you think needs most improvement, and why?
+		</qu:Instructions>
+	</qu:Page>
+	
+	
+
+	<qu:Page name="Overall Success" 
+	      qid="SUMI.OS"
+	      minval="1" 
+	      maxval="3"
+	      minlabel="agree" 
+	      maxlabel="disagree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether, ${SURVEY.RESOURCE} is a success.
+		</qu:Instructions>
+	</qu:Page>
+	
+	
+	
+</qu:Questionnaire>

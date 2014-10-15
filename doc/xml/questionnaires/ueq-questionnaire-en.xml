@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UEQ Questionnaire -->
+<!-- A simple questionnaire for measuring user experience. The UEQ Questionnaire is based on: Laugwitz, Held, and Schrepp (2008) "Construction and Evaluation of a User Experience Questionnaire". In: USAB 2008, LNCS 5298, pp. 63-76. The scale items load on the six factors Attractiveness, Perspicuity, Efficiency, Dependability, Stimulation, and Novelty. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-US">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			For the assessment of ${SURVEY.RESOURCE}, please fill out the following questionnaire. The questionnaire consists of pairs of contrasting attributes that may apply to ${SURVEY.RESOURCE}. The circles between the attributes represent gradations between the opposites. You can express your agreement with the attributes by ticking the circle that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to ${SURVEY.RESOURCE}. Nevertheless, please tick a circle in every line. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.1"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="annoying" 
+	      maxlabel="enjoyable"
+		  required="false"		  
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perspicuity" 
+	      qid="UEQ.2"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="not understandable" 
+	      maxlabel="understandable"
+		  required="false"		  
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Novelty" 
+	      qid="UEQ.3"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="dull" 
+	      maxlabel="creative"
+		  required="false"		  
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perspicuity" 
+	      qid="UEQ.4"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="easy to learn" 
+	      maxlabel="difficult to learn" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Stimulation" 
+	      qid="UEQ.5"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="valuable" 
+	      maxlabel="inferior"
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Stimulation" 
+	      qid="UEQ.6"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="boring" 
+	      maxlabel="exciting" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Stimulation" 
+	      qid="UEQ.7"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="not interesting" 
+	      maxlabel="interesting" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Dependability" 
+	      qid="UEQ.8"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="unpredictable" 
+	      maxlabel="predictable" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Efficiency" 
+	      qid="UEQ.9"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="fast" 
+	      maxlabel="slow" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Novelty" 
+	      qid="UEQ.10"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="inventive" 
+	      maxlabel="conventional" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Dependability" 
+	      qid="UEQ.11"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="obstructive" 
+	      maxlabel="supportive" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.12"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="good" 
+	      maxlabel="bad" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Perspicuity" 
+	      qid="UEQ.13"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="complicated" 
+	      maxlabel="easy" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.14"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="unlikable" 
+	      maxlabel="pleasing" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Novelty" 
+	      qid="UEQ.15"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="usual" 
+	      maxlabel="leading edge" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.16"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="unpleasant" 
+	      maxlabel="pleasant" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Dependability" 
+	      qid="UEQ.17"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="secure" 
+	      maxlabel="not secure" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Stimulation" 
+	      qid="UEQ.18"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="motivating" 
+	      maxlabel="demotivating"
+		  required="false"		  
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Dependability" 
+	      qid="UEQ.19"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="meets expectations" 
+	      maxlabel="does not meet expectations" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE}... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Efficiency" 
+	      qid="UEQ.20"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="inefficient" 
+	      maxlabel="efficient" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Perspicuity" 
+	      qid="UEQ.21"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="clear" 
+	      maxlabel="confusing" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Efficiency" 
+	      qid="UEQ.22"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="impractical" 
+	      maxlabel="practical" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Efficiency" 
+	      qid="UEQ.23"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="organized" 
+	      maxlabel="cluttered" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.24"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="attractive" 
+	      maxlabel="unattractive" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Attractiveness" 
+	      qid="UEQ.25"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="friendly" 
+	      maxlabel="unfriendly" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Novelty" 
+	      qid="UEQ.26"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="conservative" 
+	      maxlabel="innovative" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="UEQ.OS"
+	      minval="0" 
+	      maxval="7"
+	      minlabel="a total success" 
+	      maxlabel="a total failure" 
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is... 
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+</qu:Questionnaire>
