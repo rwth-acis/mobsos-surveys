@@ -60,13 +60,12 @@ create index idx_s_topic on survey(resource);
 create table response (
 	id bigint not null auto_increment,
 	uid varchar(128) not null,
-	cid varchar(128),
 	sid mediumint not null,
 	qkey varchar(32) not null,
 	qval varchar(512) not null,
 	time datetime(6),
 	constraint res_pk primary key(id),
-	constraint res_uk unique key(uid,cid,sid,qkey),
+	constraint res_uk unique key(uid,sid,qkey),
 	constraint res_fk foreign key (sid) references survey(id)
 		on delete cascade
 		on update no action

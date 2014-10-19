@@ -46,7 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 	<link href="https://dl.dropboxusercontent.com/u/17405777/mobsos/bootstrap-datetimepicker.min.css" rel="stylesheet">
 	<link href="https://dl.dropboxusercontent.com/u/17405777/mobsos/flags.css" rel="stylesheet" />
-	
+	<style type="text/css">
+
+
+.tt-dropdown-menu {
+  background-color: #fff;
+  margin: 10px 10px;
+  padding: 10px;
+}
+	</style>
 </head>
 <body>
 
@@ -136,10 +144,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</div>
 					
 					<body>
-					<div class="form-group">
+					<div class="col-md12 form-group">
 						<label for="i_survey_quest">${questionnaire}</label>
 						<div id="i_survey_quest">
 							<input type="text" id="i_survey_qid" class="form-control" placeholder="${questionnaire} ID">
+						</div>
+						
+						<div id="custom-templates">
+						  <input id="i_survey_qselect" class="form-control typeahead" type="text" placeholder="${questionnaire}">
 						</div>
 					</div>
 					
@@ -190,7 +202,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- import datetimepicker + deps -->
 	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
 	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/bootstrap-datetimepicker.js"></script>
-	
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/dist/typeahead.bundle.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
 		
 	<script type="text/javascript">
 		
@@ -232,6 +245,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#msg").addClass("hidden");
 					$("#surv").removeClass("hidden");
 				});
+				
+				$('#i_survey_qselect').typeahead(
+					{
+						minLength: 2,
+						highlight: true,
+					},
+					{
+						name: 'questionnaires',
+						displayKey: 'name',
+						source: function(query, cb){
+						
+							client.getQuestionnaires(query,1,
+								function(d,t){
+									console.log(d);
+									cb(d.questionnaires);
+									
+									
+								}, 
+								function(e){
+									console.log("Error: " + e);
+								}
+							);
+							
+							
+						},
+						templates: {
+							empty: [
+							  '<div class="empty-message">',
+							  'no questionnaire found',
+							  '</div>'
+							].join('\n'),
+							suggestion: Handlebars.compile("<p><img src='{{logo}}' width='16' /><strong>{{name}}</strong></p>")
+						}
+					}
+				);
+				
+				
 				updateSurveys("");
 				
 			} else {

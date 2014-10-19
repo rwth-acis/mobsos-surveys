@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- Software Usability Measurement Inventory (SUMI EN 4.0) -->
 <!-- An extensive questionnaire on software usability. The SUMI Questionnaire is based on: Kirakowski, J. (1996) "The software usability measurement inventory: background and usage". In: Usability Evaluation in Industry. Its use is proposed in ISO 9241, a multi-part standard from the International Organization for Standardization (ISO) covering ergonomics of human-computer interaction. -->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -123,7 +123,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			If ${SURVEY.RESOURCE} stops it is not easy to restart it.		
+			If ${SURVEY.RESOURCE} stops it is not easy to restart it.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -318,7 +318,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			${SURVEY.RESOURCE} is awkward when I want to do something which is not standard.	 
+			${SURVEY.RESOURCE} is awkward when I want to do something which is not standard.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -357,7 +357,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			Using ${SURVEY.RESOURCE} is frustrating. 
+			Using ${SURVEY.RESOURCE} is frustrating.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -383,7 +383,7 @@
 		  required="true"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			The speed of ${SURVEY.RESOURCE} is fast enough. 
+			The speed of ${SURVEY.RESOURCE} is fast enough.
 		</qu:Instructions>
 	</qu:Page>
 	

@@ -261,6 +261,7 @@
             <batchtest fork="yes" todir="${junit.report}">
                 <fileset dir="${tmp.junit}">
                     <include name="**/*Test.class"/>
+					<include name="**/SurveyDataFill.class"/>
                 </fileset>
             </batchtest>
         </junit>

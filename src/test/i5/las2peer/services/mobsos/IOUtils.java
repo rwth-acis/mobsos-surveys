@@ -2,23 +2,31 @@ package i5.las2peer.services.mobsos;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 public class IOUtils
 {
 	// Returns the contents of the file in a byte array.
 	public static synchronized byte[] getBytesFromFile(File file) throws FileNotFoundException, IOException
 	{
-		
 			InputStream is = new BufferedInputStream(new FileInputStream(file));
 			
 			// Get the size of the file
@@ -59,6 +67,57 @@ public class IOUtils
 	public static synchronized String getStringFromFile(File file) throws IOException{
 		return new String(getBytesFromFile(file));
 		
+	}
+
+	public static Document loadXMLFromString(String filename) throws Exception
+	{
+		InputStream ifs = new FileInputStream(filename);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder builder = factory.newDocumentBuilder();
+	    InputSource is = new InputSource(new InputStreamReader(ifs,"UTF-8"));
+	    Document doc = builder.parse(is);
+	    return doc;
+	}
+	
+	public static synchronized String getStringFromFile(String filename){
+
+		try {
+		 InputStream is = new FileInputStream(filename);
+		 
+		BufferedReader in = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+		String s = "";
+		String readLine;
+
+		while ((readLine = in.readLine()) != null) {
+		    s+=readLine;
+		}
+
+		return s;
+		
+		 } catch (Exception e) {
+		    	e.printStackTrace();
+		    	return "ERRR";
+		    }
+		
+		/*
+		String file = ""; 
+		try {
+
+	        InputStream is = new FileInputStream(filename);
+	        String UTF8 = "utf-8";
+	        int BUFFER_SIZE = 8192;
+
+	        BufferedReader br = new BufferedReader(new InputStreamReader(is,
+	                UTF8), BUFFER_SIZE);
+	        String str;
+	        while ((str = br.readLine()) != null) {
+	            file += str;
+	        }
+	        return file;
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    	return "ERRR";
+	    }*/
 	}
 	
 	public static synchronized void writeBytesToFile(File destination, byte[] bytes) throws FileNotFoundException, IOException

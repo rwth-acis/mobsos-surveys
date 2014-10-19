@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 import i5.las2peer.api.Service;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
@@ -56,6 +57,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -1713,7 +1715,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_CSV)
 	@Path("surveys/{id}/responses")
-	public HttpResponse retrieveSurveyResponses(@PathParam("id") int id){
+	public HttpResponse getSurveyResponses(@PathParam("id") int id){
 
 		String onAction = "retrieving responses for survey " + id;
 
@@ -1767,7 +1769,7 @@ public class SurveyService extends Service {
 			//     from mobsos.response where sid = 1 and cid = 1 group by uid;
 
 			JSONObject questions = extractQuestionInformation(form);
-			String sql = "select uid, cid, \n"; 
+			String sql = "select uid, sid, \n"; 
 
 			Iterator<String> it = questions.keySet().iterator();
 
@@ -1788,7 +1790,7 @@ public class SurveyService extends Service {
 				}
 			}
 
-			sql += " from " + jdbcSchema + ".response where sid ="+ id + " group by uid, cid;";
+			sql += " from " + jdbcSchema + ".response where sid ="+ id + " group by uid;";
 
 			//System.out.println("SQL for retrieving survey responses: \n" + sql);
 
@@ -3247,8 +3249,9 @@ public class SurveyService extends Service {
 	/**
 	 * Stores a new questionnaire described with JSON into the MobSOS database.
 	 * The MobSOS database thereby generates a new id returned by this method.
+	 * @throws UnsupportedEncodingException 
 	 */
-	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException{
+	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException, UnsupportedEncodingException{
 
 		Connection conn = null;
 		PreparedStatement stmt = null;

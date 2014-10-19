@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <!-- UEQ Questionnaire -->
 <!-- A simple questionnaire for measuring user experience. The UEQ Questionnaire is based on: Laugwitz, Held, and Schrepp (2008) "Construction and Evaluation of a User Experience Questionnaire". In: USAB 2008, LNCS 5298, pp. 63-76. The scale items load on the six factors Attractiveness, Perspicuity, Efficiency, Dependability, Stimulation, and Novelty. -->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-US">
@@ -6,7 +6,7 @@
 	<qu:Page name="Instructions" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			For the assessment of ${SURVEY.RESOURCE}, please fill out the following questionnaire. The questionnaire consists of pairs of contrasting attributes that may apply to ${SURVEY.RESOURCE}. The circles between the attributes represent gradations between the opposites. You can express your agreement with the attributes by ticking the circle that most closely reflects your impression. Please decide spontaneously. Don’t think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to ${SURVEY.RESOURCE}. Nevertheless, please tick a circle in every line. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+			For the assessment of ${SURVEY.RESOURCE}, please fill out the following questionnaire. The questionnaire consists of pairs of contrasting attributes that may apply to ${SURVEY.RESOURCE}. The circles between the attributes represent gradations between the opposites. You can express your agreement with the attributes by ticking the circle that most closely reflects your impression. Please decide spontaneously. Don't think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to ${SURVEY.RESOURCE}. Nevertheless, please tick a circle in every line. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
 		</qu:Instructions>
 	</qu:Page>
 	
