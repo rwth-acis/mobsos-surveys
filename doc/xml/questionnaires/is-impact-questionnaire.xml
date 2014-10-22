@@ -26,7 +26,7 @@
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			I have learnt much through the presente of ${SURVEY.RESOURCE}.
+			I have learnt much through the presence of ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
