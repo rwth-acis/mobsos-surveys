@@ -261,6 +261,23 @@
             <batchtest fork="yes" todir="${junit.report}">
                 <fileset dir="${tmp.junit}">
                     <include name="**/*Test.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+	
+	<target name="data_fill" depends="init_junit, compile_all">
+        <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="yes" dir=".">
+            <classpath>
+				<pathelement path="." />
+                <pathelement path="${tmp.classes}" />
+                <pathelement path="${tmp.junit}" />
+                <pathelement path="${lib.junit}" />
+                <path refid="libraries"/>
+            </classpath>
+            <formatter type="plain" />
+            <batchtest fork="yes" todir="${junit.report}">
+                <fileset dir="${tmp.junit}">
 					<include name="**/SurveyDataFill.class"/>
                 </fileset>
             </batchtest>
