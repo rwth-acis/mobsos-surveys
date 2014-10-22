@@ -260,12 +260,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					for(i=0;i<qs.length;i++){
 						
 						var q = qs[i];
-						
-						console.log("Linguaje: " + q.lang);
-						
 						var lang = q.lang.split("-")[0];
-						
-						
+					
 						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>");
 					}
 				},
