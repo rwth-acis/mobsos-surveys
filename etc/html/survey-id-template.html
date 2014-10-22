@@ -88,6 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<tr><td><b>${resource}</b></td><td><a id="s_resource"></a></td></tr>
 				<tr><td><b>${start_time}</b></td><td id="s_start"></td></tr>
 				<tr><td><b>${end_time}</b></td><td id="s_end"></td></tr>
+				<tr><td><b>${questionnaire}</b></td><td id="s_questionnaire"></td></tr>
 			</table>
 			<p>
 				<button id="i_survey_part" class="btn btn-lg btn-success hidden">${participate}</button>
@@ -148,6 +149,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					$("#s_start").html(moment.utc(data.start).format("llll"));
 					$("#s_end").html(moment.utc(data.end).format("llll"));
+					
+					//TODO: add result field qurl in service!
+					$("#s_questionnaire").html("<a href='http://localhost:8080/mobsos/questionnaires/" + data.qid + "'>Questionnaire</a>");
+					console.log(data);
 					
 					// only show participation button, if survey is active (i.e. started, and did not end, yet)
 					var now = moment();
