@@ -752,7 +752,7 @@ public class SurveyService extends Service {
 					//System.out.println("Language detected: " + lang);
 
 				} catch (SAXException e){
-					
+
 					HttpResponse result = new HttpResponse("Questionnaire form is invalid! Cause: " + e.getMessage());
 					result.setStatus(400);
 					return result;
@@ -960,25 +960,25 @@ public class SurveyService extends Service {
 				o = parseSurvey(data);
 			} catch (IllegalArgumentException | ParseException e){
 				// if passed content is invalid for some reason, notify user
-				
+
 				HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
 				result.setStatus(400);
 				return result;
 			}
 
 			try{
-			// if passed content is valid, store as new survey
-			int sid = storeNewSurvey(o);
+				// if passed content is valid, store as new survey
+				int sid = storeNewSurvey(o);
 
-			// respond to user with newly generated survey id/URL
-			JSONObject r = new JSONObject();
-			r.put("id", sid);
-			r.put("url",epUrl + "mobsos/surveys/" + sid);
+				// respond to user with newly generated survey id/URL
+				JSONObject r = new JSONObject();
+				r.put("id", sid);
+				r.put("url",epUrl + "mobsos/surveys/" + sid);
 
-			HttpResponse result = new HttpResponse(r.toJSONString());
-			result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
-			result.setStatus(201);
-			return result;
+				HttpResponse result = new HttpResponse(r.toJSONString());
+				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
+				result.setStatus(201);
+				return result;
 			} catch(SQLException e) {
 
 				if(0<=e.getMessage().indexOf("Duplicate")){
@@ -1651,8 +1651,15 @@ public class SurveyService extends Service {
 				int qid = Integer.parseInt(o.get("qid")+"");
 				HttpResponse qresp = getQuestionnaire(qid);
 
-				if(qresp.getStatus()!=200){
+				if(qresp.getStatus() != 200){
 					return qresp;
+				}
+
+				// if questionnaire exists, check if questionnaire form is defined already
+				// if no form is defined, yet, return a not found.
+				HttpResponse qformresp = downloadQuestionnaireForm(qid);
+				if(qformresp.getStatus() == 404){
+					return qformresp;
 				}
 
 				// TODO: at this point we need to check, if users already submitted responses. What to do in this case to avoid data loss?
@@ -1758,41 +1765,10 @@ public class SurveyService extends Service {
 				return result;
 			}
 
-			// generate query for result table
-
-			// example query:
-			// 
-			//     select uid,
-			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
-			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
-			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
-			//     from mobsos.response where sid = 1 and cid = 1 group by uid;
-
-			JSONObject questions = extractQuestionInformation(form);
-			String sql = "select uid, sid, \n"; 
-
-			Iterator<String> it = questions.keySet().iterator();
-
-			while(it.hasNext()){
-				String key = it.next();
-
-				JSONObject def = (JSONObject) questions.get(key);
-				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
-					sql += "  MAX(IF(qkey = '" + key + "', qval, NULL)) AS \"" + key + "\"";
-				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
-						"qu:OrdinalScaleQuestionPageType".equals(def.get("type"))){
-					sql += "  MAX(IF(qkey = '" + key + "', cast(qval as unsigned), NULL)) AS \"" + key + "\"";
-				}
-				if(it.hasNext()){
-					sql += ",\n";
-				} else {
-					sql += "\n";
-				}
+			// now check, if a survey response view exists. If not, create it.
+			if(!existsResponseView(id)){
+				createResponseView(id, form);
 			}
-
-			sql += " from " + jdbcSchema + ".response where sid ="+ id + " group by uid;";
-
-			//System.out.println("SQL for retrieving survey responses: \n" + sql);
 
 			// execute generated query
 			Connection conn = null;
@@ -1801,7 +1777,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement(sql);
+				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".survey_"+id);
 				rset = stmt.executeQuery();
 
 				// format and return result
@@ -1853,16 +1829,16 @@ public class SurveyService extends Service {
 			if(rs.getStatus() != 200){
 				return rs;
 			}
-			
+
 			JSONObject s = (JSONObject) JSONValue.parse(rs.getResult());
-			
+
 			// check if survey expired/not started
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 			df.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 			Date start = df.parse((String) s.get("start"));
 			Date end = df.parse((String) s.get("end"));
-			
+
 			if(now.getTime() > end.getTime()){
 				HttpResponse resp = new HttpResponse("Cannot submit response. Survey expired.");
 				resp.setStatus(403);
@@ -1872,10 +1848,10 @@ public class SurveyService extends Service {
 				resp.setStatus(403);
 				return resp;
 			}
-			
+
 			// check for questionnaire form
 			int qid = Integer.parseInt(s.get("qid")+"");
-			
+
 			if(qid == -1){
 				HttpResponse result = new HttpResponse("No questionnaire defined for survey " + id + "!");
 				result.setStatus(404);
@@ -2072,20 +2048,20 @@ public class SurveyService extends Service {
 		return result;
 
 	}
-	
+
 	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
-	
+
 	// For now, MobSOS Surveys maintains its own database tables for metadata on subject resources, i.e. those resources that are
 	// subjects of a survey. A resource can thereby be a tool, a service, a piece of content, a document, etc. The only prerequisite 
 	// is that such a resource is available publicly under a given URI. Metadata for such a resource currently maintained by MobSOS Surveys
 	// is name and description. In future, such information should be queried from an external Web service or maybe from the meta tags 
 	// available from the resource's HTML representation.
-	
+
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("resource-meta")
 	public HttpResponse getResourceMetadata(@ContentParam String uri){
-		
+
 		System.out.println("Resource URI: " + uri);
 		String onAction = "retrieving resource metadata for URI " + uri ;
 
@@ -2108,9 +2084,9 @@ public class SurveyService extends Service {
 					return result;
 				}
 				rset.next();
-				
+
 				JSONObject meta = new JSONObject();
-				
+
 				meta.put("name",rset.getString("name"));
 				meta.put("description",rset.getString("description"));
 
@@ -2133,7 +2109,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
-	
+
 
 
 	// ============= COMMUNITY EXTENSIONS (TODO) ==============
@@ -2729,7 +2705,7 @@ public class SurveyService extends Service {
 						} else {
 							value = uri;
 						}
-						
+
 						//JSONObject res = (JSONObject) survey.get("resource");
 						//String res_name = (String) res.get("name");
 						//value = res_name;
@@ -3627,6 +3603,117 @@ public class SurveyService extends Service {
 		System.out.println("  Min Idle: " + bds.getMinIdle());
 		System.out.println("  Min Evictable Idletime Millis: " + bds.getMinEvictableIdleTimeMillis());
 		System.out.println("  Validation Query: " + bds.getValidationQuery());
+	}
+
+	/**
+	 * Given a survey identifier, checks if the respective survey already defines a database view for survey responses.
+	 * @param sid
+	 * @return
+	 * @throws SQLException
+	 */
+	private boolean existsResponseView(int sid) throws SQLException{
+		try{
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
+
+			// +++ dsi 
+			try{
+				c = dataSource.getConnection();
+				s = c.prepareStatement("show tables in " + jdbcSchema + " like ?");
+				s.setString(1, "survey_"+sid);
+				rs = s.executeQuery();
+
+				// view does not exist
+				if (!rs.isBeforeFirst()){
+					return false; 
+				} else {
+					return true;
+				}
+
+			} catch (Exception e){
+				throw e;
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { throw e;}
+				try { if (s != null) s.close(); } catch(Exception e) { throw e;}
+				try { if (c != null) c.close(); } catch(Exception e) { throw e;}
+			}
+			// --- dsi
+
+		} catch(Exception e){
+			throw e;
+		}
+	}
+
+	/**
+	 * Given a survey and its corresponding questionnaire form, creates a new database view for convenient access to survey responses.
+	 * 
+	 * @param sid
+	 * @param form
+	 * @throws SQLException 
+	 */
+	private void createResponseView(int sid, Document form) throws SQLException{
+		try{
+			JSONObject questions = extractQuestionInformation(form);
+
+			// generate create view statement for response view
+
+			// example:
+			// 	   create view mobsos.survey_1 as
+			//     select uid, sid,
+			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
+			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
+			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
+			//     from mobsos.response where sid = 1 group by uid;
+
+			String sql = "create view " + jdbcSchema + ".survey_" + sid + " as "; 
+			sql += "select uid, sid, \n"; 
+
+			Iterator<String> it = questions.keySet().iterator();
+
+			while(it.hasNext()){
+				String key = it.next();
+
+				JSONObject def = (JSONObject) questions.get(key);
+				if("qu:FreeTextQuestionPageType".equals(def.get("type"))){
+					sql += "  MAX(IF(qkey = '" + key + "', qval, NULL)) AS \"" + key + "\"";
+				} else if("qu:DichotomousQuestionPageType".equals(def.get("type")) || 
+						"qu:OrdinalScaleQuestionPageType".equals(def.get("type"))){
+					sql += "  MAX(IF(qkey = '" + key + "', cast(qval as unsigned), NULL)) AS \"" + key + "\"";
+				}
+				if(it.hasNext()){
+					sql += ",\n";
+				} else {
+					sql += "\n";
+				}
+			}
+
+			sql += " from " + jdbcSchema + ".response where sid = "+ sid + " group by uid;";
+
+			System.out.println("SQL for creating survey response view for survey " + sid + ": \n" + sql);
+
+			Connection c = null;
+			PreparedStatement s = null;
+			ResultSet rs = null;
+
+			// +++ dsi 
+			try{
+				c = dataSource.getConnection();
+				s = c.prepareStatement(sql);
+				s.executeUpdate();
+
+			} catch (Exception e){
+				throw e;
+			} finally {
+				try { if (rs != null) rs.close(); } catch(Exception e) { throw e;}
+				try { if (s != null) s.close(); } catch(Exception e) { throw e;}
+				try { if (c != null) c.close(); } catch(Exception e) {throw e;}
+			}
+			// --- dsi
+
+		} catch(Exception e){
+			throw e;
+		}
 	}
 
 	/**

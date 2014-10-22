@@ -283,6 +283,25 @@ public class SurveyDataFill {
 			e.printStackTrace();
 		}
 
+		// IS-Impact Questionnaire (engl.)
+		try{
+
+			JSONObject q = new JSONObject(); 
+			q.put("name","IS-Impact Questionnaire");
+			q.put("description","A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) \"Re-conceptualizing information system success: the IS-Impact Measurement Model\". Journal of the Association for Information Systems, 9(7). pp. 377-408.");
+			q.put("lang", "en-US");
+			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
+			String qfuri = "./doc/xml/questionnaires/is-impact-questionnaire.xml";
+
+			URL qu = createQuestionnaire(q, qfuri);
+
+			System.out.println("Created questionnaire " + qfuri + ": " + qu);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
 	}
 
 	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException{
