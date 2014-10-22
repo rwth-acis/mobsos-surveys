@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- IS Impact Questionnaire -->
+<!-- A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) "Re-conceptualizing information system success : the IS-Impact Measurement Model". Journal of the Association for Information Systems, 9(7). pp. 377-408. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}, in this questionnaire, we ask you assess quality and impact of ${SURVEY.RESOURCE} in the four categories Individual Impact, Organizational Impact, Information Quality, and System Quality. Each category is first explained, before we ask you to complete the respective questionnaire items.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Individual Impact is concerned with how ${SURVEY.RESOURCE} has influenced your individual capabilities and effectiveness on behalf of the organization.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I have learnt much through the presente of ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} enhances my awareness and recall of job related information.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} enhances my effectiveness in the job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} increases my productivity.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.CM"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, the impact of ${SURVEY.RESOURCE} on me has been positive.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Organizational Impact refers to impacts of ${SURVEY.RESOURCE} on the organizational level, namely improved organisational results and capabilities.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is cost effective.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in reduced staff costs.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in cost reductions (e.g. inventory holding costs, administration expenses, etc.).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in overall productivity improvement.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in improved outcomes or outputs.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in an increased capacity to manage a growing volume of activity (e.g. transactions, population growth, etc.).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.7"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in improved business processes.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.8"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in better positioning for e-Government/Business.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.CM"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, the impact of ${SURVEY.RESOURCE} on my organization has been positive.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Information Quality is concerned with the quality of ${SURVEY.RESOURCE} outputs: namely, the quality of the information the system produces in reports and on-screen.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} provides output that seems to be exactly what is needed.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Information needed from ${SURVEY.RESOURCE} is always available.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Information from ${SURVEY.RESOURCE} is in a form that is readily usable.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Information from ${SURVEY.RESOURCE} is easy to understand.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Information from ${SURVEY.RESOURCE} appears readable, clear, and well-formatted.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Information from ${SURVEY.RESOURCE} is concise.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.CM"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, the ${SURVEY.RESOURCE} Information Quality is satisfactory.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			System-Quality of ${SURVEY.RESOURCE} is a multifaceted construct designed to capture how the system performs from a technical and design perspective.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is easy to use.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is easy to learn.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<!-- here, [the Unit's] was replaced by "my community's" -->
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} meets my community's requirements.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} includes necessary features and functions.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} always does what it should.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The ${SURVEY.RESOURCE} user interface can be easily adapted to one's personal approach.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.7"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} requires only the minimum number of fields and screens to achieve a task.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.8"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			All data within ${SURVEY.RESOURCE} is fully integrated and consistent.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.8"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} can be easily modified, corrected or improved.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.CM"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, the ${SURVEY.RESOURCE} System Quality is satisfactory.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="ISI.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, I think ${SURVEY.RESOURCE} is a complete success.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>
