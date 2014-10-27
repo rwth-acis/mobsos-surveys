@@ -13,7 +13,7 @@
 	<qu:Page name="Individual Impact" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			Individual Impact is concerned with how ${SURVEY.RESOURCE} has influenced your individual capabilities and effectiveness on behalf of the organization.
+			Individual Impacts are concerned with how ${SURVEY.RESOURCE} has influenced your individual performance. This section seeks to assess whether ${SURVEY.RESOURCE} has helped your (e.g.) ability to interpret information accurately, understanding of information and work related activities in your agency, decision making effectiveness, and overall productivity.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -70,6 +70,15 @@
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
 	      qid="ISI.II.CM"
 	      minval="1" 
 	      maxval="7"
@@ -85,7 +94,7 @@
 	<qu:Page name="Organizational Impact" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			Organizational Impact refers to impacts of ${SURVEY.RESOURCE} on the organizational level, namely improved organisational results and capabilities.
+			Organisational Impacts refer to impacts of ${SURVEY.RESOURCE} at a broader level. Here we are interested in (e.g.): costs of organisational resources dedicated to run ${SURVEY.RESOURCE}, number of applications replaced/introduced, changes in staff requirements, and changes in business processes, due to the introduction of ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -168,6 +177,19 @@
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.8"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has resulted in a better positioning for business.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
 	      qid="ISI.OI.7"
 	      minval="1" 
 	      maxval="7"
@@ -180,16 +202,12 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Organizational Impact" 
-	      qid="ISI.OI.8"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="totally disagree" 
-	      maxlabel="totally agree" 
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.C"
 		  required="false"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
+	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			${SURVEY.RESOURCE} has resulted in better positioning for e-Government/Business.
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -203,6 +221,15 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Overall, the impact of ${SURVEY.RESOURCE} on my organization has been positive.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Organizational Impact" 
+	      qid="ISI.OI.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -288,6 +315,15 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Information from ${SURVEY.RESOURCE} is concise.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.IQ.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	

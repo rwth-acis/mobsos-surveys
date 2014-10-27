@@ -287,13 +287,32 @@ public class SurveyDataFill {
 		try{
 
 			JSONObject q = new JSONObject(); 
-			q.put("name","IS-Impact Questionnaire");
+			q.put("name","IS-Impact Model");
 			q.put("description","A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) \"Re-conceptualizing information system success: the IS-Impact Measurement Model\". Journal of the Association for Information Systems, 9(7). pp. 377-408.");
 			q.put("lang", "en-US");
 			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
 			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/is-impact-questionnaire.xml";
+
+			URL qu = createQuestionnaire(q, qfuri);
+
+			System.out.println("Created questionnaire " + qfuri + ": " + qu);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
+		// EUCS Questionnaire (engl.)
+		try{
+
+			JSONObject q = new JSONObject(); 
+			q.put("name","End-User Computing Satisfaction (EUCS)");
+			q.put("description","A simple questionnaire for measuring end-user computing satisfaction in the dimensions Content, Accuracy, Format, Ease-of-Use and Timeliness. The EUCS Questionnaire is based on: Doll, W. J. & Torkzadeh, G. (1988) \"The Measurement of End-User Computing Satisfaction\". MIS Quarterly 12(2):259-274.");
+			q.put("lang", "en-US");
+			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
+			String qfuri = "./doc/xml/questionnaires/eucs-questionnaire-en.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 

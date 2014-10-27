@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- End User Computing Satisfaction (EUCS) -->
+<!-- A simple questionnaire for measuring end-user computing satisfaction in the dimensions Content, Accuracy, Format, Ease-of-Use and Timeliness. The EUCS Questionnaire is based on: Doll, W. J. & Torkzadeh, G. (1988) "The Measurement of End-User Computing Satisfaction". MIS Quarterly 12(2):259-274. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}! For assessing the usability of ${SURVEY.RESOURCE} please fill out the following questionnaire. Completion will take approximately 5 minutes.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Content" 
+	      qid="EUCS.C.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Does ${SURVEY.RESOURCE} provide the precise information you need?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Content" 
+	      qid="EUCS.C.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Does the information content meet your needs?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Content" 
+	      qid="EUCS.C.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Does ${SURVEY.RESOURCE} provide reports that seem to be just about exactly what you need?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Content" 
+	      qid="EUCS.C.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Does ${SURVEY.RESOURCE} provide sufficient information?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Content" 
+	      qid="EUCS.C.5"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Do you find the output relevant?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Accuracy" 
+	      qid="EUCS.A.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is ${SURVEY.RESOURCE} accurate?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Accuracy" 
+	      qid="EUCS.A.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Are you satisfied with the accuracy of ${SURVEY.RESOURCE}?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Accuracy" 
+	      qid="EUCS.A.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Do you feel the output of ${SURVEY.RESOURCE} is reliable?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Accuracy" 
+	      qid="EUCS.A.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Do you feel ${SURVEY.RESOURCE} is dependable?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Format" 
+	      qid="EUCS.F.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Do you think the output of ${SURVEY.RESOURCE} is presented in a useful format?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Format" 
+	      qid="EUCS.F.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is the information clear?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Format" 
+	      qid="EUCS.F.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Are you happy with the layout of the output?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Format" 
+	      qid="EUCS.F.4"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is the output easy to understand?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Ease of Use" 
+	      qid="EUCS.E.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is ${SURVEY.RESOURCE} user friendly?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Ease of Use" 
+	      qid="EUCS.E.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is ${SURVEY.RESOURCE} easy to use?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Ease of Use" 
+	      qid="EUCS.E.3"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is ${SURVEY.RESOURCE} efficient?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Timeliness" 
+	      qid="EUCS.T.1"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Do you get the information you need in time?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Timeliness" 
+	      qid="EUCS.T.2"
+	      minval="1" 
+	      maxval="5"
+	      minlabel="almost never" 
+	      maxlabel="almost alyways" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Does ${SURVEY.RESOURCE} provide up-to-date information?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Satisfaction" 
+	      qid="EUCS.OSA"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="almost never" 
+	      maxlabel="almost ever"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Are you satisfied with ${SURVEY.RESOURCE}?
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Overall Success" 
+	      qid="EUCS.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="almost never" 
+	      maxlabel="almost ever"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Is ${SURVEY.RESOURCE} successful?
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>
