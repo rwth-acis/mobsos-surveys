@@ -92,6 +92,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			</table>
 			<p>
 				<button id="i_survey_part" class="btn btn-lg btn-success hidden">${participate}</button>
+				<button id="i_survey_resp" class="btn btn-lg btn-success">${responses}</button>
 			</p>
 		</div>
 	</div>
@@ -120,6 +121,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				$("#survey").removeClass("hidden");
 				$("#i_survey_part").click(function(){
 					window.location.href = window.location.href + "/form?access_token=" + window.localStorage["access_token"];
+				});
+				$("#i_survey_resp").click(function(){
+					window.location.href = window.location.href + "/responses?access_token=" + window.localStorage["access_token"];
 				});
 				
 				updateSurvey();

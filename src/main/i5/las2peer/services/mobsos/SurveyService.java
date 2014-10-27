@@ -1931,7 +1931,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("insert into " + jdbcSchema + ".response(uid,sid,qkey,qval) values (?,?,?,?)");
+				stmt = conn.prepareStatement("insert into " + jdbcSchema + ".response(uid,sid,qkey,qval,time) values (?,?,?,?,?)");
 
 				Iterator<String> it = answerFieldTable.keySet().iterator();
 				while(it.hasNext()){
@@ -1943,6 +1943,7 @@ public class SurveyService extends Service {
 					stmt.setInt(2,surveyId);
 					stmt.setString(3, qkey);
 					stmt.setString(4, qval);
+					stmt.setTimestamp(5, new Timestamp(now.getTime()));
 					stmt.addBatch();
 
 				}
@@ -1953,8 +1954,14 @@ public class SurveyService extends Service {
 				return result;
 
 			} catch(SQLException | UnsupportedOperationException e) {
-				e.printStackTrace();
-				return internalError(onAction);
+				if(0<=e.getMessage().indexOf("Duplicate")){
+					HttpResponse result = new HttpResponse("Survey response already submitted!");
+					result.setStatus(409);
+					return result;
+				} else {
+					e.printStackTrace();
+					return internalError(onAction);
+				}
 			} 
 			finally {
 				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
@@ -1966,14 +1973,6 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
-
-	/**
-	 * TODO: write documentation
-	 * 
-	 * @param id
-	 * @param answerXml
-	 * @return
-	 */
 
 	/**
 	 * TODO: write documentation
@@ -2084,7 +2083,6 @@ public class SurveyService extends Service {
 	@Path("resource-meta")
 	public HttpResponse getResourceMetadata(@ContentParam String uri){
 
-		System.out.println("Resource URI: " + uri);
 		String onAction = "retrieving resource metadata for URI " + uri ;
 
 		try {

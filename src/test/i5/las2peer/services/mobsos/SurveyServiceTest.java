@@ -1067,9 +1067,15 @@ public class SurveyServiceTest {
 			assertEquals(200, ares.getHttpCode());
 
 			// now try to get results
-			ClientResponse ga=c1.sendRequest("GET", su.getPath() + "/responses","");
+			ClientResponse ga=c1.sendRequest("GET", su.getPath() + "/responses","","","text/csv",new Pair[]{});
 			assertEquals(200, ga.getHttpCode());
 			//System.out.println(ga.getResponse());
+			
+			// finally, try to submit another response for a user that already submitted. Should result in conflict.
+			qa3Json.put("A.2.3","Der gestiefelte Kater mit Mantel");
+
+			ares=c3.sendRequest("POST", su.getPath() + "/responses",qa3Json.toJSONString(),"application/json","*/*",new Pair[]{});
+			assertEquals(409, ares.getHttpCode());
 
 		} catch (MalformedURLException e){
 			e.printStackTrace();
@@ -1255,7 +1261,8 @@ public class SurveyServiceTest {
 			ares=c1.sendRequest("POST", su_fut.getPath() + "/responses",qanswer,"text/xml","*/*",new Pair[]{});
 			assertEquals(403, ares.getHttpCode());
 			//assertEquals("Cannot submit response. Survey has not begun, yet.", ares.getResponse());
-
+		
+			
 		} catch (MalformedURLException e){
 			e.printStackTrace();
 			fail("Service returned malformed URL!");
