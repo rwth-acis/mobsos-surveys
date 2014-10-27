@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014 Dominik Renzel, Advanced Community Information Systems (ACIS) Group, 
+Chair of Computer Science 5 (Databases & Information Systems), RWTH Aachen University, Germany
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the ACIS Group nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MobSOS Surveys - ${survey} ${ID}</title>
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<style type="text/css">
+		.box {
+		  font: 10px sans-serif;
+		}
+
+		.box line,
+		.box rect,
+		.box circle {
+		  fill: steelblue;
+		  stroke: #000;
+		  stroke-width: 1px;
+		}
+
+		.box .center {
+		  stroke-dasharray: 3,3;
+		}
+
+		.box .outlier {
+		  fill: none;
+		  stroke: #000;
+		}
+		
+		.axis {
+		  font: 12px sans-serif;
+		}
+		 
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		 
+		.x.axis path { 
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+		</style>
+</head>
+<body>
+
+	<!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
+          </div>
+          <div class="navbar-collapse collapse">
+			  <ul class="nav navbar-nav">
+               <li><a href="http://localhost:8080/mobsos/questionnaires">${questionnaires}</a></li>
+			   <li><a href="http://localhost:8080/mobsos/surveys">${surveys}</a></li>
+             </ul>   
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+					data-callback="signinCallback"
+					data-name="Learning Layers"
+					data-size="sm"
+					data-logo="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"
+					data-server="http://api.learning-layers.eu/o/oauth2"
+					data-clientid="a34e4324-5f26-408d-8417-99b9b8045ac3"
+					data-scope="openid phone email address profile">
+              </span>
+			
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+	
+	<!-- Container for operations on questionnaires -->
+	<div id="responses" class="container hidden">
+		<div class="row" style="margin:30px 0px 0px 0px;">
+			<h2 class="page-header"><span id="s_name" class="h2"></span></h2>
+			<h4 id="s_org"></h4>
+			
+			<div id="vis"></div>
+			<div id="txt"></div>
+			
+			<p>
+				<button id="responses_download" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-cloud-download"></span> ${download_dataset}</button>
+			</p>
+		</div>
+	</div>
+	
+	
+	
+	<!-- import jQuery for AJAX calls (must) -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	
+	<!-- import Bootstrap for responsive UI (must) -->
+	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	
+	<!-- import MobSOS Surveys lib -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
+	
+	<!-- import moment.js for displaying times and dates -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
+	
+	<!-- import d3s for visualization of survey responses -->
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	
+	<!-- import d3s boxplot visualization -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/boxplot.js"></script>
+	
+	<script type="text/javascript">
+		
+		var las2peer_server = "http://localhost:8080/";
+		var client = new MobSOSSurveysClient(las2peer_server);
+		var csv = "";
+		
+		var labels = true; // show the text labels beside individual boxplots?
+		var margin = {top: 30, right: 50, bottom: 70, left: 50};
+		var  width = 800 - margin.left - margin.right;
+		var height = 400 - margin.top - margin.bottom;
+			
+		var min = Infinity,
+			max = -Infinity;
+		
+		// OpenID Connect Button: implement a callback function
+		function signinCallback(result) {
+			if(result === "success"){
+			
+				$("#responses").removeClass("hidden");
+				$("#responses_download").click(function(){
+					client.getSurveyResponses(${ID},
+						function(d,t){
+							console.log(d);
+						},
+						function(e){
+							console.log("Error: ");
+							console.log(e);
+						}
+					);
+				});
+				
+				updateSurvey();
+			} else {
+				console.log("not signed in...");
+				console.log(result);
+			}
+		}
+		
+		function updateSurvey(){
+			
+			client.getSurvey(${ID},
+				function(data,type){
+					$("#s_name").html(decodeURIComponent(data.name));
+				},
+				function(error){
+					console.log(error);
+				}
+			);
+			
+			client.getSurveyResponses(${ID},
+				function(d,type){
+					
+					data = parseCSV(d);
+					
+					var res = separateData(data);
+					
+					console.log(res);
+					
+					renderBoxplot(res.num);
+					
+					renderText(res.txt);
+					
+				},
+				function(error){
+					console.log(error);
+				}
+			);
+				
+		}
+		
+		function renderText(data){
+			
+			var html = "<ul>";
+			for(i in data){
+				html += "<li>";
+				html += "<b>" + data[i][0] + "</b>: <ul>";
+				for(k in data[i][1]){
+					html += "<li><i>" + data[i][1][k] + "</i></li>";
+				}
+				html += "</ul></li>";
+			}
+			html += "</ul>";
+			$("#txt").html(html);
+		}
+		
+		function renderBoxplot(data){
+			var chart = d3.box()
+				.whiskers(iqr(1.5))
+				.height(height)	
+				.domain([min,max])
+				.showLabels(labels);
+			
+			var svg = d3.select("#vis").append("svg")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+				.attr("class", "box")    
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			// the x-axis
+			var x = d3.scale.ordinal()	   
+				.domain( data.map(function(d) { console.log(d); return d[0] } ) )	    
+				.rangeRoundBands([0 , width], 0.7, 0.3); 		
+
+			var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+			// the y-axis
+			var y = d3.scale.linear()
+				.domain([min,max])
+				.range([height + margin.top, 0 + margin.top]);
+			
+			var yAxis = d3.svg.axis()
+			.scale(y)
+			.orient("left");
+			
+			// draw the boxplots	
+			svg.selectAll(".box")	   
+			  .data(data)
+			  .enter().append("g")
+				.attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + margin.top + ")"; } )
+			  .call(chart.width(x.rangeBand()));
+
+			// add a title
+			svg.append("text")
+				.attr("x", (width / 2))             
+				.attr("y", 0 + (margin.top / 2))
+				.attr("text-anchor", "middle")  
+				.style("font-size", "18px") 
+				//.style("text-decoration", "underline")  
+				.text("Responses Survey " + ${ID});
+		 
+			 // draw y axis
+			svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis)
+				.append("text") // and text1
+				  .attr("transform", "rotate(-90)")
+				  .attr("y", 6)
+				  .attr("dy", ".71em")
+				  .style("text-anchor", "end")
+				  .style("font-size", "16px") 
+				  .text("");		
+			
+			// draw x axis	
+			svg.append("g")
+			  .attr("class", "x axis")
+			  .attr("transform", "translate(0," + (height  + margin.top + 10) + ")")
+			  .call(xAxis)
+			  .append("text")             // text label for the x axis
+				.attr("x", (width / 2) )
+				.attr("y",  10 )
+				.attr("dy", ".71em")
+				.style("text-anchor", "middle")
+				.style("font-size", "16px") 
+				.text(""); 
+			
+		}
+		
+		function separateData(csv){
+			var result = {"num":[],"txt":[]};
+			for(i in csv){
+				row = csv[i];
+				var include = true;
+				
+				for(k in row[1]){
+					if(row[1][k] !== '' && !parseInt(row[1][k])){
+						console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
+						include = false;
+					}
+				}
+				if(include){
+					result.num.push(row);
+				} else {
+					result.txt.push(row);
+				}
+			}
+			
+			return result;
+		}
+		
+		function parseCSV(instr){
+			var csv = d3.csv.parseRows(instr.replace(/\s*;\s*/g, ","));
+					
+			var data = [];
+			
+			// first extract field names and prepare data cells
+			for(var i=2; i<csv[0].length;i++){
+				var fname = csv[0][i];
+				
+				//console.log(fname);
+				data[i-2] = [];
+				data[i-2][0] = fname;
+				data[i-2][1] = [];
+				
+				for(var j=1;j<csv.length;j++){
+					//console.log(csv[i][j]);
+					
+					var val = csv[j][i];
+					
+					if( val !== ""){
+					data[i-2][1].push(val);
+					
+					if(parseInt(val) && val < min){
+						min = val;
+					} 
+					if(parseInt(val) && val > max){
+						max = val;
+					}}
+					
+				}
+			
+			}
+			
+			return data;
+		}
+
+		// Returns a function to compute the interquartile range.
+		function iqr(k) {
+		  return function(d, i) {
+			var q1 = d.quartiles[0],
+				q3 = d.quartiles[2],
+				iqr = (q3 - q1) * k,
+				i = -1,
+				j = d.length;
+			while (d[++i] < q1 - iqr);
+			while (d[--j] > q3 + iqr);
+			return [i, j];
+		  };
+		}
+		
+	</script>
+	  
+	<!-- add this script element right before closing tag </body> -->
+	<script type="text/javascript">
+      (function() {
+       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
+       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+     })();
+    </script>
+</body>
+</html>

@@ -1705,13 +1705,42 @@ public class SurveyService extends Service {
 		}
 	}
 
-	/**
-	 * TODO: write documentation
-	 * 
-	 * For given survey retrieves all responses submitted by end-users in convenient CSV format
-	 * @param id
-	 * @return
-	 */
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("surveys/{id}/responses")
+	public HttpResponse getSurveyResponsesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+		
+		String onAction = "retrieving responses HTML for survey " + id;
+
+		try {
+			// if survey does not exist, return 404.
+			if(checkExistenceOwnership(id,0) == -1){
+				HttpResponse result = new HttpResponse("Survey does not exist!");
+				result.setStatus(404);
+				return result;
+			}
+		} catch (SQLException e1) {
+			return internalError(onAction);
+		}
+
+		// adapt template to specific survey
+		try {
+			String html = new Scanner(new File("./etc/html/survey-id-responses-template.html")).useDelimiter("\\A").next();
+
+			// localize template
+			html = i18n(html, lang);
+
+			// fill in placeholders with concrete values
+			html = fillPlaceHolder(html,"ID", ""+id);
+
+			// finally return resulting HTML
+			HttpResponse result = new HttpResponse(html);
+			result.setStatus(200);
+			return result;
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+	}
 
 	/**
 	 * TODO: write documentation
@@ -1777,7 +1806,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".survey_"+id);
+				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".responses_survey_"+id);
 				rset = stmt.executeQuery();
 
 				// format and return result
@@ -1801,13 +1830,6 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
-
-	/**
-	 * TODO: write documentation
-	 * @param id
-	 * @param answerJSON
-	 * @return
-	 */
 
 	/**
 	 * TODO: write documentation
@@ -3621,7 +3643,7 @@ public class SurveyService extends Service {
 			try{
 				c = dataSource.getConnection();
 				s = c.prepareStatement("show tables in " + jdbcSchema + " like ?");
-				s.setString(1, "survey_"+sid);
+				s.setString(1, "responses_survey_"+sid);
 				rs = s.executeQuery();
 
 				// view does not exist
@@ -3646,7 +3668,8 @@ public class SurveyService extends Service {
 	}
 
 	/**
-	 * Given a survey and its corresponding questionnaire form, creates a new database view for convenient access to survey responses.
+	 * Given a survey and its corresponding questionnaire form, creates a new database view for 
+	 * convenient access to survey responses.
 	 * 
 	 * @param sid
 	 * @param form
@@ -3659,14 +3682,14 @@ public class SurveyService extends Service {
 			// generate create view statement for response view
 
 			// example:
-			// 	   create view mobsos.survey_1 as
+			// 	   create view mobsos.responses_survey_1 as
 			//     select uid, sid,
 			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
 			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
 			//     from mobsos.response where sid = 1 group by uid;
 
-			String sql = "create view " + jdbcSchema + ".survey_" + sid + " as "; 
+			String sql = "create view " + jdbcSchema + ".responses_survey_" + sid + " as "; 
 			sql += "select uid, sid, \n"; 
 
 			Iterator<String> it = questions.keySet().iterator();
