@@ -345,7 +345,7 @@ public class SurveyDataFill {
 	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException{
 
 		// first add a new questionnaire
-		ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",q.toJSONString(),"application/json","*/*", new Pair[]{});
+		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",q.toJSONString(),"application/json","*/*", new Pair[]{});
 		JSONObject o;
 
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
@@ -367,7 +367,6 @@ public class SurveyDataFill {
 			qform = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
 		} catch (Exception e) {
-			System.out.println("Erreur!!!!!!!!!!!!!!!!!!!");
 			e.printStackTrace();
 		}
 

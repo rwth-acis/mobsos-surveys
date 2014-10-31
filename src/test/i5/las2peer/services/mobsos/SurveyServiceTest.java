@@ -210,15 +210,15 @@ public class SurveyServiceTest {
 		try
 		{
 			//first delete all questionnaires
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// then generate two questionnaires, one to be searched
-			c2.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c3.sendRequest("POST", "mobsos/questionnaires",generateNeedleQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c2.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c3.sendRequest("POST", "mobsos-surveys/questionnaires",generateNeedleQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// list only questionnaire URLs
 			try {
-				ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+				ClientResponse result=c1.sendRequest("GET", "mobsos-surveys/questionnaires?full=0","");
 				//System.out.println("List of Questionnaire URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
@@ -239,7 +239,7 @@ public class SurveyServiceTest {
 
 			// search for specific questionnaires with query string
 			try {
-				ClientResponse result=c2.sendRequest("GET", "mobsos/questionnaires?q=Needle in the Haystack","");
+				ClientResponse result=c2.sendRequest("GET", "mobsos-surveys/questionnaires?q=Needle in the Haystack","");
 				//System.out.println("List of Questionnaires: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
@@ -273,10 +273,10 @@ public class SurveyServiceTest {
 	{
 		try {
 			// first delete all questionnaires
-			c2.sendRequest("DELETE", "mobsos/questionnaires","");
+			c2.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// then create new questionnaire
-			ClientResponse result=c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			ClientResponse result=c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			assertEquals(201, result.getHttpCode());
 			assertEquals("application/json",result.getHeader("Content-Type"));
@@ -311,7 +311,7 @@ public class SurveyServiceTest {
 
 		ClientResponse result;
 
-		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+		result = c1.sendRequest("POST", "mobsos-surveys/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
 
 		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
@@ -319,21 +319,21 @@ public class SurveyServiceTest {
 		invalidQuestionnaire.put("name", "Alcoholics Standard Questionnaire"); //make valid again and introduce other problem
 		invalidQuestionnaire.put("logo","dbis"); // malformed logo URL
 
-		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+		result = c1.sendRequest("POST", "mobsos-surveys/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
 
 		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 		invalidQuestionnaire.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
 
-		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+		result = c1.sendRequest("POST", "mobsos-surveys/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
 
 		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
 
 		invalidQuestionnaire.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
 
-		result = c1.sendRequest("POST", "mobsos/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
+		result = c1.sendRequest("POST", "mobsos-surveys/questionnaires",invalidQuestionnaire.toJSONString(),"application/json","*/*",new Pair[]{});
 
 		assertEquals("text/plain",result.getHeader("Content-Type"));
 		assertEquals(400, result.getHttpCode());
@@ -349,18 +349,18 @@ public class SurveyServiceTest {
 		try {
 
 			// first add a couple of questionnaires
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
-			ClientResponse create = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			ClientResponse create = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 			assertEquals(201,create.getHttpCode());
 
 			// check if deletion of all questionnaires works
-			ClientResponse delete=c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			ClientResponse delete=c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 			assertEquals(200,delete.getHttpCode());
 
 			// then check if questionnaire list retrieval retrieves an empty list.
-			ClientResponse result=c1.sendRequest("GET", "mobsos/questionnaires","");
+			ClientResponse result=c1.sendRequest("GET", "mobsos-surveys/questionnaires","");
 			assertEquals(200,result.getHttpCode());
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -373,11 +373,11 @@ public class SurveyServiceTest {
 
 			// check deletion again without any existing questionnaire. Should be idempotent trivially.
 			// check if deletion of all questionnaires works
-			delete=c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			delete=c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 			assertEquals(200,delete.getHttpCode());
 
 			// then check if questionnaire list retrieval retrieves an empty list.
-			result=c1.sendRequest("GET", "mobsos/questionnaires","");
+			result=c1.sendRequest("GET", "mobsos-surveys/questionnaires","");
 			assertEquals(200,result.getHttpCode());
 			o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -402,14 +402,14 @@ public class SurveyServiceTest {
 		try {
 
 			// first delete all questionnaires
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// then add a couple of questionnaires
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// then get complete list and pick the first questionnaire URL for subsequent testing
-			ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+			ClientResponse list = c1.sendRequest("GET", "mobsos-surveys/questionnaires?full=0","");
 			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
 			String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
 
@@ -451,10 +451,10 @@ public class SurveyServiceTest {
 
 
 		// first delete all questionnaires
-		c1.sendRequest("DELETE", "mobsos/questionnaires","");
+		c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 		// then add a questionnaire
-		ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 		assertTrue(r.getResponse()!=null);
 		assertTrue(r.getResponse().length()>0);
 		try{
@@ -528,13 +528,13 @@ public class SurveyServiceTest {
 		try {
 
 			// first delete all questionnaires
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// then add a questionnaire
-			c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// then get complete list of questionnaire URLs and pick the first for subsequent testing
-			ClientResponse list = c1.sendRequest("GET", "mobsos/questionnaires?full=0","");
+			ClientResponse list = c1.sendRequest("GET", "mobsos-surveys/questionnaires?full=0","");
 			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
 			String fullurl = (String) ((JSONArray) jo.get("questionnaires")).get(0);
 
@@ -572,10 +572,10 @@ public class SurveyServiceTest {
 	public void testUploadQuestionnaireForm(){
 		try{
 			// first delete all questionnaires
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// then add a questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires", generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", generateQuestionnaireJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// extract questionnaire URL for subsequent requests to up/download questionnaire form
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
@@ -632,15 +632,15 @@ public class SurveyServiceTest {
 		try
 		{
 			//first delete all surveys
-			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 			// then generate two surveys, one to be searched
-			c2.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c3.sendRequest("POST", "mobsos/surveys",generateNeedleSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c2.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c3.sendRequest("POST", "mobsos-surveys/surveys",generateNeedleSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// list only survey URLs
 			try {
-				ClientResponse result=c1.sendRequest("GET", "mobsos/surveys?full=0","");
+				ClientResponse result=c1.sendRequest("GET", "mobsos-surveys/surveys?full=0","");
 				//System.out.println("List of Survey URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
@@ -661,7 +661,7 @@ public class SurveyServiceTest {
 
 			// search for specific surveys with query string
 			try {
-				ClientResponse result=c2.sendRequest("GET", "mobsos/surveys?q=Needle in the Haystack","");
+				ClientResponse result=c2.sendRequest("GET", "mobsos-surveys/surveys?q=Needle in the Haystack","");
 				//System.out.println("List of surveys: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
@@ -695,10 +695,10 @@ public class SurveyServiceTest {
 	{
 		try {
 			// first delete all surveys
-			c2.sendRequest("DELETE", "mobsos/surveys","");
+			c2.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 			// then create new questionnaire
-			ClientResponse result=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			ClientResponse result=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			assertEquals(201, result.getHttpCode());
 			assertEquals("application/json",result.getHeader("Content-Type"));
@@ -729,53 +729,53 @@ public class SurveyServiceTest {
 	public void testBadRequestSurveyCreation()
 	{
 		// first delete all surveys
-		c2.sendRequest("DELETE", "mobsos/surveys","");
+		c2.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 		// now try creating surveys with invalid data
 
 		JSONObject invalidSurvey = generateSurveyJSON(); // until now, survey JSON is ok. Introduce problems now...
 		invalidSurvey.put("name", new Integer(2)); // name must be string
 
-		ClientResponse result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		ClientResponse result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("name", "Alcoholics Standard Survey"); //make valid again and introduce other problem
 		invalidSurvey.put("start", "20144-33-44T1000"); //introduce wrong time
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("start", "2014-05-08T12:00:00Z"); //make valid again and introduce other problem
 		invalidSurvey.put("end", "2014-04-01T00:00:00Z"); // end time before start time
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("end", "2014-06-08T00:00:00Z"); // make valid again and introduce other problem
 		invalidSurvey.put("logo","dbis"); // malformed logo URL
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/nonexistingimage"); // non-existing logo resource
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/gadgets"); // existing non-image resource
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("logo","http://dbis.rwth-aachen.de/cms/images/logo.jpg"); // make valid again and introduce other problem
 		invalidSurvey.put("resource","shitonashingle"); // malformed resource URL
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 		invalidSurvey.put("resource","http://dbis.rwth-aachen.de/nonexistingresource"); // non-existing resource URL
 
-		result=c1.sendRequest("POST", "mobsos/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
+		result=c1.sendRequest("POST", "mobsos-surveys/surveys",invalidSurvey.toJSONString(),"application/json","*/*",new Pair[]{});
 		assertEquals(400, result.getHttpCode());
 
 	}
@@ -789,18 +789,18 @@ public class SurveyServiceTest {
 		try {
 
 			// first add a couple of surveys
-			c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
-			ClientResponse create = c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			ClientResponse create = c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 			assertEquals(201,create.getHttpCode());
 
 			// check if deletion of all surveys works
-			ClientResponse delete=c1.sendRequest("DELETE", "mobsos/surveys","");
+			ClientResponse delete=c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 			assertEquals(200,delete.getHttpCode());
 
 			// then check if survey list retrieval retrieves an empty list.
-			ClientResponse result=c1.sendRequest("GET", "mobsos/surveys","");
+			ClientResponse result=c1.sendRequest("GET", "mobsos-surveys/surveys","");
 			assertEquals(200,result.getHttpCode());
 			Object o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -813,11 +813,11 @@ public class SurveyServiceTest {
 
 			// check deletion again without any existing surveys. Should be idempotent trivially.
 			// check if deletion of all surveys works
-			delete=c1.sendRequest("DELETE", "mobsos/surveys","");
+			delete=c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 			assertEquals(200,delete.getHttpCode());
 
 			// then check if survey list retrieval retrieves an empty list.
-			result=c1.sendRequest("GET", "mobsos/surveys","");
+			result=c1.sendRequest("GET", "mobsos-surveys/surveys","");
 			assertEquals(200,result.getHttpCode());
 			o = JSONValue.parseWithException(result.getResponse().trim());
 			assertTrue(o instanceof JSONObject);
@@ -842,14 +842,14 @@ public class SurveyServiceTest {
 		try {
 
 			// first delete all surveys
-			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 			// then add a couple of surveys
-			c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
-			c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// then get complete list and pick the first survey URL for subsequent testing
-			ClientResponse list = c1.sendRequest("GET", "mobsos/surveys?full=0","");
+			ClientResponse list = c1.sendRequest("GET", "mobsos-surveys/surveys?full=0","");
 			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
 			String fullurl = (String) ((JSONArray) jo.get("surveys")).get(0);
 
@@ -894,10 +894,10 @@ public class SurveyServiceTest {
 
 
 		// first delete all surveys
-		c1.sendRequest("DELETE", "mobsos/surveys","");
+		c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 		// then add a survey
-		ClientResponse r = c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 		assertTrue(r.getResponse()!=null);
 		assertTrue(r.getResponse().length()>0);
 		try{
@@ -971,13 +971,13 @@ public class SurveyServiceTest {
 		try {
 
 			// first delete all surveys
-			c1.sendRequest("DELETE", "mobsos/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
 
 			// then add a survey
-			c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
+			c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*",new Pair[]{});
 
 			// then get complete list of survey URLs and pick the first for subsequent testing
-			ClientResponse list = c1.sendRequest("GET", "mobsos/surveys?full=0","");
+			ClientResponse list = c1.sendRequest("GET", "mobsos-surveys/surveys?full=0","");
 			JSONObject jo = (JSONObject) JSONValue.parseWithException(list.getResponse().trim());
 			String fullurl = (String) ((JSONArray) jo.get("surveys")).get(0);
 
@@ -1015,7 +1015,7 @@ public class SurveyServiceTest {
 	public void testSubmitQuestionnaireAnswer(){
 		try{
 			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
@@ -1029,7 +1029,7 @@ public class SurveyServiceTest {
 			assertEquals(200, result.getHttpCode());
 
 			// then create survey using the previously created questionnaire and form
-			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 			URL su = new URL((String) svu.get("url"));
 
@@ -1093,11 +1093,11 @@ public class SurveyServiceTest {
 	public void testSubmitInvalidQuestionnaireAnswer(){
 		try{
 			// first delete all surveys & questionnaires
-			c1.sendRequest("DELETE", "mobsos/surveys","");
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
@@ -1110,7 +1110,7 @@ public class SurveyServiceTest {
 			assertEquals(200, result.getHttpCode());
 
 			// then create survey using the previously created questionnaire and form
-			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 			URL su = new URL((String) svu.get("url"));
 
@@ -1209,11 +1209,11 @@ public class SurveyServiceTest {
 			 */
 			
 			// first delete all surveys & questionnaires
-			c1.sendRequest("DELETE", "mobsos/surveys","");
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
@@ -1226,7 +1226,7 @@ public class SurveyServiceTest {
 			assertEquals(200, result.getHttpCode());
 
 			// then create survey that is already expired
-			ClientResponse csvres_exp=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON(lastyearUTC,yesterdayUTC).toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse csvres_exp=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON(lastyearUTC,yesterdayUTC).toJSONString(),"application/json","*/*", new Pair[]{});
 			JSONObject svu_exp = (JSONObject) JSONValue.parseWithException(csvres_exp.getResponse().trim());
 			URL su_exp = new URL((String) svu_exp.get("url"));
 
@@ -1240,7 +1240,7 @@ public class SurveyServiceTest {
 			assertEquals(200, ares.getHttpCode());
 
 			// then create survey starting in the future
-			ClientResponse csvres_fut=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON(tomorrowUTC, nextyearUTC).toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse csvres_fut=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON(tomorrowUTC, nextyearUTC).toJSONString(),"application/json","*/*", new Pair[]{});
 			JSONObject svu_fut = (JSONObject) JSONValue.parseWithException(csvres_fut.getResponse().trim());
 			URL su_fut = new URL((String) svu_fut.get("url"));
 
@@ -1279,11 +1279,11 @@ public class SurveyServiceTest {
 	public void testGetSurveyQuestionnaireForm(){
 		try{
 			// first delete all surveys & questionnaires
-			c1.sendRequest("DELETE", "mobsos/surveys","");
-			c1.sendRequest("DELETE", "mobsos/questionnaires","");
+			c1.sendRequest("DELETE", "mobsos-surveys/surveys","");
+			c1.sendRequest("DELETE", "mobsos-surveys/questionnaires","");
 
 			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
@@ -1297,7 +1297,7 @@ public class SurveyServiceTest {
 			assertEquals(200, result.getHttpCode());
 
 			// then create survey using the previously created questionnaire and form
-			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString(),"application/json","*/*", new Pair[]{});
 			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 			URL su = new URL((String) svu.get("url"));
 
@@ -1330,7 +1330,7 @@ public class SurveyServiceTest {
 	
 	@Test
 	public void testResourceMeta(){
-		ClientResponse res=c1.sendRequest("POST", "mobsos/resource-meta","http://wikipedia.org","text/plain","*/*",new Pair[]{});
+		ClientResponse res=c1.sendRequest("POST", "mobsos-surveys/resource-meta","http://wikipedia.org","text/plain","*/*",new Pair[]{});
 		System.out.println("Resource Meta: " + res.getResponse());
 		assertEquals(200, res.getHttpCode());
 	}
@@ -1344,7 +1344,7 @@ public class SurveyServiceTest {
 	//	public void testSubmitQuestionnaireAnswerWithCommunity(){
 	//		try{
 	//			// first add a new questionnaire
-	//			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+	//			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString());
 	//			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 	//			URL u = new URL((String) o.get("url"));
 	//
@@ -1356,7 +1356,7 @@ public class SurveyServiceTest {
 	//			assertEquals(200, result.getHttpCode());
 	//
 	//			// then create survey using the previously created questionnaire and form
-	//			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+	//			ClientResponse csvres=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString());
 	//			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 	//			URL su = new URL((String) svu.get("url"));
 	//
@@ -1411,7 +1411,7 @@ public class SurveyServiceTest {
 	public void testGetSurveyQuestionnaireFormWithCommunityContext(){
 		try{
 			// first add a new questionnaire
-			ClientResponse r = c1.sendRequest("POST", "mobsos/questionnaires",generateQuestionnaireJSON().toJSONString());
+			ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",generateQuestionnaireJSON().toJSONString());
 			JSONObject o = (JSONObject) JSONValue.parseWithException(r.getResponse().trim());
 			URL u = new URL((String) o.get("url"));
 
@@ -1423,7 +1423,7 @@ public class SurveyServiceTest {
 			assertEquals(200, result.getHttpCode());
 
 			// then create survey using the previously created questionnaire and form
-			ClientResponse csvres=c1.sendRequest("POST", "mobsos/surveys",generateSurveyJSON().toJSONString());
+			ClientResponse csvres=c1.sendRequest("POST", "mobsos-surveys/surveys",generateSurveyJSON().toJSONString());
 			JSONObject svu = (JSONObject) JSONValue.parseWithException(csvres.getResponse().trim());
 			URL su = new URL((String) svu.get("url"));
 

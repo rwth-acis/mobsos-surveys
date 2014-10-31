@@ -189,10 +189,10 @@
 	
     <target name="compile_all" depends="compile_main, compile_junit" />
 	
-	
-	<!-- Generate Jars -->
+    <!-- Generate Jars -->
     <target name="jar" depends="compile_main">
         <jar jarfile="${export.jars}/${ivy.module}.jar">
+			<fileset dir="${tmp.classes}" includes="*.properties" />
             <fileset dir="${tmp.classes}" includes="${service.path}/**" />
             <manifest>
                 <attribute name="Library-Version" value="${service.version}" />
@@ -201,6 +201,7 @@
         </jar>
 		<jar jarfile="${export.jars}/${service.name}-${service.version}.jar">
             <fileset dir="${tmp.classes}" includes="${service.path}/**" />
+			<fileset dir="${tmp.classes}" includes="*.properties" />
             <manifest>
                 <attribute name="Library-Version" value="${service.version}" />
                 <attribute name="Library-SymbolicName" value="${service.name}" />
@@ -208,6 +209,7 @@
         </jar>
         <!-- Add the same Jar to the Service Directory !-->
         <jar jarfile="${service}/${service.name}-${service.version}.jar">
+			<fileset dir="${tmp.classes}" includes="*.properties" />
             <fileset dir="${tmp.classes}" includes="${service.path}/**" />
             <manifest>
                 <attribute name="Library-Version" value="${service.version}" />

@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MobSOS Surveys Redirect</title>
+	<title>las2peer Sign-in</title>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -65,11 +65,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<br/>
 	
 	<!-- Container for options after successful sign in -->
-	<div id="options" class="container hidden">
+	<div id="options" class="container">
 		<div class="row">
 			<img width="200" src="https://dl.dropboxusercontent.com/u/17405777/las2peer-logo.svg" alt="..." class="img-rounded">
-			<h1>Welcome to MobSOS Surveys, <span id="name"></span></h2>
-			<h4>We now redirect you to <span id="redir" />.</h4>
+			<h1>Welcome to MobSOS Surveys<span id="name">!</span></h2>
 		</div>
 	</div>
 	
@@ -84,14 +83,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-			
-				var last = window.localStorage["last_resource"];
 				
-				$("#name").html(oidc_userinfo.name);	
-				$("#redir").html("<a href='" + last + "'>" + last );
-				$("#options").removeClass("hidden");
+				$("#name").html("," + oidc_userinfo.name + "!");
 				
-				window.location.href=last;
 			} else {
 				$("#auth-status").html("Sign in!");
 				console.log("not signed in...");

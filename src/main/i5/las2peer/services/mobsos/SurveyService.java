@@ -139,7 +139,7 @@ import com.mysql.jdbc.EscapeTokenizer;
  * @author Dominik Renzel
  *
  */
-@Path("mobsos")
+@Path("mobsos-surveys")
 @Version("0.1")
 public class SurveyService extends Service {
 
@@ -150,10 +150,10 @@ public class SurveyService extends Service {
 	private DocumentBuilder parser;
 	private Validator validator;
 
+	// fields read from service configuration file
 	private String epUrl, questionnaireSchemaPath;
-	private String jdbcDriverClassName;
-	private String jdbcUrl, jdbcSchema;
-	private String jdbcLogin, jdbcPass;
+	private String jdbcDriverClassName, jdbcUrl, jdbcSchema,jdbcLogin, jdbcPass;
+	private String oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
 
 	public SurveyService(){
 
@@ -193,6 +193,11 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -253,11 +258,11 @@ public class SurveyService extends Service {
 				while(rs.next()){
 					if(full>0){
 						JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
-						questionnaire.put("url", epUrl + "mobsos/questionnaires/" + questionnaire.get("id"));
+						questionnaire.put("url", epUrl + "mobsos-surveys/questionnaires/" + questionnaire.get("id"));
 						qs.add(questionnaire);	
 					} else {
 						String id = rs.getString("id");
-						qs.add(epUrl + "mobsos/questionnaires/" + id);
+						qs.add(epUrl + "mobsos-surveys/questionnaires/" + id);
 					}
 				}
 
@@ -317,7 +322,7 @@ public class SurveyService extends Service {
 				// respond to user with newly created id/URL
 				JSONObject r = new JSONObject();
 				r.put("id",qid);
-				r.put("url",epUrl + "mobsos/questionnaires/" + qid);
+				r.put("url",epUrl + "mobsos-surveys/questionnaires/" + qid);
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 				result.setStatus(201);
@@ -465,6 +470,10 @@ public class SurveyService extends Service {
 			// fill in placeholders with values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -812,6 +821,10 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -917,11 +930,11 @@ public class SurveyService extends Service {
 				while(rs.next()){
 					if(full>0){
 						JSONObject survey = readSurveyFromResultSet(rs);
-						survey.put("url", epUrl + "mobsos/surveys/" + survey.get("id"));
+						survey.put("url", epUrl + "mobsos-surveys/surveys/" + survey.get("id"));
 						qs.add(survey);	
 					} else {
 						String id = rs.getString("id");
-						qs.add(epUrl + "mobsos/surveys/" + id);
+						qs.add(epUrl + "mobsos-surveys/surveys/" + id);
 					}
 				}
 
@@ -981,7 +994,7 @@ public class SurveyService extends Service {
 				// respond to user with newly generated survey id/URL
 				JSONObject r = new JSONObject();
 				r.put("id", sid);
-				r.put("url",epUrl + "mobsos/surveys/" + sid);
+				r.put("url",epUrl + "mobsos-surveys/surveys/" + sid);
 
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
@@ -1158,6 +1171,10 @@ public class SurveyService extends Service {
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -2074,6 +2091,36 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
+		
+		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+		html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+		html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
+
+		HttpResponse result = new HttpResponse(html);
+		result.setStatus(200);
+		return result;
+
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	@Path("/")
+	public HttpResponse serveIndexPage(){
+		String onAction = "serving index page";
+
+		String html = "";
+		// start off with template
+		try {
+			html = new Scanner(new File("./etc/html/index.html")).useDelimiter("\\A").next();
+		} catch (FileNotFoundException e) {
+			return internalError(onAction);
+		}
+		
+		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+		html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+		html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 		HttpResponse result = new HttpResponse(html);
 		result.setStatus(200);

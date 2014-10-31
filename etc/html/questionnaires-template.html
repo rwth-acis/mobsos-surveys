@@ -64,16 +64,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
           <div class="navbar-collapse collapse">
 			 <ul class="nav navbar-nav">
-               <li><a href="${EP_URL}mobsos/questionnaires">${questionnaires}</a></li>
-			   <li><a href="${EP_URL}mobsos/surveys">${surveys}</a></li>
+               <li><a href="${EP_URL}mobsos-surveys/questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}mobsos-surveys/surveys">${surveys}</a></li>
              </ul>  
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
-					data-name="Learning Layers"
+					data-name="${OIDC_PROV_NAME}"
 					data-size="sm"
-					data-logo="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png"
-					data-server="http://api.learning-layers.eu/o/oauth2"
-					data-clientid="a34e4324-5f26-408d-8417-99b9b8045ac3"
+					data-logo="${OIDC_PROV_LOGO}"
+					data-server="${OIDC_PROV_URL}"
+					data-clientid="${OIDC_CLNT_ID}"
 					data-scope="openid phone email address profile">
               </span>
 			
@@ -254,6 +254,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				function(data,type){
 					
 					qs = data.questionnaires;
+					console.log(data);
 					
 					$('#questionnaires').html("");
 					
