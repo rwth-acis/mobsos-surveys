@@ -191,6 +191,9 @@ public class SurveyService extends Service {
 			// localize template
 			html = i18n(html, lang);
 
+			// fill in placeholders
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
+
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
@@ -461,6 +464,8 @@ public class SurveyService extends Service {
 
 			// fill in placeholders with values
 			html = fillPlaceHolder(html,"ID", ""+id);
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
+
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
@@ -804,6 +809,9 @@ public class SurveyService extends Service {
 
 			// localize template
 			html = i18n(html, lang);
+
+			// fill in placeholders
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -1149,6 +1157,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -1413,14 +1422,15 @@ public class SurveyService extends Service {
 			// now start to transform XML into ready-to-use HTML
 
 			// start off with template
-			String text = new Scanner(new File("./etc/html/survey-form-template.html")).useDelimiter("\\A").next();
+			String html = new Scanner(new File("./etc/html/survey-form-template.html")).useDelimiter("\\A").next();
 
-
+			// fill in placeholders
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
 
 			// do all adaptation to user and survey
-			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), null);
+			String adaptHtml = adaptForm(html, survey, (UserAgent) this.getActiveAgent(), null);
 
-			adaptText = i18n(adaptText, lang);
+			adaptHtml = i18n(adaptHtml, lang);
 
 			//String adaptText = text;
 
@@ -1574,12 +1584,12 @@ public class SurveyService extends Service {
 			String answerLink = "<a href=\""+ answerUrl + "\" id=\"return-url\" class=\"hidden\" ></a>";
 
 			// finally insert all generated parts into the resulting adapted HTML
-			adaptText = adaptText.replaceAll("<!-- NAVPILLS -->", navpillItems);
-			adaptText = adaptText.replaceAll("<!-- QUESTIONPAGES -->",questionDivs);
-			adaptText = adaptText.replaceAll("<!-- ANSWERLINK -->", answerLink);
+			adaptHtml = adaptHtml.replaceAll("<!-- NAVPILLS -->", navpillItems);
+			adaptHtml = adaptHtml.replaceAll("<!-- QUESTIONPAGES -->",questionDivs);
+			adaptHtml = adaptHtml.replaceAll("<!-- ANSWERLINK -->", answerLink);
 
 			// return adapted HTML
-			HttpResponse result = new HttpResponse(adaptText);
+			HttpResponse result = new HttpResponse(adaptHtml);
 			result.setStatus(200);
 			return result;
 
@@ -1709,7 +1719,7 @@ public class SurveyService extends Service {
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/responses")
 	public HttpResponse getSurveyResponsesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
-		
+
 		String onAction = "retrieving responses HTML for survey " + id;
 
 		try {
@@ -1732,6 +1742,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
+			html = fillPlaceHolder(html,"EP_URL", epUrl);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
@@ -2847,19 +2858,32 @@ public class SurveyService extends Service {
 		// first create header row
 		for(int i=1;i<=cols;i++){
 			headline += rs.getMetaData().getColumnName(i);
+			rs.getMetaData().getColumnTypeName(i);
 			if(i<cols) headline += ";";
 		}
 		res += headline + "\n";
 
-		// now compile answer data
+		// now compile answer data; stick to RFC 4180
 		String data = "";
 		while(rs.next()){
 			for(int i=1;i<=cols;i++){
 				Object o = rs.getObject(i);
 				if(o != null){
-					data += o.toString();
+
+					//Fields containing line breaks (CRLF), double quotes, and commas should be enclosed in double-quotes.
+					if(o.toString().contains(",") || o.toString().contains("\"") || o.toString().contains("\n")){
+
+						String fval = o.toString();
+
+						// If double-quotes are used to enclose fields, then a double-quote appearing inside a field must be escaped by preceding it with another double quote.
+						fval = fval.replaceAll("\"", "\"\\\"");
+
+						data += "\"" + fval + "\"";
+					} else {
+						data += o.toString();
+					}
 				}
-				if(i<cols) data += ";";
+				if(i<cols) data += ",";
 			}
 			data += "\n";
 		}

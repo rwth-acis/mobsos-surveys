@@ -72,8 +72,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
           <div class="navbar-collapse collapse">
 			  <ul class="nav navbar-nav">
-               <li><a href="http://localhost:8080/mobsos/questionnaires">${questionnaires}</a></li>
-			   <li><a href="http://localhost:8080/mobsos/surveys">${surveys}</a></li>
+               <li><a href="${EP_URL}mobsos/questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}mobsos/surveys">${surveys}</a></li>
              </ul>    
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
@@ -210,13 +210,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- import datetimepicker + deps -->
 	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
 	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/bootstrap-datetimepicker.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/dist/typeahead.bundle.min.js"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+	<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.10.4/dist/typeahead.bundle.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script> -->
 		
 	<script type="text/javascript">
 		
-		var las2peer_server = "http://localhost:8080/";
-		var client = new MobSOSSurveysClient(las2peer_server);
+		var endpoint_url = "${EP_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url);
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {

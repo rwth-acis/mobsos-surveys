@@ -100,8 +100,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
           <div class="navbar-collapse collapse">
 			  <ul class="nav navbar-nav">
-               <li><a href="http://localhost:8080/mobsos/questionnaires">${questionnaires}</a></li>
-			   <li><a href="http://localhost:8080/mobsos/surveys">${surveys}</a></li>
+               <li><a href="${EP_URL}mobsos/questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}mobsos/surveys">${surveys}</a></li>
              </ul>   
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
@@ -154,13 +154,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	
 	<script type="text/javascript">
 		
-		var las2peer_server = "http://localhost:8080/";
-		var client = new MobSOSSurveysClient(las2peer_server);
+		var endpoint_url = "${EP_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url);
+		
 		var csv = "";
 		
 		var labels = true; // show the text labels beside individual boxplots?
 		var margin = {top: 30, right: 50, bottom: 70, left: 50};
-		var  width = 800 - margin.left - margin.right;
+		var width = 800 - margin.left - margin.right;
 		var height = 400 - margin.top - margin.bottom;
 			
 		var min = Infinity,
@@ -203,12 +204,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			client.getSurveyResponses(${ID},
 				function(d,type){
+				
+					console.log("CSV data from service:");
+					console.log(d);
 					
 					data = parseCSV(d);
 					
 					var res = separateData(data);
-					
-					console.log(res);
 					
 					renderBoxplot(res.num);
 					
@@ -237,16 +239,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			$("#txt").html(html);
 		}
 		
+		function resize(){
+			var width = parseInt(d3.select("#vis").style("width")),
+				height = parseInt(d3.select("#vis").style("height"));
+				
+			console.log(width + "x" + height);
+		}
+		
 		function renderBoxplot(data){
+			
 			var chart = d3.box()
 				.whiskers(iqr(1.5))
 				.height(height)	
 				.domain([min,max])
 				.showLabels(labels);
+				
+			console.log(data[0]);
+			
+			d3.select(window).on('resize',resize);
 			
 			var svg = d3.select("#vis").append("svg")
 				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
+				.attr("height", height + margin.top + margin.bottom + 40)
 				.attr("class", "box")    
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -289,27 +303,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			 // draw y axis
 			svg.append("g")
 				.attr("class", "y axis")
-				.call(yAxis)
-				.append("text") // and text1
-				  .attr("transform", "rotate(-90)")
-				  .attr("y", 6)
-				  .attr("dy", ".71em")
-				  .style("text-anchor", "end")
-				  .style("font-size", "16px") 
-				  .text("");		
+				.call(yAxis);
+				
 			
 			// draw x axis	
 			svg.append("g")
 			  .attr("class", "x axis")
 			  .attr("transform", "translate(0," + (height  + margin.top + 10) + ")")
 			  .call(xAxis)
-			  .append("text")             // text label for the x axis
-				.attr("x", (width / 2) )
-				.attr("y",  10 )
-				.attr("dy", ".71em")
-				.style("text-anchor", "middle")
-				.style("font-size", "16px") 
-				.text(""); 
+			  .selectAll("text")  
+					.style("text-anchor", "end")
+					.attr("dx", "-.8em")
+					.attr("dy", ".15em")
+					.attr("transform", function(d) {
+						return "rotate(-45)" 
+						});
+			
+			var t0 = Date.now();
+			
+			/*
+			d3.timer(function(){	
+				var t = Date.now() - t0;
+				svg.attr("transform", "translate(400,400),rotate(" + (t%360)/2 + ")");
+			});
+			*/
+			//svg.selectAll("text").attr("transform", "rotate(-90),translate(-100,0)");
+			//svg.attr("transform", "translate(" + width + ",0),rotate(90)");
 			
 		}
 		
@@ -321,7 +340,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				for(k in row[1]){
 					if(row[1][k] !== '' && !parseInt(row[1][k])){
-						console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
+						//console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
 						include = false;
 					}
 				}
