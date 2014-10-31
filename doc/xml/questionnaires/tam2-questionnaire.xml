@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use and explains perceived usefulness and usage intentions in terms of social influence and cognitive instrumental processes. The TAM2 Questionnaire is based on: Venkatesh, Viswanath and Davis, Fred D. (2000) "A Theoretical Extension of the Technology Acceptance Model: Four Longitudinal Field Studies". Management Science 46(2):186-204. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xml="http://www.w3.org/XML/1998/namespace">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			Dear ${USER.NAME}! For the assessment, please fill out the following questionnaire. You can express your agreement with the attributes by ticking the value that most closely reflects your impression. Please decide spontaneously. Don't think too long about your decision to make sure that you convey your original impression. Sometimes you may not be completely sure about your agreement with a particular attribute or you may find that the attribute does not apply completely to ${SURVEY.RESOURCE}. Nevertheless, please make a selection on every item. It is your personal opinion that counts. Please remember: there is no wrong or right answer!
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Intention to Use" 
+	      qid="TAM2.IU.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Assuming I have access to ${SURVEY.RESOURCE}, I intend to use it.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Intention to Use" 
+	      qid="TAM2.IU.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Given that I have access to ${SURVEY.RESOURCE}, I predict that I would use it.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM2.PU.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} improves my performance in my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM2.PU.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} in my job increases my productivity.
+		</qu:Instructions>
+		
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM2.PU.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Using ${SURVEY.RESOURCE} enhances my effectiveness in my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Usefulness" 
+	      qid="TAM2.PU.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I find ${SURVEY.RESOURCE} to be useful in my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease of Use" 
+	      qid="TAM2.PEU.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			My interaction with ${SURVEY.RESOURCE} is clear and understandable.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease of Use" 
+	      qid="TAM2.PEU.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Interacting with ${SURVEY.RESOURCE} does not require a lot of my mental effort.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease of Use" 
+	      qid="TAM2.PEU.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I find ${SURVEY.RESOURCE} to be easy to use.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Perceived Ease of Use" 
+	      qid="TAM2.PEU.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I find it easy to get ${SURVEY.RESOURCE} to do what I want it to do.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Subjective Norm" 
+	      qid="TAM2.SN.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			People who influence my behavior think that I should use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Subjective Norm" 
+	      qid="TAM2.SN.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			People who are important to me think that I should use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Voluntariness" 
+	      qid="TAM2.VOL.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			My use of ${SURVEY.RESOURCE} is voluntary.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Voluntariness" 
+	      qid="TAM2.VOL.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			My supervisor does not require me to use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Voluntariness" 
+	      qid="TAM2.VOL.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Although it might be helpful, using ${SURVEY.RESOURCE} is certainly not compulsory in my job.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Image" 
+	      qid="TAM2.IMG.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			People in my organization who use ${SURVEY.RESOURCE} have more prestige than those who do not.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Image" 
+	      qid="TAM2.IMG.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			People in my organization who use ${SURVEY.RESOURCE} have a high profile.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Image" 
+	      qid="TAM2.IMG.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Having ${SURVEY.RESOURCE} is a status symbol in my organization.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Job Relevance" 
+	      qid="TAM2.REL.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			In my job, usage of ${SURVEY.RESOURCE} is important.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Job Relevance" 
+	      qid="TAM2.REL.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			In my job, usage of ${SURVEY.RESOURCE} is relevant.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Output Quality" 
+	      qid="TAM2.OQ.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The quality of output I get from ${SURVEY.RESOURCE} is high.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Output Quality" 
+	      qid="TAM2.OQ.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I have no problem with the quality of ${SURVEY.RESOURCE}'s output.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Result Demonstratability" 
+	      qid="TAM2.RD.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I have no difficulty telling others about the results of using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Result Demonstratability" 
+	      qid="TAM2.RD.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I believe I could communicate to others the consequences of using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Result Demonstratability" 
+	      qid="TAM2.RD.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The results of using ${SURVEY.RESOURCE} are apparent to me.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Result Demonstratability" 
+	      qid="TAM2.RD.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I would have difficulty explaining why using ${SURVEY.RESOURCE} may or may not be beneficial.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<!-- 
+		The following items are custom extensions to the original TAM2 instrument.
+		Overall Success is a criterion measure enabling to find which success factors were most relevant.
+		Positive/Negative aspects additionally allow to collect qualitative data on the success of the surveyed resource. 
+	-->
+	
+	<qu:Page name="Overall Success" 
+	      qid="TAM2.OS"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree"  
+		  required="true"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Altogether, ${SURVEY.RESOURCE} is a success.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Negative Aspects" 
+	      qid="TAM2.N"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most negative aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Positive Aspects" 
+	      qid="TAM2.P"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			List the most positive aspects about ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>

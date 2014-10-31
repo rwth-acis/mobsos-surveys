@@ -283,6 +283,25 @@ public class SurveyDataFill {
 			e.printStackTrace();
 		}
 
+		// TAM2 Questionnaire (engl.)
+		try{
+
+			JSONObject q = new JSONObject(); 
+			q.put("name","Technology Acceptance Model 2 (TAM2)");
+			q.put("description","A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use and explains perceived usefulness and usage intentions in terms of social influence and cognitive instrumental processes. The TAM2 Questionnaire is based on: Venkatesh, Viswanath and Davis, Fred D. (2000) \"A Theoretical Extension of the Technology Acceptance Model: Four Longitudinal Field Studies\". Management Science 46(2):186-204.");
+			q.put("lang", "en-US");
+			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
+			String qfuri = "./doc/xml/questionnaires/tam2-questionnaire.xml";
+
+			URL qu = createQuestionnaire(q, qfuri);
+
+			System.out.println("Created questionnaire " + qfuri + ": " + qu);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+
 		// IS-Impact Questionnaire (engl.)
 		try{
 
