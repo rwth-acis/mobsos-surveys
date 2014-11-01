@@ -1443,6 +1443,10 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// do all adaptation to user and survey
 			String adaptHtml = adaptForm(html, survey, (UserAgent) this.getActiveAgent(), null);
