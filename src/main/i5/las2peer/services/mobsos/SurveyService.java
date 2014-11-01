@@ -1764,6 +1764,10 @@ public class SurveyService extends Service {
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
+			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
+			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
+			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
