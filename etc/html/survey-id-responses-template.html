@@ -119,11 +119,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	
 	<!-- Container for operations on questionnaires -->
 	<div id="responses" class="container hidden">
-		<div class="row" style="margin:30px 0px 0px 0px;">
+		<div id="vis" class="row" style="margin:30px 0px 0px 0px;">
 			<h2 class="page-header"><span id="s_name" class="h2"></span></h2>
 			<h4 id="s_org"></h4>
 			
-			<div id="vis"></div>
+			<svg id="graph" />
 			<div id="txt"></div>
 			
 			<p>
@@ -166,6 +166,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 		var min = Infinity,
 			max = -Infinity;
+			
+		
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
@@ -239,13 +241,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			$("#txt").html(html);
 		}
 		
-		function resize(){
-			var width = parseInt(d3.select("#vis").style("width")),
-				height = parseInt(d3.select("#vis").style("height"));
-				
-			console.log(width + "x" + height);
-		}
-		
 		function renderBoxplot(data){
 			
 			var chart = d3.box()
@@ -253,17 +248,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				.height(height)	
 				.domain([min,max])
 				.showLabels(labels);
-				
-			console.log(data[0]);
 			
-			d3.select(window).on('resize',resize);
-			
-			var svg = d3.select("#vis").append("svg")
+			var svg = d3.select("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom + 40)
-				.attr("class", "box")    
+				.attr("class", "box")
+				//.attr("viewbox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom + 40))
+				//.attr("preserveAspectRatio","xMidyMid")
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			
+			var aspect = (width + margin.left + margin.right)/(height + margin.top + margin.bottom + 40);
+			
+			d3.select(window).on('resize', function() {
+				
+				var swidth = parseInt(d3.select('#vis').style("width").replace("px","")) - margin.left - margin.right;
+				var sheight = parseInt(d3.select('#vis').style("height").replace("px","")) - margin.top - margin.bottom;
+	
+				
+				var scale = (swidth)/(width+margin.left + margin.right);
+				
+				console.log(swidth + "X" + sheight);
+				var targetWidth = swidth;
+				
+				d3.select('#graph')
+					.attr("width", targetWidth + margin.left + margin.right)
+					.attr("height", targetWidth/aspect)
+					.select("g")
+					.attr("transform","scale(" + scale + "),translate(" + margin.left + "," + margin.top + ")");
+			});
 			
 			// the x-axis
 			var x = d3.scale.ordinal()	   
@@ -318,17 +331,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					.attr("transform", function(d) {
 						return "rotate(-45)" 
 						});
-			
-			var t0 = Date.now();
-			
-			/*
-			d3.timer(function(){	
-				var t = Date.now() - t0;
-				svg.attr("transform", "translate(400,400),rotate(" + (t%360)/2 + ")");
-			});
-			*/
-			//svg.selectAll("text").attr("transform", "rotate(-90),translate(-100,0)");
-			//svg.attr("transform", "translate(" + width + ",0),rotate(90)");
 			
 		}
 		

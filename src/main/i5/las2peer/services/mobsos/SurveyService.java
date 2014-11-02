@@ -2914,7 +2914,7 @@ public class SurveyService extends Service {
 		for(int i=1;i<=cols;i++){
 			headline += rs.getMetaData().getColumnName(i);
 			rs.getMetaData().getColumnTypeName(i);
-			if(i<cols) headline += ";";
+			if(i<cols) headline += ",";
 		}
 		res += headline + "\n";
 
