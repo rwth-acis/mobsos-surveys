@@ -50,6 +50,7 @@ import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Produces;
 import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
+import i5.las2peer.security.Context;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
 
@@ -95,7 +96,9 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.bouncycastle.crypto.digests.MD5Digest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -193,7 +196,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
-			
+
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -299,6 +302,10 @@ public class SurveyService extends Service {
 	@Path("questionnaires")
 	public HttpResponse createQuestionnaire(@ContentParam String content){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to create questionnaires!");
+			noauth.setStatus(401);
+		}
 		String onAction = "creating new questionnaire";
 
 		try {
@@ -355,6 +362,11 @@ public class SurveyService extends Service {
 	@DELETE
 	@Path("questionnaires")
 	public HttpResponse deleteQuestionnaires(){
+		
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaires!");
+			noauth.setStatus(401);
+		}
 
 		String onAction = "deleting all questionnaires";
 
@@ -378,6 +390,24 @@ public class SurveyService extends Service {
 			try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("userinfo")
+	public HttpResponse getUserInfo(){
+
+		String onAction = "retrieving user info";
+		try {
+			JSONObject uinfo = getActiveUserInfo();
+
+			HttpResponse r = new HttpResponse(uinfo.toJSONString());
+			r.setStatus(200);
+			return r;
+
+		} catch (ParseException e) {
+			return internalError(onAction + ": " + e.getMessage());
 		}
 	}
 
@@ -456,7 +486,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-		} catch (SQLException e1) {
+		} catch (Exception e1) {
 			return internalError(onAction);
 		}
 		// adapt template to specific questionnaire
@@ -497,6 +527,11 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}")
 	public HttpResponse updateQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to update questionnaire!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "updating questionnaire " + id;
 
 		try{
@@ -581,6 +616,11 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}")
 	public HttpResponse deleteQuestionnaire(@PathParam("id") int id){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaire!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "deleting questionnaire " + id;
 
 		try{
@@ -724,6 +764,11 @@ public class SurveyService extends Service {
 	@Path("questionnaires/{id}/form")
 	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to upload questionnaire form!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "uploading form for questionnaire " + id;
 
 		try{
@@ -971,6 +1016,11 @@ public class SurveyService extends Service {
 	@Path("surveys")
 	public HttpResponse createSurvey(@ContentParam String data)
 	{
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to create surveys!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "creating new survey";
 
 		try {
@@ -1027,6 +1077,11 @@ public class SurveyService extends Service {
 	@Path("surveys")
 	public HttpResponse deleteSurveys(){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to delete surveys!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "deleting surveys";
 
 		try{
@@ -1157,7 +1212,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-		} catch (SQLException e1) {
+		} catch (Exception e1) {
 			return internalError(onAction);
 		}
 
@@ -1198,6 +1253,11 @@ public class SurveyService extends Service {
 	@Path("surveys/{id}")
 	public HttpResponse updateSurvey(@PathParam("id") int id, @ContentParam String content){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to update survey!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "updating survey " + id;
 
 		try{
@@ -1284,6 +1344,11 @@ public class SurveyService extends Service {
 	@Path("surveys/{id}")
 	public HttpResponse deleteSurvey(@PathParam("id") int id){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to delete survey!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "deleting survey " + id;
 
 		try{
@@ -1347,7 +1412,7 @@ public class SurveyService extends Service {
 	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	@Path("surveys/{id}/form")
+	@Path("surveys/{id}/questionnaire")
 	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
@@ -1359,7 +1424,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-		} catch (SQLException e1) {
+		} catch (Exception e1) {
 			return internalError(onAction);
 		}
 
@@ -1634,6 +1699,11 @@ public class SurveyService extends Service {
 	@Path("surveys/{id}/questionnaire")
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to set questionnaire for survey!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "setting questionnaire for survey " + id;
 
 		try{
@@ -1750,7 +1820,7 @@ public class SurveyService extends Service {
 				result.setStatus(404);
 				return result;
 			}
-		} catch (SQLException e1) {
+		} catch (Exception e) {
 			return internalError(onAction);
 		}
 
@@ -1959,7 +2029,12 @@ public class SurveyService extends Service {
 
 			// after all validation finally persist survey response in database
 			int surveyId = id;
-			long userId = this.getActiveAgent().getId();
+			
+			String sub = (String) getActiveUserInfo().get("sub");
+			
+			if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+				sub += now.getTime();
+			}
 
 			Connection conn = null;
 			PreparedStatement stmt = null;
@@ -1975,7 +2050,7 @@ public class SurveyService extends Service {
 					String qkey = it.next();
 					String qval = ""+answerFieldTable.get(qkey);
 
-					stmt.setLong(1, userId);
+					stmt.setString(1,sub);
 					stmt.setInt(2,surveyId);
 					stmt.setString(3, qkey);
 					stmt.setString(4, qval);
@@ -2052,6 +2127,11 @@ public class SurveyService extends Service {
 	@Path("surveys/{id}/responses")
 	public HttpResponse deleteSurveyResponses(@PathParam("id") int id){
 
+		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			HttpResponse noauth = new HttpResponse("Please authenticate to delete responses for survey!");
+			noauth.setStatus(401);
+		}
+		
 		String onAction = "deleting responses for survey " + id;
 
 		try{
@@ -2099,7 +2179,7 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
-		
+
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 		html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -2110,11 +2190,11 @@ public class SurveyService extends Service {
 		return result;
 
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("/")
-	public HttpResponse serveIndexPage(){
+	public HttpResponse serveIndexPage(@HeaderParam(name="accept-language", defaultValue="") String lang){
 		String onAction = "serving index page";
 
 		String html = "";
@@ -2124,6 +2204,12 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
+
+		// localize template
+		html = i18n(html, lang);
+
+		// fill in placeholders with concrete values
+		html = fillPlaceHolder(html,"EP_URL", epUrl);
 		
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
@@ -2843,9 +2929,9 @@ public class SurveyService extends Service {
 	 * @param id int survey or questionnaire id
 	 * @param type int 0 for survey, 1 for questionnaire
 	 * @return int -1 if questionnaire/survey does not exist, 0 if active agent is not owner, 1 if active agent is owner
-	 * @throws SQLException 
+	 * @throws Exception 
 	 */
-	private int checkExistenceOwnership(int id, int type) throws SQLException{
+	private int checkExistenceOwnership(int id, int type) throws Exception{
 
 		try{
 			Connection c = null;
@@ -2874,7 +2960,10 @@ public class SurveyService extends Service {
 				String owner = rs.getString(1);
 
 				// active agent is not owner.
-				if(!owner.equals(""+this.getActiveAgent().getId())){
+				
+				String sub = (String) getActiveUserInfo().get("sub");
+				
+				if(!owner.equals(sub)){
 					return 0;
 				} 
 				// active agent is owner.
@@ -2916,7 +3005,7 @@ public class SurveyService extends Service {
 			rs.getMetaData().getColumnTypeName(i);
 			if(i<cols) headline += ",";
 		}
-		res += headline + "\n";
+		res += headline + "\r\n";
 
 		// now compile answer data; stick to RFC 4180
 		String data = "";
@@ -2940,7 +3029,7 @@ public class SurveyService extends Service {
 				}
 				if(i<cols) data += ",";
 			}
-			data += "\n";
+			data += "\r\n";
 		}
 		res += data.trim();
 		return res;
@@ -3279,19 +3368,22 @@ public class SurveyService extends Service {
 	/**
 	 * Stores a new survey described with JSON into the MobSOS database.
 	 * The MobSOS database thereby generates a new id returned by this method.
+	 * @throws ParseException 
 	 */
-	private int storeNewSurvey(JSONObject survey) throws IllegalArgumentException, SQLException{
+	private int storeNewSurvey(JSONObject survey) throws IllegalArgumentException, SQLException, ParseException{
 
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
+		
+		String sub = (String) getActiveUserInfo().get("sub");
 
 		try {
 			conn = dataSource.getConnection();
 			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".survey(owner, organization, logo, name, description, resource, start, end, lang ) values (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
 			stmt.clearParameters();
-			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
+			stmt.setString(1, sub); // active agent becomes owner automatically
 			stmt.setString(2, (String) survey.get("organization"));
 			stmt.setString(3, (String) survey.get("logo"));
 			stmt.setString(4, (String) survey.get("name"));
@@ -3325,9 +3417,12 @@ public class SurveyService extends Service {
 	 * Stores a new questionnaire described with JSON into the MobSOS database.
 	 * The MobSOS database thereby generates a new id returned by this method.
 	 * @throws UnsupportedEncodingException 
+	 * @throws ParseException 
 	 */
-	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException, UnsupportedEncodingException{
+	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException, UnsupportedEncodingException, ParseException{
 
+		String sub = (String) getActiveUserInfo().get("sub");
+		
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
@@ -3337,7 +3432,7 @@ public class SurveyService extends Service {
 			stmt = conn.prepareStatement("insert into " + jdbcSchema + ".questionnaire(owner, organization, logo, name, description, lang) values (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 
 			stmt.clearParameters();
-			stmt.setString(1, ""+this.getActiveAgent().getId()); // active agent becomes owner automatically
+			stmt.setString(1, sub); // active agent becomes owner automatically
 			stmt.setString(2, (String) questionnaire.get("organization"));
 			stmt.setString(3, (String) questionnaire.get("logo"));
 			stmt.setString(4, (String) questionnaire.get("name"));
@@ -3813,6 +3908,32 @@ public class SurveyService extends Service {
 
 		} catch(Exception e){
 			throw e;
+		}
+	}
+
+	private JSONObject getActiveUserInfo() throws ParseException {
+		
+		if(this.getActiveAgent() instanceof UserAgent){
+			UserAgent me = (UserAgent) this.getActiveAgent();
+			JSONObject o;
+			
+			if(me.getUserData() != null){	
+				o = (JSONObject) JSONValue.parseWithException((String) me.getUserData());
+			} else {
+				o = new JSONObject();
+				
+				if(getActiveNode().getAnonymous().getId() == getActiveAgent().getId()){
+					o.put("sub","anonymous");		
+				} else {
+				
+					String md5ide = new String(""+me.getId());
+					o.put("sub", md5ide);
+				}
+			}
+			return o;
+
+		} else {
+			return new JSONObject();
 		}
 	}
 

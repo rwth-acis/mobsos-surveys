@@ -178,12 +178,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	</div>
 	
 	<!-- Container for operations on questionnaires -->
-	<div id="surv" class="container hidden">
+	<div id="surv" class="container">
 		
 		<div class="row" style="margin:30px 0px 0px 0px; ">
 			<h2 class="page-header">${surveys}</h2>
 			<p>
-				<div class="btn-group">
+				<div class="btn-group hidden" id="interact">
 					<button id="surveys_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
 					<button id="surveys_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> ${create_survey}</button>
 				</div>
@@ -229,7 +229,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 						for(i in d.questionnaires){
 							var q = d.questionnaires[i];
-							$("#i_survey_qpick").append("<option value='" + q.id + "'>" + q.name + "</option>")
+							$("#i_survey_qpick").append("<option value='" + q.id + "'>" + decodeURIComponent(q.name) + "</option>")
 						}
 					}, 
 					function(e){
@@ -237,7 +237,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					}
 				);
 				
-				$("#surv").removeClass("hidden");
+				$("#interact").removeClass("hidden");
 				$("#surveys_refresh").click(function(){
 					updateSurveys("");
 				});
@@ -271,8 +271,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				updateSurveys("");
 				
 			} else {
-				console.log("not signed in...");
-				console.log(result);
+				updateSurveys("");
+				
 			}
 		}
 		

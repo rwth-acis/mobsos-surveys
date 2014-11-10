@@ -149,15 +149,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
-			if(result === "success"){
-				
-				$("#form").removeClass("hidden");
-				update();
-				
-			} else {
-				console.log("not signed in...");
-				console.log(result);
-			}
+			update();
 		}
 		
 		function transferValue(scale){
@@ -233,6 +225,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			});
 			
 			$("#submit").click(collectAnswers);	
+			$("#form").removeClass("hidden");
 		}
 		
 		function collectAnswers(e){
@@ -265,7 +258,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				function(data, type){
 					console.log("Submitted Response successfully!")
 					$("#submit-msg").removeClass("hidden").removeClass("alert-danger").addClass("alert-success").html("Response submitted successfully.");
-					window.location.href = "${EP_URL}mobsos-surveys/surveys/${SURVEY.ID}/responses?access_token=" + window.localStorage["access_token"]
+					client.navigateAbsolute("${EP_URL}mobsos-surveys/surveys/${SURVEY.ID}/responses");
 				},
 				function(error){
 					console.log("Error");

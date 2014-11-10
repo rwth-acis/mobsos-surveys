@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- Container for operations on questionnaires -->
 	<div id="quest" class="container hidden">
 		<div class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="qname" class="h2"></span> <button id="i_quest_edit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button></h2>
+			<h2 class="page-header"><span id="qname" class="h2"></span> <button id="i_quest_edit" class="btn btn-default hidden"><span class="glyphicon glyphicon-edit"></span></button></h2>
 			<h4 id="qorg"></h4>
 			<p>
 			<div id="qdesc" class="well"></div>
@@ -110,21 +110,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				//console.log("signed in");
-				//console.log(oidc_provider_config);
-				//console.log(oidc_userinfo);
-				//console.log(window.localStorage["access_token"]);
-				
-				$("#quest").removeClass("hidden");
-				$("#i_quest_refresh").click(function(){
-					updateQuestionnaire();
-				});
-				
-				updateQuestionnaire();
+				$("#i_quest_edit").removeClass("hidden");
 			} else {
 				console.log("not signed in...");
 				console.log(result);
 			}
+			updateQuestionnaire();
 		}
 		
 		function updateQuestionnaire(){
@@ -135,10 +126,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#qorg").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
 					$("#qdesc").html(""+decodeURIComponent(data.description));
 					
+					// check owner
+					
+					if(!client.isAnonymous()){
+						console.log("owner: " + data.owner + " oidc sub: " + oidc_userinfo.sub);
+					} else {
+						console.log("owner: " + data.owner + " me: anonymous");
+					}
+					
 					client.getQuestionnaireForm(data.id,
 						function(data,type){
 							//console.log("Questionnaire XML");
 							//console.log(data);
+							
+							
 							
 							var pages = data.getElementsByTagName("Page");
 							var ipages = 0;
@@ -203,6 +204,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							$("#pc").html(pages.length);
 							$("#ip").html(ipages);
 							$("#qp").html(qpages);
+							$("#quest").removeClass("hidden");
 						},
 						function(error){
 							console.log(error);

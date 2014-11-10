@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>las2peer Sign-in</title>
+	<title>MobSOS Surveys - ${survey} ${ID}</title>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,53 +47,74 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </head>
 <body>
 
-	<div id="oidc" class="container">
-		<!-- OpenID Connect Button: add HTML element representing button -->
-		<span class="oidc-signin"
-			data-callback="signinCallback"
-			data-name="${OIDC_PROV_NAME}"
-			data-size="default"
-			data-logo="${OIDC_PROV_LOGO}"
-			data-server="${OIDC_PROV_URL}"
-			data-clientid="${OIDC_CLNT_ID}"
-			data-scope="openid phone email address profile">
-		</span>
-		
-	</div>
+	<!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
+          </div>
+          <div class="navbar-collapse collapse">
+			  <ul class="nav navbar-nav">
+               <li><a href="${EP_URL}mobsos-surveys/questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}mobsos-surveys/surveys">${surveys}</a></li>
+             </ul>   
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+					data-callback="signinCallback"
+					data-name="${OIDC_PROV_NAME}"
+					data-size="sm"
+					data-logo="${OIDC_PROV_LOGO}"
+					data-server="${OIDC_PROV_URL}"
+					data-clientid="${OIDC_CLNT_ID}"
+					data-scope="openid phone email address profile">
+              </span>
+			
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
 	
-	<br/>
-	<br/>
-	
-	<!-- Container for options after successful sign in -->
-	<div id="options" class="container">
-		<div class="row">
-			<img width="200" src="https://dl.dropboxusercontent.com/u/17405777/las2peer-logo.svg" alt="..." class="img-rounded">
-			<h1>Welcome to MobSOS Surveys<span id="name">!</span></h2>
+	<!-- Container for operations on questionnaires -->
+	<div id="content" class="container">
+		<div class="row" style="margin:30px 0px 0px 0px;">
+			<div id="start" class="jumbotron">
+				MobSOS Surveys? I love it.
+			</div>
 		</div>
 	</div>
+	
+	
 	
 	<!-- import jQuery for AJAX calls (must) -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 	
 	<!-- import Bootstrap for responsive UI (must) -->
 	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-		
+	
+	<!-- import MobSOS Surveys lib -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
+	
+	<!-- import moment.js for displaying times and dates -->
+	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
+	
 	<script type="text/javascript">
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
-				
-				$("#name").html("," + oidc_userinfo.name + "!");
+			
+				$("#survey").removeClass("hidden");
 				
 			} else {
-				$("#auth-status").html("Sign in!");
 				console.log("not signed in...");
 				console.log(result);
 			}
 		}
-		
-		
+	
 	</script>
 	  
 	<!-- add this script element right before closing tag </body> -->

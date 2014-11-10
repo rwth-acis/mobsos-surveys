@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<![endif]-->
 	
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-	<style type="text/css">
+	<style id="svg_css" type="text/css">
 		.box {
 		  font: 10px sans-serif;
 		}
@@ -118,17 +118,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
 	
 	<!-- Container for operations on questionnaires -->
-	<div id="responses" class="container hidden">
+	<div id="responses" class="container">
+		
 		<div id="vis" class="row" style="margin:30px 0px 0px 0px;">
 			<h2 class="page-header"><span id="s_name" class="h2"></span></h2>
 			<h4 id="s_org"></h4>
-			
+			<p>
+				
+				<button id="responses_download" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-list-alt"></span> ${download_dataset}</button>
+				<button id="responses_boxplot" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-picture"></span> ${download_boxplot}</button>
+				<a id="dl" href="#" class="hidden"></a>
+					
+			</p>
+			<h4 id="n"></h4>
 			<svg id="graph" />
 			<div id="txt"></div>
 			
-			<p>
-				<button id="responses_download" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-cloud-download"></span> ${download_dataset}</button>
-			</p>
+			
 		</div>
 	</div>
 	
@@ -172,28 +178,81 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
+				
+			} else {
+				
+			}
 			
-				$("#responses").removeClass("hidden");
-				$("#responses_download").click(function(){
+			$("#responses_download").click(function(){
 					client.getSurveyResponses(${ID},
 						function(d,t){
-							console.log(d);
+
+							pd = encodeURIComponent(d);
+							
+							var a = $("#dl");
+							a.attr("download","survey-responses-${ID}.csv");
+							a.attr("href","data:application/csv;charset=utf-8,"+pd);
+							a[0].click();
+							
+							
 						},
 						function(e){
 							console.log("Error: ");
 							console.log(e);
 						}
 					);
-				});
+			});
+			$("#responses_boxplot").click(function(){
 				
-				updateSurvey();
-			} else {
-				console.log("not signed in...");
-				console.log(result);
-			}
+				var css = $("#svg_css").html();
+				
+				console.log(css);
+				
+				var jsvg = $("#graph");
+				var jse = $("<style id='genstyle' type='text/css'/>");
+				jsvg.append(jse);
+				
+				var svg = document.getElementById("graph");
+				
+				var docu = new DOMParser().parseFromString('<xml></xml>',  "application/xml")
+				var cData = docu.createCDATASection(css);
+				
+				var sty = document.getElementById("genstyle");
+				sty.appendChild(cData);
+				
+				//get svg element.
+
+				//get svg source.
+				var serializer = new XMLSerializer();
+				var source = serializer.serializeToString(svg);
+
+				//add name spaces.
+				if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+					source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+				}
+				if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+					source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+				}
+
+				//add xml declaration
+				source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+				//convert svg source to URI data scheme.
+				var url = "data:image/svg+xml;charset=utf-8,"+decodeURIComponent(source);
+				
+				var a = $("#dl");
+							a.attr("download","survey-responses-${ID}.boxplot.svg");
+							a.attr("href",url);
+							a[0].click();
+				
+				
+
+			});
+			
+			update();
 		}
 		
-		function updateSurvey(){
+		function update(){
 			
 			client.getSurvey(${ID},
 				function(data,type){
@@ -210,9 +269,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					console.log("CSV data from service:");
 					console.log(d);
 					
-					data = parseCSV(d);
+					csvd = parseCSV(d);
+					console.log("CSV");
+					console.log(csvd);
 					
-					var res = separateData(data);
+					var res = separateData(csvd);
 					
 					renderBoxplot(res.num);
 					
@@ -268,7 +329,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				var scale = (swidth)/(width+margin.left + margin.right);
 				
-				console.log(swidth + "X" + sheight);
 				var targetWidth = swidth;
 				
 				d3.select('#graph')
@@ -280,7 +340,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			// the x-axis
 			var x = d3.scale.ordinal()	   
-				.domain( data.map(function(d) { console.log(d); return d[0] } ) )	    
+				.domain( data.map(function(d) {return d[0] } ) )	    
 				.rangeRoundBands([0 , width], 0.7, 0.3); 		
 
 			var xAxis = d3.svg.axis()
@@ -362,6 +422,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			var data = [];
 			
 			// first extract field names and prepare data cells
+			console.log();
+			$("#n").html("N=" + (csv.length-1));
+			
 			for(var i=2; i<csv[0].length;i++){
 				var fname = csv[0][i];
 				

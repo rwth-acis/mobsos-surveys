@@ -136,12 +136,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	</div>
 	
 	<!-- Container for operations on questionnaires -->
-	<div id="quest" class="container hidden">
+	<div id="quest" class="container">
 			
 		<div class="row" style="margin:30px 0px 0px 0px; ">
 			<h2 class="page-header">${questionnaires}</h2>
 			<p>
-				<div class="btn-group">
+				<div class="btn-group hidden" id="interact">
 					<button id="quest_refresh" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
 					<button id="quest_create" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> ${create_questionnaire}</button>
 				</div>
@@ -172,7 +172,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		function signinCallback(result) {
 			if(result === "success"){
 				
-				$("#quest").removeClass("hidden");
+				$("#interact").removeClass("hidden");
 				$("#quest_refresh").click(function(){
 					updateQuestionnaires("");
 				});
@@ -245,6 +245,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			} else {
 				console.log("not signed in...");
 				console.log(result);
+				updateQuestionnaires("");
+				
 			}
 		}
 		
@@ -258,12 +260,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					$('#questionnaires').html("");
 					
+					client.getUserInfo(
+							function(d){
+								console.log("User Info from Service");
+								console.log(d);
+							},
+							function(e){
+								console.log(e);
+							}
+						);
+						
 					for(i=0;i<qs.length;i++){
 						
 						var q = qs[i];
 						var lang = q.lang.split("-")[0];
 					
-						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>");
+						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /><span class='delete hidden glyphicon glyphicon-trash pull-right'></span></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>");
+						
+						/*
+						var html = "<a href='#' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /><span class='delete glyphicon glyphicon-trash hidden pull-right' id='" + q.id + "'></span></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>";
+					
+						$('#questionnaires').append(html);
+						*/
+					}
+					
+					if(!client.isAnonymous()){
+						$(".delete").removeClass("hidden").click(function(){
+							var id = $(this).attr("id");
+							console.log("Delete questionnaire " + id);
+							
+							client.deleteQuestionnaire(id,
+								function(data,type){
+									console.log(data);
+									//reload page
+									window.location.reload();
+								},
+								function(error){
+									console.log(error);
+								}
+							);
+							
+						});
 					}
 				},
 				function(error){
@@ -316,7 +353,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = 'http://dbis.rwth-aachen.de/~renzel/mobsos/lib/js/oidc/oidc-button.js';
+       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

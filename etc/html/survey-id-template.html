@@ -79,9 +79,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
 	
 	<!-- Container for operations on questionnaires -->
-	<div id="survey" class="container hidden">
+	<div id="survey" class="container ">
 		<div class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="s_name" class="h2"></span> <button id="i_survey_edit" class="btn btn-default"><span class="glyphicon glyphicon-edit"></span></button></h2>
+			<h2 class="page-header"><span id="s_name" class="h2"></span> <button id="i_survey_edit" class="btn btn-default hidden"><span class="glyphicon glyphicon-edit"></span></button></h2>
 			<h4 id="s_org"></h4>
 			<table class="table table-bordered">
 				<tr><td colspan="2" id="s_desc"></td></tr>
@@ -117,20 +117,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
+				$("#i_survey_edit").removeClass("hidden");
+			} 
 			
-				$("#survey").removeClass("hidden");
-				$("#i_survey_part").click(function(){
-					window.location.href = window.location.href + "/form?access_token=" + window.localStorage["access_token"];
-				});
-				$("#i_survey_resp").click(function(){
-					window.location.href = window.location.href + "/responses?access_token=" + window.localStorage["access_token"];
-				});
-				
-				updateSurvey();
-			} else {
-				console.log("not signed in...");
-				console.log(result);
-			}
+			$("#i_survey_part").click(function(){
+					client.navigateTo("questionnaire");
+					//window.location.href = window.location.href + "/questionnaire?access_token=" + window.localStorage["access_token"];
+			});
+			
+			$("#i_survey_resp").click(function(){
+				client.navigateTo("responses");
+				//window.location.href = window.location.href + "/responses?access_token=" + window.localStorage["access_token"];
+			});
+			
+			updateSurvey();
 		}
 		
 		function updateSurvey(){
