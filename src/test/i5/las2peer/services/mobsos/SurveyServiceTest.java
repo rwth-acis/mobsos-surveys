@@ -1312,7 +1312,7 @@ public class SurveyServiceTest {
 
 			// now we are ready to download questionnaire form for given survey.
 			Pair lang = new Pair("accept-language","de-DE"); 
-			ClientResponse qsfres=c1.sendRequest("GET", su.getPath() + "/form","","","text/html",new Pair[]{lang});
+			ClientResponse qsfres=c1.sendRequest("GET", su.getPath() + "/questionnaire","","","text/html",new Pair[]{lang});
 			assertEquals(200, qsfres.getHttpCode());
 
 

@@ -183,7 +183,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires")
-	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
+	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang){
 		String onAction = "retrieving questionnaires HTML";
 
 		// only respond with template; nothing to be adapted
@@ -852,7 +852,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys")
-	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query){
+	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="") String lang){
 
 		String onAction = "retrieving surveys HTML";
 
@@ -879,44 +879,6 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
-
-	/**
-	 * localizes the given String t according to locale l. If no resource bundle exists for locale l, fall back to English.
-	 * Input string t is expected to contain placeholders ${k}, where k is a key defined in the ResourceBundle.
-	 * 
-	 * @param t a String to be localized
-	 * @param l a Locale
-	 * @return
-	 */
-	private String i18n(String t, String lang){
-
-		// now parse locales from accept-language header
-		Pattern p = Pattern.compile("[a-z]+-[A-Z]+");
-		Matcher m = p.matcher(lang);
-
-		// do not iterate over all locales found, but only use first option with highest preference.
-
-		Locale l= null;
-
-		if(m.find()){
-			String[] tokens = m.group().split("-");
-			l = new Locale(tokens[0], tokens[1]);
-			//System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
-		}
-
-		ResourceBundle messages = ResourceBundle.getBundle("MessageBundle", l);
-		Enumeration<String> e = messages.getKeys();
-
-		while(e.hasMoreElements()){
-
-			String key = e.nextElement();
-			String translation = messages.getString(key);
-			t = t.replaceAll("\\$\\{"+key+"\\}",escapeHtml4(translation));
-		}
-
-		return t;
-	}
-
 
 	/**
 	 * TODO: write documentation 
@@ -3909,6 +3871,43 @@ public class SurveyService extends Service {
 		} catch(Exception e){
 			throw e;
 		}
+	}
+	
+	/**
+	 * localizes the given String t according to locale l. If no resource bundle exists for locale l, fall back to English.
+	 * Input string t is expected to contain placeholders ${k}, where k is a key defined in the ResourceBundle.
+	 * 
+	 * @param t a String to be localized
+	 * @param l a Locale
+	 * @return
+	 */
+	private String i18n(String t, String lang){
+
+		// now parse locales from accept-language header
+		Pattern p = Pattern.compile("[a-z]+-[A-Z]+");
+		Matcher m = p.matcher(lang);
+
+		// do not iterate over all locales found, but only use first option with highest preference.
+
+		Locale l= null;
+
+		if(m.find()){
+			String[] tokens = m.group().split("-");
+			l = new Locale(tokens[0], tokens[1]);
+			//System.out.println("Locale: " + l.getDisplayCountry() + " " + l.getDisplayLanguage());
+		}
+
+		ResourceBundle messages = ResourceBundle.getBundle("MessageBundle", l);
+		Enumeration<String> e = messages.getKeys();
+
+		while(e.hasMoreElements()){
+
+			String key = e.nextElement();
+			String translation = messages.getString(key);
+			t = t.replaceAll("\\$\\{"+key+"\\}",escapeHtml4(translation));
+		}
+
+		return t;
 	}
 
 	private JSONObject getActiveUserInfo() throws ParseException {
