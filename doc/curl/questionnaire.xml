@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
+		  xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	
+	<qu:Page name="Introduction" 
+	      xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			How cool is ${SURVEY.RESOURCE}? Help us rate...
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Coolness" 
+	      qid="COOL.1"
+	      minval="0" 
+	      maxval="10" 
+	      minlabel="totally disagree" 
+	      maxlabel="totally agree"
+		  required="true"		  
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} is cool.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Comments" 
+	      qid="COOL.C"
+		  required="true"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			What else can you tell us about ${SURVEY.RESOURCE}?
+		</qu:Instructions>
+	</qu:Page>
+	
+</qu:Questionnaire>

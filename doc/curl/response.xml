@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<QuestionnaireAnswer xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd">
+	<Question qid="COOL.1">1</Question>
+	<Question qid="COOL.C">Et jeht auch mit XML, Du Otto!</Question>
+</QuestionnaireAnswer>
