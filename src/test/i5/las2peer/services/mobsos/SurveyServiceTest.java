@@ -219,6 +219,7 @@ public class SurveyServiceTest {
 			// list only questionnaire URLs
 			try {
 				ClientResponse result=c1.sendRequest("GET", "mobsos-surveys/questionnaires?full=0","");
+				
 				//System.out.println("List of Questionnaire URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
@@ -467,6 +468,8 @@ public class SurveyServiceTest {
 			// check if first questionnaire URL is a valid URL, then extract path
 			URL u = new URL(fullurl);
 			String pathonly = u.getPath();
+			
+			System.out.println("testUpdateExistingQuestionnaire: " + u);
 
 			// use path to get the questionnaire
 			ClientResponse result=c1.sendRequest("GET", u.getPath(),"","","application/json",new Pair[]{});

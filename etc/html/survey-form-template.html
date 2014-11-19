@@ -81,8 +81,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
           <div class="navbar-collapse collapse">
 			  <ul class="nav navbar-nav">
-               <li><a href="${EP_URL}mobsos-surveys/questionnaires">${questionnaires}</a></li>
-			   <li><a href="${EP_URL}mobsos-surveys/surveys">${surveys}</a></li>
+               <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
              </ul>
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
@@ -140,7 +140,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
 		
 	<script type="text/javascript">
 		
@@ -258,7 +258,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				function(data, type){
 					console.log("Submitted Response successfully!")
 					$("#submit-msg").removeClass("hidden").removeClass("alert-danger").addClass("alert-success").html("Response submitted successfully.");
-					client.navigateAbsolute("${EP_URL}mobsos-surveys/surveys/${SURVEY.ID}/responses");
+					client.navigateAbsolute("${EP_URL}surveys/${SURVEY.ID}/responses");
 				},
 				function(error){
 					console.log("Error");
@@ -276,7 +276,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

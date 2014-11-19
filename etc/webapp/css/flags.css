@@ -1,0 +1,10 @@
+.flag {
+	width: 16px;
+	height: 11px;
+	background:url(https://dl.dropboxusercontent.com/u/17405777/mobsos/flags.png) no-repeat
+}
+
+.flag.flag-de {background-position: -16px 0}
+.flag.flag-es {background-position: -32px 0}
+.flag.flag-fr {background-position: 0 -11px}
+.flag.flag-en {background-position: -16px -11px}

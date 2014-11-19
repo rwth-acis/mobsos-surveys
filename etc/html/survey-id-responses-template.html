@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<![endif]-->
 	
 	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	
 	<style id="svg_css" type="text/css">
 		.box {
 		  font: 10px sans-serif;
@@ -82,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		  stroke: #000;
 		  shape-rendering: crispEdges;
 		}
-		</style>
+	</style>
 </head>
 <body>
 
@@ -100,8 +101,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
           <div class="navbar-collapse collapse">
 			  <ul class="nav navbar-nav">
-               <li><a href="${EP_URL}mobsos-surveys/questionnaires">${questionnaires}</a></li>
-			   <li><a href="${EP_URL}mobsos-surveys/surveys">${surveys}</a></li>
+               <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
              </ul>   
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
@@ -138,8 +139,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</div>
 	</div>
 	
-	
-	
 	<!-- import jQuery for AJAX calls (must) -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 	
@@ -147,16 +146,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
 	
 	<!-- import moment.js for displaying times and dates -->
-	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/moment.min.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>
 	
 	<!-- import d3s for visualization of survey responses -->
 	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 	
 	<!-- import d3s boxplot visualization -->
-	<script type="text/javascript" src="https://dl.dropboxusercontent.com/u/17405777/mobsos/boxplot.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/boxplot.js"></script>
 	
 	<script type="text/javascript">
 		
@@ -274,6 +273,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					console.log(csvd);
 					
 					var res = separateData(csvd);
+					
+					console.log(res.num);
+					console.log(res.txt);
 					
 					renderBoxplot(res.num);
 					
@@ -401,8 +403,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var include = true;
 				
 				for(k in row[1]){
+				
+					console.log("Detected field " + row[0][k] + " with value " + row[1][k]);
+					
 					if(row[1][k] !== '' && !parseInt(row[1][k])){
-						//console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
+						console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
 						include = false;
 					}
 				}
@@ -475,7 +480,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = 'https://dl.dropboxusercontent.com/u/17405777/oidc-graz/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

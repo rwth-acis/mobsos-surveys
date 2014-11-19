@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package i5.las2peer.services.mobsos;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 import i5.las2peer.api.Service;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
@@ -42,7 +41,6 @@ import i5.las2peer.restMapper.annotations.ContentParam;
 import i5.las2peer.restMapper.annotations.DELETE;
 import i5.las2peer.restMapper.annotations.GET;
 import i5.las2peer.restMapper.annotations.HeaderParam;
-import i5.las2peer.restMapper.annotations.HttpHeaders;
 import i5.las2peer.restMapper.annotations.POST;
 import i5.las2peer.restMapper.annotations.PUT;
 import i5.las2peer.restMapper.annotations.Path;
@@ -50,7 +48,6 @@ import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Produces;
 import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
-import i5.las2peer.security.Context;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
 
@@ -72,7 +69,6 @@ import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -96,9 +92,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.bouncycastle.crypto.digests.MD5Digest;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -110,8 +104,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
-
-import com.mysql.jdbc.EscapeTokenizer;
 
 /**
  * 
@@ -147,7 +139,7 @@ import com.mysql.jdbc.EscapeTokenizer;
 public class SurveyService extends Service {
 
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
-
+	
 	private static BasicDataSource dataSource;
 
 	private DocumentBuilder parser;
@@ -157,14 +149,31 @@ public class SurveyService extends Service {
 	private String epUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName, jdbcUrl, jdbcSchema,jdbcLogin, jdbcPass;
 	private String oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
+	
+	private String staticContentUrl;
 
 	public SurveyService(){
 
 		// set values from configuration file
 		this.setFieldValues();
+		
+		// make sure epUrl and staticContentUrl have trailing slash
+		if(!epUrl.endsWith("/")){
+			epUrl += "/";
+		}
+		
+		if(staticContentUrl == null || staticContentUrl.isEmpty()){
+			staticContentUrl = epUrl;
+		} else {
+			if(!staticContentUrl.endsWith("/")){
+				staticContentUrl += "/";
+			}
+		}
 
+		// include this service into las2peer monitoring
 		this.monitor = true;
 
+		// prepare database connection pooling and XML infrastructure
 		try {
 			setupDataSource();
 			initXMLInfrastructure();
@@ -172,10 +181,6 @@ public class SurveyService extends Service {
 			e.printStackTrace();
 		}
 
-		printDataSourceStats(dataSource);
-
-		// print out REST mapping for this service
-		//System.out.println(getRESTMapping());
 	}
 
 	// ============= QUESTIONNAIRE-RELATED RESOURCES ==============
@@ -196,6 +201,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
@@ -261,11 +267,11 @@ public class SurveyService extends Service {
 				while(rs.next()){
 					if(full>0){
 						JSONObject questionnaire = readQuestionnaireFromResultSet(rs);
-						questionnaire.put("url", epUrl + "mobsos-surveys/questionnaires/" + questionnaire.get("id"));
+						questionnaire.put("url", epUrl + "questionnaires/" + questionnaire.get("id"));
 						qs.add(questionnaire);	
 					} else {
 						String id = rs.getString("id");
-						qs.add(epUrl + "mobsos-surveys/questionnaires/" + id);
+						qs.add(epUrl + "questionnaires/" + id);
 					}
 				}
 
@@ -314,7 +320,7 @@ public class SurveyService extends Service {
 			// first parse passed questionnaire data 
 			try{
 				o = parseQuestionnaire(content);
-			} catch (IllegalArgumentException | ParseException e){
+			} catch (IllegalArgumentException e){
 				// if passed data is invalid, respond error to user
 				HttpResponse result = new HttpResponse("Invalid questionnaire! " + e.getMessage());
 				result.setHeader("Content-Type", MediaType.TEXT_PLAIN);
@@ -329,7 +335,7 @@ public class SurveyService extends Service {
 				// respond to user with newly created id/URL
 				JSONObject r = new JSONObject();
 				r.put("id",qid);
-				r.put("url",epUrl + "mobsos-surveys/questionnaires/" + qid);
+				r.put("url",epUrl + "questionnaires/" + qid);
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
 				result.setStatus(201);
@@ -500,6 +506,7 @@ public class SurveyService extends Service {
 			// fill in placeholders with values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -565,7 +572,7 @@ public class SurveyService extends Service {
 
 				try{
 					o = parseQuestionnaire(content);
-				} catch (IllegalArgumentException | ParseException e){
+				} catch (IllegalArgumentException e){
 					// respond with 400, if content for updated questionnaire is not valid
 					HttpResponse result = new HttpResponse("Invalid questionnaire data! " + e.getMessage());
 					result.setStatus(400);
@@ -866,6 +873,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -937,11 +945,11 @@ public class SurveyService extends Service {
 				while(rs.next()){
 					if(full>0){
 						JSONObject survey = readSurveyFromResultSet(rs);
-						survey.put("url", epUrl + "mobsos-surveys/surveys/" + survey.get("id"));
+						survey.put("url", epUrl + "surveys/" + survey.get("id"));
 						qs.add(survey);	
 					} else {
 						String id = rs.getString("id");
-						qs.add(epUrl + "mobsos-surveys/surveys/" + id);
+						qs.add(epUrl + "surveys/" + id);
 					}
 				}
 
@@ -991,7 +999,7 @@ public class SurveyService extends Service {
 			// first parse survey data passed by user
 			try{
 				o = parseSurvey(data);
-			} catch (IllegalArgumentException | ParseException e){
+			} catch (IllegalArgumentException e){
 				// if passed content is invalid for some reason, notify user
 
 				HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
@@ -1006,7 +1014,7 @@ public class SurveyService extends Service {
 				// respond to user with newly generated survey id/URL
 				JSONObject r = new JSONObject();
 				r.put("id", sid);
-				r.put("url",epUrl + "mobsos-surveys/surveys/" + sid);
+				r.put("url",epUrl + "surveys/" + sid);
 
 				HttpResponse result = new HttpResponse(r.toJSONString());
 				result.setHeader("Content-Type", MediaType.APPLICATION_JSON);
@@ -1188,6 +1196,7 @@ public class SurveyService extends Service {
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -1253,7 +1262,7 @@ public class SurveyService extends Service {
 				// parse and validate content. If invalid, return 400 (bad request)
 				try{
 					o = parseSurvey(content);
-				} catch (IllegalArgumentException | ParseException e){
+				} catch (IllegalArgumentException e){
 					HttpResponse result = new HttpResponse("Invalid survey data! " + e.getMessage());
 					result.setStatus(400);
 					return result;
@@ -1470,6 +1479,7 @@ public class SurveyService extends Service {
 
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -1628,7 +1638,6 @@ public class SurveyService extends Service {
 
 			// then generate answer link
 			URL answerUrl = new URL(epUrl+"surveys/"+id+"/answers"); 
-
 			String answerLink = "<a href=\""+ answerUrl + "\" id=\"return-url\" class=\"hidden\" ></a>";
 
 			// finally insert all generated parts into the resulting adapted HTML
@@ -1796,6 +1805,7 @@ public class SurveyService extends Service {
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html,"ID", ""+id);
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
+			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 			html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 			html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 			html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -2142,6 +2152,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 
+		html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 		html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -2172,6 +2183,7 @@ public class SurveyService extends Service {
 
 		// fill in placeholders with concrete values
 		html = fillPlaceHolder(html,"EP_URL", epUrl);
+		html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 		
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
@@ -2182,6 +2194,55 @@ public class SurveyService extends Service {
 		result.setStatus(200);
 		return result;
 
+	}
+	
+	// ================= Static Content Hosting ===================
+	// 
+	// The browser frontend part of this service, in particular the HTML code generated from templates in ./etc/html 
+	// links to static content (JS/CSS). This static content should be hosted on a regular, however highly available
+	// Web server. Therefore, this service foresees a configuration parameter staticContentUrl, which allows to specify
+	// a URL linking to a folder under which this static content is expected to be hosted. As a fallback solution, 
+	// MobSOS Surveys can host this static content on its own with the two methods below. However, the built-in mechanism
+	// should not be used with productive installations due to performance issues!
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JAVASCRIPT)
+	@Path("/js/{filename}")
+	public HttpResponse serveJS(@PathParam("filename") String filename){
+		
+		String onAction = "serving JavaScript";
+		
+		try {
+			String js = new Scanner(new File("./etc/webapp/js/" + filename)).useDelimiter("\\A").next();
+			HttpResponse result = new HttpResponse(js);
+			result.setStatus(200);
+			return result;
+			
+		} catch (FileNotFoundException e) {
+			HttpResponse result = new HttpResponse(filename + " not found!");
+			result.setStatus(404);
+			return result;
+		}
+	}
+	
+	@GET
+	@Produces(MediaType.TEXT_CSS)
+	@Path("/css/{filename}")
+	public HttpResponse serveCSS(@PathParam("filename") String filename){
+		
+		String onAction = "serving CSS";
+		
+		try {
+			String js = new Scanner(new File("./etc/webapp/css/" + filename)).useDelimiter("\\A").next();
+			HttpResponse result = new HttpResponse(js);
+			result.setStatus(200);
+			return result;
+			
+		} catch (FileNotFoundException e) {
+			HttpResponse result = new HttpResponse(filename + " not found!");
+			result.setStatus(404);
+			return result;
+		}
 	}
 
 	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
@@ -2994,6 +3055,10 @@ public class SurveyService extends Service {
 			data += "\r\n";
 		}
 		res += data.trim();
+		
+		// add separator declaration
+		res = "sep=,\r\n" + res;
+		
 		return res;
 	}
 
@@ -3144,9 +3209,14 @@ public class SurveyService extends Service {
 	/**
 	 * Parses incoming content to a survey JSON representation including checks for completeness, illegal fields and values.
 	 */
-	private JSONObject parseSurvey(String content) throws ParseException, IllegalArgumentException {
-		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
-
+	private JSONObject parseSurvey(String content) throws IllegalArgumentException {
+		
+		JSONObject o;
+	try{	
+		o = (JSONObject) JSONValue.parseWithException(content);
+	} catch (ParseException e1) {
+		throw new IllegalArgumentException("Survey data *" + content + "* is not valid JSON!");
+	}
 		// check result for unknown illegal fields. If so, parsing fails.
 		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end", "lang", "qid"};
 		for (Object key: o.keySet()){
@@ -3254,9 +3324,15 @@ public class SurveyService extends Service {
 	/**
 	 * Parses incoming content to a questionnaire JSON representation including checks for completeness, illegal fields and values.
 	 */
-	private JSONObject parseQuestionnaire(String content) throws ParseException, IllegalArgumentException {
+	private JSONObject parseQuestionnaire(String content) throws IllegalArgumentException {
 
-		JSONObject o = (JSONObject) JSONValue.parseWithException(content);
+		
+		JSONObject o;
+		try {
+			o = (JSONObject) JSONValue.parseWithException(content);
+		} catch (ParseException e1) {
+			throw new IllegalArgumentException("Questionnaire data *" + content + "* is not valid JSON!");
+		}
 
 		// check result for unknown illegal fields. If so, parsing fails.
 		String[] fields = {"id","owner","organization","logo", "name","description", "lang"};
