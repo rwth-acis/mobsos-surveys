@@ -48,6 +48,8 @@ import i5.las2peer.restMapper.annotations.PathParam;
 import i5.las2peer.restMapper.annotations.Produces;
 import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
+import i5.las2peer.restMapper.annotations.swagger.ApiInfo;
+import i5.las2peer.restMapper.annotations.swagger.*;
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
 
@@ -136,6 +138,18 @@ import org.xml.sax.SAXException;
  */
 @Path("mobsos-surveys")
 @Version("0.1")
+@ApiInfo(
+		title="MobSOS Surveys",
+		description="<p>A simple RESTful service for online survey management.</p><p>MobSOS Surveys is part of the MobSOS "
+				+ "Tool Set dedicated to exploring, modeling, and measuring Community Information System (CIS) "
+				+ "Success as a complex construct established by multiple dimensions and factors. As part of "
+				+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
+				+ "measurements of CIS Success.</p>", 
+		termsOfServiceUrl="",
+		contact="renzel@dbis.rwth-aachen.de",
+		license="MIT",
+		licenseUrl="https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE"
+		)
 public class SurveyService extends Service {
 
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
@@ -226,6 +240,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
+	@ResourceListApi(description = "Manage questionnaires")
+	@Summary("search or list questionnaires.")
+	@Notes("query parameter matches questionnaire name, description.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaires data (TODO: introduce Swagger models)"),
+	})
 	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
 		String onAction = "retrieving questionnaires";
 
@@ -306,6 +326,14 @@ public class SurveyService extends Service {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
+	@Summary("create new questionnaire.")
+	@Notes("Requires authentication.")
+	@ApiResponses(value={
+			@ApiResponse(code = 201, message = "Questionnaire created successfully."),
+			@ApiResponse(code = 400, message = "Questionnaire data invalid."),
+			@ApiResponse(code = 401, message = "Questionnaire creation requires authentication."),
+			@ApiResponse(code = 409, message = "Questionnaire already exists.")	
+	})
 	public HttpResponse createQuestionnaire(@ContentParam String content){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -427,6 +455,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
+	@Summary("retrieve given questionnaire.")
+	@Notes("Use parent resource to retrieve list of existing questionnaires. ")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaire data (TODO: introduce Swagger models)"),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist.")	
+	})
 	public HttpResponse getQuestionnaire(@PathParam("id") int id){
 
 		String onAction = "retrieving questionnaire " + id;
@@ -532,6 +566,14 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
+	@Summary("update given questionnaire.")
+	@Notes("Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaire updated successfully."),
+			@ApiResponse(code = 400, message = "Questionnaire data invalid."),
+			@ApiResponse(code = 401, message = "Questionnaire may only be updated by its owner."),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist.")	
+	})
 	public HttpResponse updateQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -621,6 +663,13 @@ public class SurveyService extends Service {
 	 */
 	@DELETE
 	@Path("questionnaires/{id}")
+	@Summary("delete given questionnaire.")
+	@Notes("Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaire deleted successfully."),
+			@ApiResponse(code = 401, message = "Questionnaire may only be deleted by its owner."),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist.")	
+	})
 	public HttpResponse deleteQuestionnaire(@PathParam("id") int id){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -690,6 +739,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
+	@Summary("Download form of a given questionnaire.")
+	@Notes("Use parent resource to retrieve list of existing surveys. Response body contains XML document compliant with the MobSOS Surveys XML Schema.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaire form data."),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist -or- Questionnaire does not define a form.")	
+	})
 	public HttpResponse downloadQuestionnaireForm(@PathParam("id") int id){
 
 		String onAction = "downloading form for questionnaire " + id;
@@ -769,6 +824,14 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
+	@Summary("Upload for for given questionnaire.")
+	@Notes("Requires authentication and ownership of questionnaire.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaire form upload successful."),
+			@ApiResponse(code = 400, message = "Questionnaire form data invalid."),
+			@ApiResponse(code = 401, message = "Questionnaire form may only be uploaded by owner. -or- Questionnaire form upload requires authentication."),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist.")
+			})
 	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -903,6 +966,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
+	@ResourceListApi(description = "Manage surveys")
+	@Summary("search or list questionnaires.")
+	@Notes("query parameter matches questionnaire name, description.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Questionnaires data (TODO: introduce Swagger models)"),
+	})
 	public HttpResponse getSurveys(@QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query)
 	{
 
@@ -984,6 +1053,14 @@ public class SurveyService extends Service {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
+	@Summary("create new survey.")
+	@Notes("Requires authentication.")
+	@ApiResponses(value={
+			@ApiResponse(code = 201, message = "Survey URL & ID (TODO: introduce Swagger models)"),
+			@ApiResponse(code = 400, message = "Survey data invalid."),
+			@ApiResponse(code = 401, message = "Survey creation requires authentication."),
+			@ApiResponse(code = 409, message = "Survey already exists.")	
+	})
 	public HttpResponse createSurvey(@ContentParam String data)
 	{
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -1097,6 +1174,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
+	@Summary("retrieve given survey.")
+	@Notes("Use <b>/surveys</b> to retrieve list of existing surveys. ")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey data (TODO: introduce Swagger models)"),
+			@ApiResponse(code = 404, message = "Survey does not exist.")	
+	})
 	public HttpResponse getSurvey(@PathParam("id") int id){
 
 		String onAction = "retrieving survey " + id;
@@ -1222,6 +1305,14 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
+	@Summary("update given survey.")
+	@Notes("Requires authentication. Use parent resource to retrieve list of existing surveys.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey updated successfully."),
+			@ApiResponse(code = 400, message = "Survey data invalid."),
+			@ApiResponse(code = 401, message = "Survey may only be updated by its owner."),
+			@ApiResponse(code = 404, message = "Survey does not exist.")	
+	})
 	public HttpResponse updateSurvey(@PathParam("id") int id, @ContentParam String content){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -1313,6 +1404,13 @@ public class SurveyService extends Service {
 	 */
 	@DELETE
 	@Path("surveys/{id}")
+	@Summary("delete given survey.")
+	@Notes("Requires authentication. Use parent resource to retrieve list of existing surveys.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey deleted successfully."),
+			@ApiResponse(code = 401, message = "Survey may only be deleted by its owner."),
+			@ApiResponse(code = 404, message = "Survey does not exist.")	
+	})
 	public HttpResponse deleteSurvey(@PathParam("id") int id){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -1384,6 +1482,13 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/questionnaire")
+	@Summary("Download questionnaire form for given survey. Enables response submission.")
+	@Notes("Can be used with or without authentication, including response submission.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey questionnaire HTML representation."),
+			@ApiResponse(code = 400, message = "Survey questionnaire form invalid. Cause: ..."),
+			@ApiResponse(code = 404, message = "Questionnaire does not exist. <b>-or-</b> Survey questionnaire not set. <b>-or-</b> Survey questionnaire does not define form.")
+			})
 	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
@@ -1668,6 +1773,12 @@ public class SurveyService extends Service {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/questionnaire")
+	@Summary("Set questionnaire for given survey.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey questionnaire set."),
+			@ApiResponse(code = 400, message = "Invalid JSON for setting survey questionnaire."),
+			@ApiResponse(code = 404, message = "Survey or questionnaire to be set does not exist.")
+			})
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
@@ -1829,6 +1940,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_CSV)
 	@Path("surveys/{id}/responses")
+	@Summary("retrieve response data for given survey.")
+	@Notes("Use resource <i>/surveys</i> to retrieve list of existing surveys.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey response data in CSV format."),
+			@ApiResponse(code = 404, message = "Survey does not exist -or- No questionnaire defined for survey.")	
+	})
 	public HttpResponse getSurveyResponses(@PathParam("id") int id){
 
 		String onAction = "retrieving responses for survey " + id;
@@ -1909,16 +2026,17 @@ public class SurveyService extends Service {
 		}
 	}
 
-	/**
-	 * TODO: write documentation
-	 * 
-	 * @param id
-	 * @param answerJSON
-	 * @return
-	 */
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/responses")
+	@Summary("submit response data to given survey.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey response submitted successfully."),
+			@ApiResponse(code = 400, message = "Survey response invalid -or- questionnaire form invalid. Cause: ..."),
+			@ApiResponse(code = 404, message = "Survey does not exist -or- No questionnaire defined for survey."),
+			@ApiResponse(code = 400, message = "Survey response already submitted."),
+	})
 	public HttpResponse submitSurveyResponseJSON(@PathParam("id") int id, @ContentParam String answerJSON){
 		Date now = new Date();
 		String onAction = "submitting response to survey " + id;
@@ -2090,23 +2208,43 @@ public class SurveyService extends Service {
 		}
 	}
 
-	/**
-	 * TODO: write documentation
-	 * @param id
-	 * @return
-	 */
 	@DELETE
 	@Path("surveys/{id}/responses")
+	@Summary("delete response data for given survey.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Survey responses deleted successfully."),
+			@ApiResponse(code = 401, message = "Survey responses may only be deleted by survey owner."),
+			@ApiResponse(code = 404, message = "Survey does not exist."),
+	})
 	public HttpResponse deleteSurveyResponses(@PathParam("id") int id){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete responses for survey!");
 			noauth.setStatus(401);
+			return noauth;
 		}
 		
 		String onAction = "deleting responses for survey " + id;
 
 		try{
+			
+			int exown;
+			// survey may only be updated if survey exists and active agent is owner
+			exown = checkExistenceOwnership(id,0);
+
+			// check if survey exists; if not, return 404.
+			if(exown == -1){
+				HttpResponse result = new HttpResponse("Survey does not exist.");
+				result.setStatus(404);
+				return result;
+			} 
+			// if survey exists, check if active agent is owner. if not, return 401.
+			else if (exown == 0){
+				HttpResponse result = new HttpResponse("Survey responses may only be deleted by survey owner.");
+				result.setStatus(401);
+				return result;
+			}
+			
 			Connection c = null;
 			PreparedStatement s = null;
 			ResultSet rs = null;
@@ -2194,6 +2332,32 @@ public class SurveyService extends Service {
 		result.setStatus(200);
 		return result;
 
+	}
+	
+	// ================= Swagger Resource Listing & API Declarations =====================
+	
+	@GET
+	@Path("api-docs")
+	@Summary("retrieve Swagger 1.2 resource listing.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Swagger 1.2 compliant resource listing"),
+			@ApiResponse(code = 404, message = "Swagger resource listing not available due to missing annotations."),
+	})
+	@Produces(MediaType.APPLICATION_JSON)
+	public HttpResponse getSwaggerResourceListing(){
+		return RESTMapper.getSwaggerResourceListing(this.getClass());
+	}
+	
+	@GET
+	@Path("api-docs/{tlr}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Summary("retrieve Swagger 1.2 API declaration for given top-level resource.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Swagger 1.2 compliant API declaration"),
+			@ApiResponse(code = 404, message = "Swagger API declaration not available due to missing annotations."),
+	})
+	public HttpResponse getSwaggerApiDeclaration(@PathParam("tlr") String tlr){
+		return RESTMapper.getSwaggerApiDeclaration(this.getClass(),tlr, epUrl);
 	}
 	
 	// ================= Static Content Hosting ===================
