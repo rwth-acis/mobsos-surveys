@@ -2027,7 +2027,7 @@ public class SurveyService extends Service {
 
 		} catch (Exception e){
 			e.printStackTrace();
-			return internalError(onAction);
+			return internalError(onAction + "cause: " +e.getMessage());
 		}
 	}
 
@@ -4162,7 +4162,8 @@ public class SurveyService extends Service {
 			UserAgent me = (UserAgent) this.getActiveAgent();
 			JSONObject o;
 			
-			if(me.getUserData() != null){	
+			if(me.getUserData() != null){
+				System.err.println(me.getUserData());
 				o = (JSONObject) JSONValue.parseWithException((String) me.getUserData());
 			} else {
 				o = new JSONObject();
