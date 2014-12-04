@@ -39,12 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	  <script src="${SC_URL}js/html5shiv.js"></script>
+	  <script src="${SC_URL}js/respond.min.js"></script>
 	<![endif]-->
 	
-	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
-	
+	<link href="${SC_URL}bootstrap-3.0.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
 	<link href="${SC_URL}css/flags.css" rel="stylesheet" />
 	
 </head>
@@ -99,19 +98,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				</div>
 				<div class="form-group">
 					<label for="i_quest_name">${name}</label>
-					<input type="text" class="form-control" id="i_quest_name" placeholder="${name}" value="USE Questionnaire"></input>
+					<input type="text" class="form-control" id="i_quest_name" placeholder="${name}" value=""></input>
 				</div>
 				<div class="form-group">
 					<label for="i_quest_org">${org}</label>
-					<input type="text" class="form-control" id="i_quest_org" placeholder="${org}" value="Advanced Community Information Systems (ACIS), RWTH Aachen University, Germany"></input>
+					<input type="text" class="form-control" id="i_quest_org" placeholder="${org}" value=""></input>
 				</div>
 				<div class="form-group">
 					<label for="i_quest_logo">${logo}</label>
-					<span id="i_quest_lpic"></span><input type="text" class="form-control" id="i_quest_logo" placeholder="${logo} URL (.jpg, .png)" value="http://dbis.rwth-aachen.de/cms/images/logo.jpg"></input>
+					<span id="i_quest_lpic"></span><input type="text" class="form-control" id="i_quest_logo" placeholder="${logo} URL (.jpg, .png)" value=""></input>
 				</div>
 				<div class="form-group">
 					<label for="i_quest_desc">${desc}</label>
-					<textarea class="form-control" id="i_quest_desc" placeholder="${desc}">A questionnaire for measuring Usability in terms of Usefulness, Ease of Use, Ease of Learning, and Satisfaction. The USE Questionnaire is based on: Lund, A.M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.</textarea>
+					<textarea class="form-control" id="i_quest_desc" placeholder="${desc}"></textarea>
 				</div>
 				<div class="col-md3 form-group">
 					<label for="i_quest_file">${questionnaire} XML</label>
@@ -154,6 +153,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</div>
 		
 	</div>
+	
+	<!-- import jQuery for AJAX calls (must) -->
+	<script type="text/javascript" src="${SC_URL}js/jquery-1.11.1.min.js"></script>
+	
+	<!-- import Bootstrap for responsive UI (must) -->
+	<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>
 	
 	<!-- import MobSOS Surveys lib -->
 	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
@@ -277,11 +282,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img class='flag flag-" + lang + "' /><span class='delete hidden glyphicon glyphicon-trash pull-right'></span></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>");
 						
-						/*
-						var html = "<a href='#' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>    " + decodeURIComponent(q.name) + " <img src='blank.gif' class='flag flag-" + lang + "' /><span class='delete glyphicon glyphicon-trash hidden pull-right' id='" + q.id + "'></span></span><p class='list-group-item-text'>" + decodeURIComponent(q.description) + "</p></a>";
-					
-						$('#questionnaires').append(html);
-						*/
 					}
 					
 					if(!client.isAnonymous()){
@@ -342,14 +342,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		}
 		
 	</script>
-	
-	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
-	
-	<!-- import Bootstrap for responsive UI (must) -->
-	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-	
-	
 	
 	<!-- add this script element right before closing tag </body> -->
 	<script type="text/javascript">

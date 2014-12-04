@@ -39,11 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	  <script src="${SC_URL}js/html5shiv.js"></script>
+	  <script src="${SC_URL}js/respond.min.js"></script>
 	<![endif]-->
 	
-	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="${SC_URL}bootstrap-3.0.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 </head>
 <body>
 
@@ -94,10 +94,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	</div>
 	
 	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/jquery-1.11.1.min.js"></script>
 	
 	<!-- import Bootstrap for responsive UI (must) -->
-	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>
 	
 	<!-- import MobSOS Surveys lib -->
 	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
@@ -121,21 +121,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		function updateQuestionnaire(){
 			
 			client.getQuestionnaire(${ID},
-				function(data,type){
-					$("#qname").html(decodeURIComponent(data.name))
-					$("#qorg").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
-					$("#qdesc").html(""+decodeURIComponent(data.description));
+				function(d){
+					
+					$("#qname").html(decodeURIComponent(d.name))
+					$("#qorg").html("<img src='" + d.logo + "' height='20'> " + decodeURIComponent(d.organization));
+					$("#qdesc").html(""+decodeURIComponent(d.description));
 					
 					// check owner
 					if(!client.isAnonymous()){
-						console.log("owner: " + data.owner + " oidc sub: " + oidc_userinfo.sub);
+						console.log("owner: " + d.owner + " oidc sub: " + oidc_userinfo.sub);
 					} else {
-						console.log("owner: " + data.owner + " me: anonymous");
+						console.log("owner: " + d.owner + " me: anonymous");
 					}
 					
-					client.getQuestionnaireForm(data.id,
+					client.getQuestionnaireForm(${ID},
+						
 						function(data,type){
-					
+							
 							var pages = data.getElementsByTagName("Page");
 							var ipages = 0;
 							var qpages = 0;

@@ -34,50 +34,63 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MobSOS Surveys Redirect</title>
+	<title>MobSOS Surveys</title>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
-	  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-	  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	  <script src="${SC_URL}js/html5shiv.js"></script>
+	  <script src="${SC_URL}js/respond.min.js"></script>
 	<![endif]-->
 	
-	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<link href="${SC_URL}bootstrap-3.0.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 </head>
 <body>
 
-	<div id="oidc" class="container">
-		<!-- OpenID Connect Button: add HTML element representing button -->
-		<span class="oidc-signin"
-			data-callback="signinCallback"
-			data-name="${OIDC_PROV_NAME}"
-			data-size="default"
-			data-logo="${OIDC_PROV_LOGO}"
-			data-server="${OIDC_PROV_URL}"
-			data-clientid="${OIDC_CLNT_ID}"
-			data-scope="openid phone email address profile">
-		</span>
-		
-	</div>
-	
-	<br/>
-	<br/>
+	<!-- Fixed navbar -->
+      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
+          </div>
+          <div class="navbar-collapse collapse">
+			  <ul class="nav navbar-nav">
+               <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
+			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
+             </ul>   
+              <span class="oidc-signin navbar-btn navbar-right btn-default"
+					data-callback="signinCallback"
+					data-name="${OIDC_PROV_NAME}"
+					data-size="sm"
+					data-logo="${OIDC_PROV_LOGO}"
+					data-server="${OIDC_PROV_URL}"
+					data-clientid="${OIDC_CLNT_ID}"
+					data-scope="openid phone email address profile">
+              </span>
+			
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
 	
 	<!-- Container for options after successful sign in -->
 	<div id="options" class="container hidden">
 		<div class="row">
-			<img width="200" src="https://dl.dropboxusercontent.com/u/17405777/las2peer-logo.svg" alt="..." class="img-rounded">
 			<h1>Welcome to MobSOS Surveys, <span id="name"></span></h2>
 			<h4>We now redirect you to <span id="redir" />.</h4>
 		</div>
 	</div>
 	
 	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/jquery-1.11.1.min.js"></script>
 	
 	<!-- import Bootstrap for responsive UI (must) -->
-	<script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>
 		
 	<script type="text/javascript">
 		
