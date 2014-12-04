@@ -1946,7 +1946,7 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 200, message = "Survey response data in CSV format."),
 			@ApiResponse(code = 404, message = "Survey does not exist -or- No questionnaire defined for survey.")	
 	})
-	public HttpResponse getSurveyResponses(@PathParam("id") int id){
+	public HttpResponse getSurveyResponses(@PathParam("id") int id, @QueryParam(name = "sepline" , defaultValue = "0" ) int sepline, @QueryParam(name = "sep" , defaultValue = "," ) String sep){
 
 		String onAction = "retrieving responses for survey " + id;
 
@@ -2005,8 +2005,13 @@ public class SurveyService extends Service {
 				rset = stmt.executeQuery();
 
 				// format and return result
-				String res = createCSVQuestionnaireResult(rset);
+				String res = createCSVQuestionnaireResult(rset,sep);
 
+				if(sepline > 0){
+					// add separator declaration
+					res = "sep=" + sep + "\r\n" + res;
+				}
+				
 				HttpResponse result = new HttpResponse(res);
 				result.setStatus(200);
 				return result;
@@ -3184,7 +3189,7 @@ public class SurveyService extends Service {
 	 * @return
 	 * @throws SQLException
 	 */
-	private String createCSVQuestionnaireResult(ResultSet rs) throws SQLException{
+	private String createCSVQuestionnaireResult(ResultSet rs, String sep) throws SQLException{
 		int cols = rs.getMetaData().getColumnCount();
 
 		String res = "";
@@ -3194,7 +3199,7 @@ public class SurveyService extends Service {
 		for(int i=1;i<=cols;i++){
 			headline += rs.getMetaData().getColumnName(i);
 			rs.getMetaData().getColumnTypeName(i);
-			if(i<cols) headline += ",";
+			if(i<cols) headline += sep;
 		}
 		res += headline + "\r\n";
 
@@ -3218,14 +3223,11 @@ public class SurveyService extends Service {
 						data += o.toString();
 					}
 				}
-				if(i<cols) data += ",";
+				if(i<cols) data += sep;
 			}
 			data += "\r\n";
 		}
 		res += data.trim();
-		
-		// add separator declaration
-		res = "sep=,\r\n" + res;
 		
 		return res;
 	}
