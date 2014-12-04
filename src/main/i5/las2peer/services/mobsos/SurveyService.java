@@ -2279,7 +2279,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("redirect")
-	public HttpResponse redirectCallback(){
+	public HttpResponse redirectCallback(@HeaderParam(name="accept-language", defaultValue="") String lang){
 		String onAction = "processing OpenID Connect redirect Callback";
 
 		String html = "";
@@ -2289,7 +2289,11 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
+		
+		// localize template
+		html = i18n(html, lang);
 
+		html = fillPlaceHolder(html,"EP_URL", staticContentUrl);
 		html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
