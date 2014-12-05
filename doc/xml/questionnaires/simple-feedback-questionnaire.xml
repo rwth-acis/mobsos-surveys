@@ -2,58 +2,25 @@
 
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
-	<qu:Page name="Instructions" 
-		 xsi:type="qu:InformationPageType">
-		<qu:Instructions>
-			Dear ${USER.NAME}! Please rate the quality of your pizza from ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Deliciousness" 
-	      qid="PIZZA.1"
+	<qu:Page name="Overall Quality" 
+	      qid="SFQ.OQ"
 	      minval="1" 
 	      maxval="5"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree" 
+	      minlabel="low" 
+	      maxlabel="high" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
-			My pizza was delicious.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Delivery" 
-	      qid="PIZZA.2"
-	      minval="1" 
-	      maxval="5"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree" 
-		  required="false"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Pizza delivery was fast.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Price" 
-	      qid="PIZZA.3"
-	      minval="1" 
-	      maxval="5"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree" 
-		  required="false"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			The price for my pizza was acceptable.
+			Overall Quality of ${SURVEY.RESOURCE}
 		</qu:Instructions>
 	</qu:Page>
 	
 	<qu:Page name="Comments" 
-	      qid="PIZZA.C"
+	      qid="SFQ.C"
 		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			Any comments?
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	
