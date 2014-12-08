@@ -90,6 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				<tr><td><b>${end_time}</b></td><td id="s_end"></td></tr>
 				<tr><td><b>${questionnaire}</b></td><td id="s_questionnaire"></td></tr>
 			</table>
+			<p id="submit-msg" class="alert alert-info hidden"></p>
 			<p>
 				<button id="i_survey_part" class="btn btn-lg btn-success hidden">${participate}</button>
 				<button id="i_survey_resp" class="btn btn-lg btn-success">${responses}</button>
@@ -177,8 +178,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					} else if(now < s_s){
 						console.log("Warning: survey did not yet begin!");
 					} else {
-						console.log("Participation possible");
-						$("#i_survey_part").removeClass("hidden");
+						console.log("Participation possible timewise");
+						
+						if(!oidc_userinfo){
+							console.log("User anonymous. Check ");
+							if(client.hasSubmission(data.id)){
+								$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
+							} else {
+								$("#i_survey_part").removeClass("hidden");
+							}
+						} else {
+							// check responses, if user already participated.
+							client.getSurveyResponses(${ID},
+								function(d,type){
+									console.log(d);
+									var lines = d.split("\r\n");
+									for(i in lines){
+										if(lines[i].indexOf(oidc_userinfo.sub) == 0){
+											$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
+											return;
+										}
+									}
+									// user does not have participated, yet -> show participate button.
+									$("#i_survey_part").removeClass("hidden");
+								},function(e){
+									console.log(e);
+								}
+							);
+							
+						}
+						
+						
 					}
 					
 				},

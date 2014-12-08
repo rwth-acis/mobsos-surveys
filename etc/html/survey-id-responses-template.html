@@ -205,7 +205,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 				var css = $("#svg_css").html();
 				
-				console.log(css);
+				//console.log(css);
 				
 				var jsvg = $("#graph");
 				var jse = $("<style id='genstyle' type='text/css'/>");
@@ -265,20 +265,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			client.getSurveyResponses(${ID},
 				function(d,type){
 				
-					console.log("CSV data from service:");
-					console.log(d);
-					
 					csvd = parseCSV(d);
-					console.log("CSV");
-					console.log(csvd);
-					
 					var res = separateData(csvd);
 					
-					console.log(res.num);
-					console.log(res.txt);
-					
 					renderBoxplot(res.num);
-					
 					renderText(res.txt);
 					
 				},
@@ -403,11 +393,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				var include = true;
 				
 				for(k in row[1]){
-				
-					console.log("Detected field " + row[0][k] + " with value " + row[1][k]);
 					
 					if(row[1][k] !== '' && !parseInt(row[1][k])){
-						console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
+						//console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
 						include = false;
 					}
 				}
@@ -427,7 +415,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			var data = [];
 			
 			// first extract field names and prepare data cells
-			console.log();
+			
 			$("#n").html("N=" + (csv.length-1));
 			
 			for(var i=3; i<csv[0].length;i++){
