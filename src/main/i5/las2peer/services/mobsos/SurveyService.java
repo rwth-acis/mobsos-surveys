@@ -145,15 +145,15 @@ import org.xml.sax.SAXException;
 				+ "Success as a complex construct established by multiple dimensions and factors. As part of "
 				+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
 				+ "measurements of CIS Success.</p>", 
-		termsOfServiceUrl="",
-		contact="renzel@dbis.rwth-aachen.de",
-		license="MIT",
-		licenseUrl="https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE"
+				termsOfServiceUrl="",
+				contact="renzel@dbis.rwth-aachen.de",
+				license="MIT",
+				licenseUrl="https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE"
 		)
 public class SurveyService extends Service {
 
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
-	
+
 	private static BasicDataSource dataSource;
 
 	private DocumentBuilder parser;
@@ -163,19 +163,19 @@ public class SurveyService extends Service {
 	private String epUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName, jdbcUrl, jdbcSchema,jdbcLogin, jdbcPass;
 	private String oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
-	
+
 	private String staticContentUrl;
 
 	public SurveyService(){
 
 		// set values from configuration file
 		this.setFieldValues();
-		
+
 		// make sure epUrl and staticContentUrl have trailing slash
 		if(!epUrl.endsWith("/")){
 			epUrl += "/";
 		}
-		
+
 		if(staticContentUrl == null || staticContentUrl.isEmpty()){
 			staticContentUrl = epUrl;
 		} else {
@@ -396,7 +396,7 @@ public class SurveyService extends Service {
 	@DELETE
 	@Path("questionnaires")
 	public HttpResponse deleteQuestionnaires(){
-		
+
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaires!");
 			noauth.setStatus(401);
@@ -580,7 +580,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to update questionnaire!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "updating questionnaire " + id;
 
 		try{
@@ -676,7 +676,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaire!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "deleting questionnaire " + id;
 
 		try{
@@ -831,14 +831,14 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 400, message = "Questionnaire form data invalid."),
 			@ApiResponse(code = 401, message = "Questionnaire form may only be uploaded by owner. -or- Questionnaire form upload requires authentication."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist.")
-			})
+	})
 	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to upload questionnaire form!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "uploading form for questionnaire " + id;
 
 		try{
@@ -1067,7 +1067,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to create surveys!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "creating new survey";
 
 		try {
@@ -1128,7 +1128,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete surveys!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "deleting surveys";
 
 		try{
@@ -1319,7 +1319,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to update survey!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "updating survey " + id;
 
 		try{
@@ -1417,7 +1417,7 @@ public class SurveyService extends Service {
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete survey!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "deleting survey " + id;
 
 		try{
@@ -1488,7 +1488,7 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 200, message = "Survey questionnaire HTML representation."),
 			@ApiResponse(code = 400, message = "Survey questionnaire form invalid. Cause: ..."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist. <b>-or-</b> Survey questionnaire not set. <b>-or-</b> Survey questionnaire does not define form.")
-			})
+	})
 	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
@@ -1778,14 +1778,14 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 200, message = "Survey questionnaire set."),
 			@ApiResponse(code = 400, message = "Invalid JSON for setting survey questionnaire."),
 			@ApiResponse(code = 404, message = "Survey or questionnaire to be set does not exist.")
-			})
+	})
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
 		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to set questionnaire for survey!");
 			noauth.setStatus(401);
 		}
-		
+
 		String onAction = "setting questionnaire for survey " + id;
 
 		try{
@@ -2011,7 +2011,7 @@ public class SurveyService extends Service {
 					// add separator declaration
 					res = "sep=" + sep + "\r\n" + res;
 				}
-				
+
 				HttpResponse result = new HttpResponse(res);
 				result.setStatus(200);
 				return result;
@@ -2124,9 +2124,9 @@ public class SurveyService extends Service {
 
 			// after all validation finally persist survey response in database
 			int surveyId = id;
-			
+
 			String sub = (String) getActiveUserInfo().get("sub");
-			
+
 			if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
 				sub += now.getTime();
 			}
@@ -2228,11 +2228,11 @@ public class SurveyService extends Service {
 			noauth.setStatus(401);
 			return noauth;
 		}
-		
+
 		String onAction = "deleting responses for survey " + id;
 
 		try{
-			
+
 			int exown;
 			// survey may only be updated if survey exists and active agent is owner
 			exown = checkExistenceOwnership(id,0);
@@ -2249,7 +2249,7 @@ public class SurveyService extends Service {
 				result.setStatus(401);
 				return result;
 			}
-			
+
 			Connection c = null;
 			PreparedStatement s = null;
 			ResultSet rs = null;
@@ -2294,7 +2294,7 @@ public class SurveyService extends Service {
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
-		
+
 		// localize template
 		html = i18n(html, lang);
 
@@ -2331,7 +2331,7 @@ public class SurveyService extends Service {
 		// fill in placeholders with concrete values
 		html = fillPlaceHolder(html,"EP_URL", epUrl);
 		html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
-		
+
 		html = fillPlaceHolder(html,"OIDC_PROV_NAME", oidcProviderName);
 		html = fillPlaceHolder(html,"OIDC_PROV_LOGO", oidcProviderLogo);
 		html = fillPlaceHolder(html,"OIDC_PROV_URL", oidcProviderUrl);
@@ -2342,9 +2342,9 @@ public class SurveyService extends Service {
 		return result;
 
 	}
-	
+
 	// ================= Swagger Resource Listing & API Declarations =====================
-	
+
 	@GET
 	@Path("api-docs")
 	@Summary("retrieve Swagger 1.2 resource listing.")
@@ -2356,7 +2356,7 @@ public class SurveyService extends Service {
 	public HttpResponse getSwaggerResourceListing(){
 		return RESTMapper.getSwaggerResourceListing(this.getClass());
 	}
-	
+
 	@GET
 	@Path("api-docs/{tlr}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -2368,7 +2368,7 @@ public class SurveyService extends Service {
 	public HttpResponse getSwaggerApiDeclaration(@PathParam("tlr") String tlr){
 		return RESTMapper.getSwaggerApiDeclaration(this.getClass(),tlr, epUrl);
 	}
-	
+
 	// ================= Static Content Hosting ===================
 	// 
 	// The browser frontend part of this service, in particular the HTML code generated from templates in ./etc/html 
@@ -2377,40 +2377,40 @@ public class SurveyService extends Service {
 	// a URL linking to a folder under which this static content is expected to be hosted. As a fallback solution, 
 	// MobSOS Surveys can host this static content on its own with the two methods below. However, the built-in mechanism
 	// should not be used with productive installations due to performance issues!
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JAVASCRIPT)
 	@Path("/js/{filename}")
 	public HttpResponse serveJS(@PathParam("filename") String filename){
-		
+
 		String onAction = "serving JavaScript";
-		
+
 		try {
 			String js = new Scanner(new File("./etc/webapp/js/" + filename)).useDelimiter("\\A").next();
 			HttpResponse result = new HttpResponse(js);
 			result.setStatus(200);
 			return result;
-			
+
 		} catch (FileNotFoundException e) {
 			HttpResponse result = new HttpResponse(filename + " not found!");
 			result.setStatus(404);
 			return result;
 		}
 	}
-	
+
 	@GET
 	@Produces(MediaType.TEXT_CSS)
 	@Path("/css/{filename}")
 	public HttpResponse serveCSS(@PathParam("filename") String filename){
-		
+
 		String onAction = "serving CSS";
-		
+
 		try {
 			String js = new Scanner(new File("./etc/webapp/css/" + filename)).useDelimiter("\\A").next();
 			HttpResponse result = new HttpResponse(js);
 			result.setStatus(200);
 			return result;
-			
+
 		} catch (FileNotFoundException e) {
 			HttpResponse result = new HttpResponse(filename + " not found!");
 			result.setStatus(404);
@@ -2420,12 +2420,118 @@ public class SurveyService extends Service {
 
 	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("oidc/clients")
+	public HttpResponse getClientsMetadata(){
+
+		String onAction = "retrieving metadata for clients";
+
+		JSONArray result = new JSONArray();
+
+		try {
+
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details");
+
+				rset = stmt.executeQuery();
+
+				while(rset.next()){
+					JSONObject meta = new JSONObject();
+					meta.put("id", rset.getString("client_id"));
+					meta.put("name",rset.getString("client_name"));
+					meta.put("description",rset.getString("client_description"));
+					meta.put("uri", rset.getString("client_uri"));
+					meta.put("logo", rset.getString("logo_uri"));
+					result.add(meta);
+				}
+
+				HttpResponse rr = new HttpResponse(result.toJSONString());
+				rr.setStatus(200);
+				return rr;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction + e.getMessage());
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+			return internalError(onAction + " " + e.getMessage());
+		}
+	}
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("oidc/clients/{id}")
+	public HttpResponse getClientMetadata(@PathParam(value="id") String id){
+
+		String onAction = "retrieving metadata for client " + id ;
+
+		try {
+
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details where client_id = ?");
+				stmt.setString(1, id);
+
+				rset = stmt.executeQuery();
+
+				if (!rset.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("No metadata found for client " + id + "!");
+					result.setStatus(404);
+					return result;
+				}
+				rset.next();
+
+				JSONObject meta = new JSONObject();
+				meta.put("id", rset.getString("client_id"));
+				meta.put("name",rset.getString("client_name"));
+				meta.put("description",rset.getString("client_description"));
+				meta.put("uri", rset.getString("client_uri"));
+				meta.put("logo", rset.getString("logo_uri"));
+
+				HttpResponse result = new HttpResponse(meta.toJSONString());
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+
 	// For now, MobSOS Surveys maintains its own database tables for metadata on subject resources, i.e. those resources that are
 	// subjects of a survey. A resource can thereby be a tool, a service, a piece of content, a document, etc. The only prerequisite 
 	// is that such a resource is available publicly under a given URI. Metadata for such a resource currently maintained by MobSOS Surveys
 	// is name and description. In future, such information should be queried from an external Web service or maybe from the meta tags 
 	// available from the resource's HTML representation.
 
+	/*
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("resource-meta")
@@ -2477,6 +2583,7 @@ public class SurveyService extends Service {
 			return internalError(onAction);
 		}
 	}
+	*/
 
 
 
@@ -3065,13 +3172,13 @@ public class SurveyService extends Service {
 					} else if (tag.endsWith("DESCRIPTION")){
 						value = (String) survey.get("description");
 					} else if (tag.endsWith("RESOURCE")){
-						String uri = (String) survey.get("resource");
-						HttpResponse r = getResourceMetadata(uri);
+						String id = (String) survey.get("resource");
+						HttpResponse r = getClientMetadata(id);
 						if(r.getStatus() == 200){
 							JSONObject meta = (JSONObject) JSONValue.parse(r.getResult());
 							value = (String) meta.get("name");
 						} else {
-							value = uri;
+							value = id;
 						}
 
 						//JSONObject res = (JSONObject) survey.get("resource");
@@ -3156,9 +3263,9 @@ public class SurveyService extends Service {
 				String owner = rs.getString(1);
 
 				// active agent is not owner.
-				
+
 				String sub = (String) getActiveUserInfo().get("sub");
-				
+
 				if(!owner.equals(sub)){
 					return 0;
 				} 
@@ -3228,7 +3335,7 @@ public class SurveyService extends Service {
 			data += "\r\n";
 		}
 		res += data.trim();
-		
+
 		return res;
 	}
 
@@ -3239,6 +3346,7 @@ public class SurveyService extends Service {
 	 * @return
 	 * @throws SQLException
 	 */
+	/*
 	private String createJSONQuestionnaireResult(ResultSet rs, JSONObject qinfo) throws SQLException{
 		JSONObject res = new JSONObject();
 		int cols = rs.getMetaData().getColumnCount();
@@ -3275,7 +3383,7 @@ public class SurveyService extends Service {
 			data.add(resrow);
 		}
 		return res.toJSONString();
-	}
+	}*/
 
 	/**
 	 * Marshals survey data in a result set from the MobSOS database to a JSON representation.
@@ -3380,13 +3488,13 @@ public class SurveyService extends Service {
 	 * Parses incoming content to a survey JSON representation including checks for completeness, illegal fields and values.
 	 */
 	private JSONObject parseSurvey(String content) throws IllegalArgumentException {
-		
+
 		JSONObject o;
-	try{	
-		o = (JSONObject) JSONValue.parseWithException(content);
-	} catch (ParseException e1) {
-		throw new IllegalArgumentException("Survey data *" + content + "* is not valid JSON!");
-	}
+		try{	
+			o = (JSONObject) JSONValue.parseWithException(content);
+		} catch (ParseException e1) {
+			throw new IllegalArgumentException("Survey data *" + content + "* is not valid JSON!");
+		}
 		// check result for unknown illegal fields. If so, parsing fails.
 		String[] fields = {"id","owner","organization","logo", "name","description","resource","start","end", "lang", "qid"};
 		for (Object key: o.keySet()){
@@ -3496,7 +3604,7 @@ public class SurveyService extends Service {
 	 */
 	private JSONObject parseQuestionnaire(String content) throws IllegalArgumentException {
 
-		
+
 		JSONObject o;
 		try {
 			o = (JSONObject) JSONValue.parseWithException(content);
@@ -3583,7 +3691,7 @@ public class SurveyService extends Service {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
-		
+
 		String sub = (String) getActiveUserInfo().get("sub");
 
 		try {
@@ -3630,7 +3738,7 @@ public class SurveyService extends Service {
 	private int storeNewQuestionnaire(JSONObject questionnaire) throws IllegalArgumentException, SQLException, UnsupportedEncodingException, ParseException{
 
 		String sub = (String) getActiveUserInfo().get("sub");
-		
+
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rset = null;
@@ -4063,14 +4171,14 @@ public class SurveyService extends Service {
 
 			// example:
 			// 	   create view mobsos.responses_survey_1 as
-			//     select uid, sid,
+			//     select uid, sid, s.resource as cid,
 			//     MAX(IF(qkey = 'A.2.1', cast(qval as unsigned), NULL)) AS "A.2.1",
 			//     MAX(IF(qkey = 'A.2.2', cast(qval as unsigned), NULL)) AS "A.2.2",
 			//     MAX(IF(qkey = 'A.2.3', qval, NULL)) AS "A.2.3"
-			//     from mobsos.response where sid = 1 group by uid;
+			//     from mobsos.response r join mobsos.survey s on (s.id = r.sid) where sid = 1 group by uid, cid;
 
 			String sql = "create view " + jdbcSchema + ".responses_survey_" + sid + " as "; 
-			sql += "select uid, sid, \n"; 
+			sql += "select uid, sid, s.resource as cid \n"; 
 
 			Iterator<String> it = questions.keySet().iterator();
 
@@ -4091,7 +4199,7 @@ public class SurveyService extends Service {
 				}
 			}
 
-			sql += " from " + jdbcSchema + ".response where sid = "+ sid + " group by uid;";
+			sql += " from " + jdbcSchema + ".response r join " + jdbcSchema + ".survey on (s.id = r.sid) where sid = "+ sid + " group by uid, cid;";
 
 			System.out.println("SQL for creating survey response view for survey " + sid + ": \n" + sql);
 
@@ -4118,7 +4226,7 @@ public class SurveyService extends Service {
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * localizes the given String t according to locale l. If no resource bundle exists for locale l, fall back to English.
 	 * Input string t is expected to contain placeholders ${k}, where k is a key defined in the ResourceBundle.
@@ -4157,21 +4265,21 @@ public class SurveyService extends Service {
 	}
 
 	private JSONObject getActiveUserInfo() throws ParseException {
-		
+
 		if(this.getActiveAgent() instanceof UserAgent){
 			UserAgent me = (UserAgent) this.getActiveAgent();
 			JSONObject o;
-			
+
 			if(me.getUserData() != null){
 				System.err.println(me.getUserData());
 				o = (JSONObject) JSONValue.parseWithException((String) me.getUserData());
 			} else {
 				o = new JSONObject();
-				
+
 				if(getActiveNode().getAnonymous().getId() == getActiveAgent().getId()){
 					o.put("sub","anonymous");		
 				} else {
-				
+
 					String md5ide = new String(""+me.getId());
 					o.put("sub", md5ide);
 				}

@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			<h4 id="s_org"></h4>
 			<table class="table table-bordered">
 				<tr><td colspan="2" id="s_desc"></td></tr>
-				<tr><td><b>${resource}</b></td><td><a id="s_resource"></a></td></tr>
+				<tr><td><b>${resource}</b></td><td id="s_resource"></td></tr>
 				<tr><td><b>${start_time}</b></td><td id="s_start"></td></tr>
 				<tr><td><b>${end_time}</b></td><td id="s_end"></td></tr>
 				<tr><td><b>${questionnaire}</b></td><td id="s_questionnaire"></td></tr>
@@ -140,7 +140,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					
 					client.getResourceMeta(data.resource, 
 						function(meta){
-							$("#s_resource").html(meta.name);
+							console.log("Meta: ");
+							console.log(meta);
+							if(meta.uri && meta.logo){
+								$("#s_resource").html("<img src='" + meta.logo + "' height='48px'/>  <a href='" + meta.uri + "'>" + meta.name + "</a>");
+							} else if(meta.uri){
+								$("#s_resource").html("<a href='" + meta.uri + "'>" + meta.name + "</a>");
+							}
+							else{
+								$("#s_resource").html(meta.name);
+							}
 						}, 
 						function(err){
 						}
@@ -149,7 +158,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#s_name").html(decodeURIComponent(data.name))
 					$("#s_org").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
 					$("#s_desc").html(""+decodeURIComponent(data.description));
-					$("#s_resource").attr("href",data.resource).html(data.resource);
+					$("#s_resource").html(data.resource);
 					
 					$("#s_start").html(moment.utc(data.start).format("llll"));
 					$("#s_end").html(moment.utc(data.end).format("llll"));

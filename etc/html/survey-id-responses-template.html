@@ -430,13 +430,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			console.log();
 			$("#n").html("N=" + (csv.length-1));
 			
-			for(var i=2; i<csv[0].length;i++){
+			for(var i=3; i<csv[0].length;i++){
 				var fname = csv[0][i];
 				
 				//console.log(fname);
-				data[i-2] = [];
-				data[i-2][0] = fname;
-				data[i-2][1] = [];
+				data[i-3] = [];
+				data[i-3][0] = fname;
+				data[i-3][1] = [];
 				
 				for(var j=1;j<csv.length;j++){
 					//console.log(csv[i][j]);
@@ -444,7 +444,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					var val = csv[j][i];
 					
 					if( val !== ""){
-					data[i-2][1].push(val);
+					data[i-3][1].push(val);
 					
 					if(parseInt(val) && val < min){
 						min = val;
