@@ -108,37 +108,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</div>
 					<div class="form-group">
 						<label for="i_survey_name">${name}</label>
-						<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="Layers AchSo!@Construction Survey 2014" />
+						<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_org">${org}</label>
-						<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="Learning Layers Project" />
+						<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_logo">${logo}</label>
-						<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="http://learning-layers.eu/wp-content/themes/learninglayers/images/logo.png" />
+						<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="" />
 					</div>
 					<div class="form-group">
 						<label for="i_survey_desc">${desc}</label>
-						<textarea class="form-control" id="i_survey_desc" placeholder="Description" >A survey on the user experience of AchSo! for the construction sector.</textarea>
+						<textarea class="form-control" id="i_survey_desc" placeholder="Description" ></textarea>
 					</div>
 					
 					<div class="form-group">
 						<label for="i_survey_resource">${resource}</label>
-						<input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />
+						<div>
+							<select id="i_survey_clientpick" class="form-control">
+								<!-- client options inserted dynamically -->
+							</select>
+						</div>
+						<!-- <input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />-->
 					</div>
 					
 					<div class="col-md-6 form-group">
 						<label for="i_survey_start">${start_time}</label>
 						<div class='input-group date' id='i_survey_start'>
-							<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-01-01T00:00:00Z"/>
+							<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value=""/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 						</div>
 					</div>
 					<div class="col-md-6 form-group">
 						<label for="i_survey_end">${end_time}</label>
 						<div class='input-group date' id='i_survey_end'>
-							<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value="2014-12-31T23:59:59Z"/>
+							<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value=""/>
 							<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
 							</span>
 						</div>
@@ -236,6 +241,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					}
 				);
 				
+				client.getResourcesMeta( 
+					function(d){
+						for (i in d){
+							var c = d[i];
+							console.log(c);
+							if(c.name != null)
+							$("#i_survey_clientpick").append("<option value='" + c.id + "'>" + c.name + "</option>")
+						}
+					},
+					function(e){
+						console.log(e);
+					}
+				);
+				
 				$("#interact").removeClass("hidden");
 				$("#surveys_refresh").click(function(){
 					updateSurveys("");
@@ -308,7 +327,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				"logo": $('#i_survey_logo').val(),
 				"start": $("#i_survey_starttime").val(),
 				"end": $("#i_survey_endtime").val(),
-				"resource": $("#i_survey_resource").val(),
+				"resource": $("#i_survey_clientpick").val(),
+				//"resource": $("#i_survey_resource").val(),
 				"lang": $("#i_survey_lang").val()
 			};
 			

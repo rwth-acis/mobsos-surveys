@@ -2437,7 +2437,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details");
+				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details order by client_name asc");
 
 				rset = stmt.executeQuery();
 
@@ -3529,7 +3529,12 @@ public class SurveyService extends Service {
 					}
 				} 
 				else if(key.equals("resource")){
-					try {
+					
+					HttpResponse h = getClientMetadata((String) o.get(key));
+					if(h.getStatus()==404){
+						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be an existing OpenID Client ID.");
+					}
+					/*try {
 						URL u = new URL((String) o.get(key));
 						HttpURLConnection con = (HttpURLConnection) u.openConnection();
 						if(404 == con.getResponseCode()){
@@ -3539,7 +3544,7 @@ public class SurveyService extends Service {
 						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
 					} catch (IOException e) {
 						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
-					}
+					}*/
 				}
 				else if(key.equals("start")){
 					try{
