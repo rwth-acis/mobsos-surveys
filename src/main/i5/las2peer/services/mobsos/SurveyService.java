@@ -4183,7 +4183,7 @@ public class SurveyService extends Service {
 			//     from mobsos.response r join mobsos.survey s on (s.id = r.sid) where sid = 1 group by uid, cid;
 
 			String sql = "create view " + jdbcSchema + ".responses_survey_" + sid + " as "; 
-			sql += "select uid, sid, s.resource as cid \n"; 
+			sql += "select uid, sid, s.resource as cid, \n"; 
 
 			Iterator<String> it = questions.keySet().iterator();
 
@@ -4204,7 +4204,7 @@ public class SurveyService extends Service {
 				}
 			}
 
-			sql += " from " + jdbcSchema + ".response r join " + jdbcSchema + ".survey on (s.id = r.sid) where sid = "+ sid + " group by uid, cid;";
+			sql += " from " + jdbcSchema + ".response r join " + jdbcSchema + ".survey s on (s.id = r.sid) where sid = "+ sid + " group by uid, cid;";
 
 			System.out.println("SQL for creating survey response view for survey " + sid + ": \n" + sql);
 
