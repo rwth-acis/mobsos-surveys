@@ -162,7 +162,7 @@ public class SurveyService extends Service {
 	// fields read from service configuration file
 	private String epUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName, jdbcUrl, jdbcSchema,jdbcLogin, jdbcPass;
-	private String oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
+	private String oidcSchema, oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
 
 	private String staticContentUrl;
 
@@ -2437,7 +2437,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details order by client_name asc");
+				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from " + oidcSchema + ".client_details order by client_name asc");
 
 				rset = stmt.executeQuery();
 
@@ -2486,7 +2486,7 @@ public class SurveyService extends Service {
 
 			try {
 				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from openidconnect.client_details where client_id = ?");
+				stmt = conn.prepareStatement("select client_id, client_name, client_description, client_uri, logo_uri from " + oidcSchema + ".client_details where client_id = ?");
 				stmt.setString(1, id);
 
 				rset = stmt.executeQuery();
