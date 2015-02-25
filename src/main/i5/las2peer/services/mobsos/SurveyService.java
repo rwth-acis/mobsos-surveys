@@ -2525,67 +2525,132 @@ public class SurveyService extends Service {
 		}
 	}
 
-	// For now, MobSOS Surveys maintains its own database tables for metadata on subject resources, i.e. those resources that are
-	// subjects of a survey. A resource can thereby be a tool, a service, a piece of content, a document, etc. The only prerequisite 
-	// is that such a resource is available publicly under a given URI. Metadata for such a resource currently maintained by MobSOS Surveys
-	// is name and description. In future, such information should be queried from an external Web service or maybe from the meta tags 
-	// available from the resource's HTML representation.
+	// ============= OVERALL RATING ===========================
+	@GET
+	@Produces(MediaType.TEXT_CSV)
+	@Path("surveys/{id}/responses")
+	@Summary("retrieve response data for given survey.")
+	@Notes("Use resource <i>/surveys</i> to retrieve list of existing surveys.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Client feedback data"),
+			@ApiResponse(code = 404, message = "Client does not exist.")	
+	})
+	public HttpResponse getFeedback(@PathParam(value="client_id") String cid,@QueryParam(name = "sep", defaultValue = ",") String sep, @QueryParam(name="sepline", defaultValue = "0") int sepline){
 
-	/*
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("resource-meta")
-	public HttpResponse getResourceMetadata(@ContentParam String uri){
+		String onAction = "retrieving client feedback";
 
-		String onAction = "retrieving resource metadata for URI " + uri ;
-
-		try {
-
-			Connection conn = null;
-			PreparedStatement stmt = null;
-			ResultSet rset = null;
-
-			try {
-				conn = dataSource.getConnection();
-				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".resource where uri = ?");
-				stmt.setString(1, uri);
-
-				rset = stmt.executeQuery();
-
-				if (!rset.isBeforeFirst()){
-					HttpResponse result = new HttpResponse("No metadata found for resource " + uri + "!");
-					result.setStatus(404);
-					return result;
-				}
-				rset.next();
-
-				JSONObject meta = new JSONObject();
-
-				meta.put("name",rset.getString("name"));
-				meta.put("description",rset.getString("description"));
-
-				HttpResponse result = new HttpResponse(meta.toJSONString());
-				result.setStatus(200);
+		try{
+			// authentication required for submitting response
+			if(this.getActiveAgent() != this.getActiveNode().getAnonymous()){
+				HttpResponse result = new HttpResponse("Client feedback retrieval requires authentication.");
+				result.setStatus(401);
 				return result;
-
-			} catch(SQLException | UnsupportedOperationException e) {
-				return internalError(onAction);
-			} 
-			finally {
-				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
-				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
-				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
 			}
-		}
+			else{
+				JSONObject r = new JSONObject(); //result to return in HTTP response
 
-		catch (Exception e) {
+				Connection c = null;
+				PreparedStatement s = null;
+				ResultSet rs = null;
+
+				// +++ dsi 
+				try{
+					// query for given survey
+					c = dataSource.getConnection();
+					s = c.prepareStatement("select * from " + jdbcSchema + ".feedback where client_id = ?");
+					s.setString(1,cid);
+
+					rs = s.executeQuery();
+
+					String res = createCSVQuestionnaireResult(rs,sep);
+
+					if(sepline > 0){
+						// add separator declaration
+						res = "sep=" + sep + "\r\n" + res;
+					}
+
+					HttpResponse result = new HttpResponse(res);
+					result.setStatus(200);
+					return result;
+
+				} catch (Exception e){
+					e.printStackTrace();
+					return internalError(onAction);
+				} finally {
+					try { if (rs != null) rs.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+					try { if (s != null) s.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+					try { if (c != null) c.close(); } catch(Exception e) { e.printStackTrace(); return internalError(onAction);}
+				}
+				// --- dsi
+			}
+		} catch(Exception e){
 			e.printStackTrace();
 			return internalError(onAction);
 		}
 	}
-	*/
 
+	@PUT
+	@Path("feedback/{client_id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Summary("Submit feedback for a given client as numeric rating and comment.")
+	@ApiResponses(value={
+			@ApiResponse(code = 200, message = "Client feedback submission complete."),
+			@ApiResponse(code = 400, message = "Client feedback data invalid"),
+			//@ApiResponse(code = 401, message = "Client feedback submission requires authentication."),
+			@ApiResponse(code = 404, message = "Client does not exist.")
+	})
+	public HttpResponse sumbitFeedback(@PathParam(value="client_id") String cid, @ContentParam String data){
 
+		UserAgent me = (UserAgent) getActiveAgent();
+		JSONObject mej = (JSONObject) JSONValue.parse(me.getUserData().toString());
+
+		JSONObject fb;
+
+		try {
+			fb = (JSONObject) JSONValue.parseWithException(data);
+		} catch (ParseException e) {
+			HttpResponse result = new HttpResponse("Feedback data required in JSON format!");
+			result.setStatus(400);
+			return result;
+		}
+
+		if(fb.get("rating") == null && fb.get("comment") == null){
+			HttpResponse result = new HttpResponse("Feedback data must include rating or comment!");
+			result.setStatus(400);
+			return result;
+		}
+
+		Integer rating = null;
+		String comment = null;
+
+		if(fb.get("rating") != null){
+			try{
+				rating = Integer.parseInt(fb.get("rating").toString());
+			} catch (NumberFormatException e){
+				HttpResponse result = new HttpResponse("Feedback rating must be number (0 <= x <= 5)!");
+				result.setStatus(400);
+				return result;
+			}
+			if(rating > 5 || rating < 0){
+				HttpResponse result = new HttpResponse("Feedback rating must be number (0 <= x <= 5)!");
+				result.setStatus(400);
+				return result;
+			}
+		}
+
+		if(fb.get("comment") != null){
+			comment = fb.get("comment").toString();
+		}
+
+		System.out.println("Feedback received from " + mej.get("sub"));
+		System.out.println(" - Rating: " + rating);
+		System.out.println(" - Comment: " + comment);
+
+		HttpResponse result = new HttpResponse("Client feedback submission complete");
+		result.setStatus(200);
+		return result;
+
+	}
 
 	// ============= COMMUNITY EXTENSIONS (TODO) ==============
 
@@ -3529,7 +3594,7 @@ public class SurveyService extends Service {
 					}
 				} 
 				else if(key.equals("resource")){
-					
+
 					HttpResponse h = getClientMetadata((String) o.get(key));
 					if(h.getStatus()==404){
 						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be an existing OpenID Client ID.");
