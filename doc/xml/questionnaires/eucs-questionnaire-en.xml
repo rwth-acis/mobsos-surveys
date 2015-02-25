@@ -15,7 +15,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -28,7 +28,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -41,7 +41,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -54,7 +54,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -67,7 +67,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -80,7 +80,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -93,7 +93,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -106,7 +106,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -119,7 +119,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -132,7 +132,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -145,7 +145,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -158,7 +158,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -171,7 +171,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -184,7 +184,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -197,7 +197,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -210,7 +210,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -223,7 +223,7 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
@@ -236,37 +236,11 @@
 	      minval="1" 
 	      maxval="5"
 	      minlabel="almost never" 
-	      maxlabel="almost alyways" 
+	      maxlabel="almost always" 
 		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Does ${SURVEY.RESOURCE} provide up-to-date information?
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Overall Satisfaction" 
-	      qid="EUCS.OSA"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="almost never" 
-	      maxlabel="almost ever"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Are you satisfied with ${SURVEY.RESOURCE}?
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Overall Success" 
-	      qid="EUCS.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="almost never" 
-	      maxlabel="almost ever"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Is ${SURVEY.RESOURCE} successful?
 		</qu:Instructions>
 	</qu:Page>
 	

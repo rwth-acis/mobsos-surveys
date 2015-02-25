@@ -2,10 +2,10 @@
 <!-- A simple questionnaire for measuring Usability and Learnability. The SUS Questionnaire is based on: Brooke, J. (1996) "SUS: A quick and dirty usability scale". In: Usability Evaluation in Industry. The two different factors of usability and learnability stem from a study by Lewis, J. R. & Sauro, J. (2009) "The Factor Structure of the System Usability Scale". The german version as modelled in this document is a result of a crowdsourcing initiative by Wolfgang Reinhardt, consolidated by the usability specialists Eva Ruegenhagen and Bernard Rummel from SAP. -->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
-	<qu:Page name="Instructions" 
+	<qu:Page name="Instruktionen" 
 		 xsi:type="qu:InformationPageType">
 		<qu:Instructions>
-			Hallo, ${USER.NAME}! Bitte fülle folgenden Fragebogen zur System-Gebrauchstauglichkeit von ${SURVEY.RESOURCE} aus. Das Ausfüllen wird ca. 5 Minuten dauern.
+			Bitte füllen Sie folgenden Fragebogen zur System-Gebrauchstauglichkeit von ${SURVEY.RESOURCE} aus. Das Ausfüllen wird ca. 5 Minuten dauern.
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -136,37 +136,6 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Ich musste eine Menge lernen, bevor ich anfangen konnte ${SURVEY.RESOURCE} zu verwenden.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Gesamterfolg" 
-	      qid="SUS.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="stimme überhaupt nicht zu" 
-	      maxlabel="stimme vollkommen zu"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Insgesamt denke ich, ${SURVEY.RESOURCE} ist ein voller Erfolg.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Negative Aspects" 
-	      qid="SUS.N"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			Liste die negativsten Aspekte von ${SURVEY.RESOURCE} auf.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Positive Aspects" 
-	      qid="SUS.P"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			Liste die positivsten Aspekte von ${SURVEY.RESOURCE} auf.
 		</qu:Instructions>
 	</qu:Page>
 	

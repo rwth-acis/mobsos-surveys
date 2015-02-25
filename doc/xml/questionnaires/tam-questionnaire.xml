@@ -166,35 +166,4 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Overall Success" 
-	      qid="TAM.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Altogether, ${SURVEY.RESOURCE} is a success.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Negative Aspects" 
-	      qid="TAM.N"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most negative aspects about ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Positive Aspects" 
-	      qid="TAM.P"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most positive aspects about ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
 </qu:Questionnaire>

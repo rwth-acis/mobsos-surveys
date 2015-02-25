@@ -369,18 +369,4 @@
 		
 	</qu:Page>
 	
-	<qu:Page name="Overall Success" 
-	      qid="UEQ.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="a total success" 
-	      maxlabel="a total failure" 
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			${SURVEY.RESOURCE} is... 
-		</qu:Instructions>
-		
-	</qu:Page>
-	
 </qu:Questionnaire>

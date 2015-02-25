@@ -16,7 +16,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} responds too slowly to inputs.
@@ -29,7 +29,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I would recommend ${SURVEY.RESOURCE} to my colleagues.
@@ -42,7 +42,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			The instructions and prompts are helpful.
@@ -55,7 +55,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has at some time stopped unexpectedly.
@@ -68,7 +68,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Learning to operate ${SURVEY.RESOURCE} initially is full of problems.
@@ -81,7 +81,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I sometimes don't know what to do next with ${SURVEY.RESOURCE}.	
@@ -94,7 +94,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I enjoy the time I spend using ${SURVEY.RESOURCE}.
@@ -107,7 +107,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I find that the help information given by ${SURVEY.RESOURCE} is not very useful.
@@ -120,7 +120,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			If ${SURVEY.RESOURCE} stops it is not easy to restart it.
@@ -133,7 +133,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It takes too long to learn the ${SURVEY.RESOURCE} functions.
@@ -146,7 +146,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I sometimes wonder if I am using the right function.
@@ -159,7 +159,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Working with ${SURVEY.RESOURCE} is satisfying.
@@ -172,7 +172,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			The way that system information is presented is clear and understandable.
@@ -185,7 +185,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I feel safer if I use only a few familiar functions.
@@ -198,7 +198,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			The ${SURVEY.RESOURCE} documentation is very informative.
@@ -211,7 +211,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} seems to disrupt the way I normally like to arrange my work.
@@ -224,7 +224,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Working with ${SURVEY.RESOURCE} is mentally stimulating.
@@ -237,7 +237,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			There is never enough information on the screen when it's needed.
@@ -250,7 +250,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I feel in command of ${SURVEY.RESOURCE} when I am using it.
@@ -263,7 +263,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I prefer to stick to the functions that I know best.
@@ -276,7 +276,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I think ${SURVEY.RESOURCE} is inconsistent.
@@ -289,7 +289,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I would not like to use ${SURVEY.RESOURCE} every day.
@@ -302,7 +302,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I can understand and act on the information provided by ${SURVEY.RESOURCE}.
@@ -315,7 +315,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is awkward when I want to do something which is not standard.
@@ -328,7 +328,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			There is too much to read before you can use ${SURVEY.RESOURCE}.
@@ -341,7 +341,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Tasks can be performed in a straight forward manner using ${SURVEY.RESOURCE}.
@@ -354,7 +354,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} is frustrating.
@@ -367,7 +367,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has helped me overcome any problems I have had in using it.
@@ -380,7 +380,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			The speed of ${SURVEY.RESOURCE} is fast enough.
@@ -393,7 +393,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I keep having to go back to look at the guides.
@@ -406,7 +406,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It is obvious that user needs have been fully taken into consideration.
@@ -419,7 +419,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			There have been times in using ${SURVEY.RESOURCE} when I have felt quite tense.
@@ -432,7 +432,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			The organisation of the menus seems quite logical.
@@ -446,7 +446,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} allows the user to be economic of keystrokes.
@@ -459,7 +459,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Learning how to use new functions is difficult.
@@ -472,7 +472,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			There are too many steps required to get something to work.
@@ -485,7 +485,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I think this software has sometimes given me a headache.
@@ -498,7 +498,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Error messages are not adequate.
@@ -511,7 +511,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It is easy to make ${SURVEY.RESOURCE} do exactly what you want.
@@ -524,7 +524,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I will never learn to use all that is offered in ${SURVEY.RESOURCE}.
@@ -537,7 +537,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} hasn't always done what I was expecting.
@@ -550,7 +550,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} presents itself in a very attractive way.
@@ -563,7 +563,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Either the amount or quality of the help information varies across ${SURVEY.RESOURCE}.
@@ -576,7 +576,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It is relatively easy to move from one part of a task to another.
@@ -589,7 +589,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It is easy to forget how to do things with ${SURVEY.RESOURCE}.
@@ -602,7 +602,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} occasionally behaves in a way which can't be understood.
@@ -615,7 +615,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is really very awkward.
@@ -628,7 +628,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			It is easy to see at a glance what the options are at each stage.
@@ -642,7 +642,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Getting data files in and out of ${SURVEY.RESOURCE} is not easy.
@@ -655,7 +655,7 @@
 	      maxval="3"
 	      minlabel="agree" 
 	      maxlabel="disagree" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			I have to look for assistance most times when I use ${SURVEY.RESOURCE}.
@@ -664,7 +664,7 @@
 	
 	<qu:Page name="General Questions" 
 	      qid="SUMI.GQ.1"
-		  required="true"
+		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
 			What, in general, do you use ${SURVEY.RESOURCE} for?
@@ -677,7 +677,7 @@
 	      maxval="4"
 	      minlabel="extremely important" 
 	      maxlabel="not important at all" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			How important for you is the kind of software you have just been rating?
@@ -690,7 +690,7 @@
 	      maxval="4"
 	      minlabel="Very experienced and technical" 
 	      maxlabel="I find most software difficult to use" 
-		  required="true"
+		  required="false"
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			How would you rate your software skills and knowledge?
@@ -699,7 +699,7 @@
 	
 	<qu:Page name="General Questions" 
 	      qid="SUMI.GQ.4"
-		  required="true"
+		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
 			What do you think is the best aspect of ${SURVEY.RESOURCE}, and why?
@@ -708,28 +708,11 @@
 	
 	<qu:Page name="General Questions" 
 	      qid="SUMI.GQ.5"
-		  required="true"
+		  required="false"
 	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
 			What do you think needs most improvement, and why?
 		</qu:Instructions>
 	</qu:Page>
-	
-	
-
-	<qu:Page name="Overall Success" 
-	      qid="SUMI.OS"
-	      minval="1" 
-	      maxval="3"
-	      minlabel="agree" 
-	      maxlabel="disagree"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Altogether, ${SURVEY.RESOURCE} is a success.
-		</qu:Instructions>
-	</qu:Page>
-	
-	
 	
 </qu:Questionnaire>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- IS Impact Questionnaire -->
-<!-- A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) "Re-conceptualizing information system success : the IS-Impact Measurement Model". Journal of the Association for Information Systems, 9(7). pp. 377-408. -->
+<!-- A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) "Re-conceptualizing information system success: the IS-Impact Measurement Model". Journal of the Association for Information Systems, 9(7). pp. 377-408. -->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
 	<qu:Page name="Instructions" 
@@ -70,15 +70,6 @@
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
-	      qid="ISI.II.C"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			Comments
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Individual Impact" 
 	      qid="ISI.II.CM"
 	      minval="1" 
 	      maxval="7"
@@ -88,6 +79,15 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Overall, the impact of ${SURVEY.RESOURCE} on me has been positive.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Individual Impact" 
+	      qid="ISI.II.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -202,15 +202,6 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Individual Impact" 
-	      qid="ISI.II.C"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			Comments
-		</qu:Instructions>
-	</qu:Page>
-	
 	<qu:Page name="Organizational Impact" 
 	      qid="ISI.OI.CM"
 	      minval="1" 
@@ -318,15 +309,6 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Individual Impact" 
-	      qid="ISI.IQ.C"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			Comments
-		</qu:Instructions>
-	</qu:Page>
-	
 	<qu:Page name="Information Quality" 
 	      qid="ISI.IQ.CM"
 	      minval="1" 
@@ -337,6 +319,15 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			Overall, the ${SURVEY.RESOURCE} Information Quality is satisfactory.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="ISI.IQ.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	
@@ -453,7 +444,7 @@
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
-	      qid="ISI.SQ.8"
+	      qid="ISI.SQ.9"
 	      minval="1" 
 	      maxval="7"
 	      minlabel="totally disagree" 
@@ -478,16 +469,12 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<qu:Page name="Overall Success" 
-	      qid="ISI.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="totally disagree" 
-	      maxlabel="totally agree"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
+	<qu:Page name="System Quality" 
+	      qid="ISI.SQ.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
 		<qu:Instructions>
-			Overall, I think ${SURVEY.RESOURCE} is a complete success.
+			Comments
 		</qu:Instructions>
 	</qu:Page>
 	

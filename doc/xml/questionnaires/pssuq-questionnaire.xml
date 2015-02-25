@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Post Study System Usability Questionnaire -->
+<!-- A simple questionnaire for assessing system usability. Based on Lewis, J. R. (1993) "IBM Computer Usability Satisfaction Questionnaires: Psychometric Evaluation and Instructions for Use". IBM Corporation Technical Report 54.786. -->
+<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-US">
+	
+	<qu:Page name="Instructions" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			This questionnaire, which starts on the following page, gives you an opportunity to tell us your reactions to the system you used. Your responses will help us understand what aspects of the system you are particularly concerned about and the aspects that satisfy you. To as great a degree as possible, think about all the tasks that you have done with the system while you answer these questions. Please read each statement and indicate how strongly you agree or disagree with the statement by circling a number on the scale. If a statement does not apply to you, do not respond. Please write comments to elaborate on your answers. After you have completed this questionnaire, I'll go over your answers with you to make sure I understand all of your responses. Thank you!
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.1"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, I am satisfied with how easy it is to use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.2"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It was simple to use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.3"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I could effectively complete the tasks and scenarios using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.4"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I was able to complete the tasks and scenarios quickly using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.5"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I was able to efficiently complete the tasks and scenarios using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.6"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I felt comfortable using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.7"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It was easy to learn to use ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="System Usefulness" 
+	      qid="PSSUQ.8"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I believe I could become productive quickly using ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.9"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} gave error messages that clearly told me how to fix problems..
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.10"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Whenever I made a mistake using ${SURVEY.RESOURCE}, I could recover easily and quickly.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.11"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The information (such as on-line help, on-screen messages and other documentation) provided with ${SURVEY.RESOURCE} was clear.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.12"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			It was easy to find the information I needed.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.13"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The information provided for ${SURVEY.RESOURCE} was easy to understand.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.14"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The information was effective in helping me complete the tasks and scenarios.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Information Quality" 
+	      qid="PSSUQ.15"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The organization of information on ${SURVEY.RESOURCE} screens was clear.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Note" 
+		 xsi:type="qu:InformationPageType">
+		<qu:Instructions>
+			The interface includes those items that you use to interact with the system. For example, some components of the interface are the keyboard, the mouse, the screens (including their use of graphics and language).
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Interface Quality" 
+	      qid="PSSUQ.16"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			The interface of ${SURVEY.RESOURCE} was pleasant.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Interface Quality" 
+	      qid="PSSUQ.17"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			I liked using the interface of ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Interface Quality" 
+	      qid="PSSUQ.18"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			${SURVEY.RESOURCE} has all the functions and capabilities I expect it to have.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Interface Quality" 
+	      qid="PSSUQ.19"
+	      minval="1" 
+	      maxval="7"
+	      minlabel="strongly disagree" 
+	      maxlabel="strongly agree" 
+		  required="false"
+	      xsi:type="qu:OrdinalScaleQuestionPageType">
+		<qu:Instructions>
+			Overall, I am satisfied with ${SURVEY.RESOURCE}.
+		</qu:Instructions>
+	</qu:Page>
+	
+	<qu:Page name="Comments" 
+	      qid="PSSUQ.C"
+		  required="false"
+	      xsi:type="qu:FreeTextQuestionPageType">
+		<qu:Instructions>
+			Comments:
+		</qu:Instructions>
+	</qu:Page>
+
+</qu:Questionnaire>

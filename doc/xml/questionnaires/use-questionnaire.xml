@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
+<!-- USE Questionnaire: Usefulness, Satisfaction, and Ease of use
+Based on: Lund, A. M. (2001) "Measuring Usability with the USE Questionnaire". STC Usability SIG Newsletter, 8:2.-->
 <qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xml:lang="en-US">
 	
 	<qu:Page name="Instructions" 
@@ -396,37 +397,6 @@
 	      xsi:type="qu:OrdinalScaleQuestionPageType">
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is pleasant to use.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Overall Success" 
-	      qid="USE.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Altogether, ${SURVEY.RESOURCE} is a success.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Negative Aspects" 
-	      qid="USE.N"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most negative aspects about ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Positive Aspects" 
-	      qid="USE.P"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most positive aspects about ${SURVEY.RESOURCE}.
 		</qu:Instructions>
 	</qu:Page>
 	

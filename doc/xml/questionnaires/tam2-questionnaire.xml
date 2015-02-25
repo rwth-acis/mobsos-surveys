@@ -349,41 +349,4 @@
 		</qu:Instructions>
 	</qu:Page>
 	
-	<!-- 
-		The following items are custom extensions to the original TAM2 instrument.
-		Overall Success is a criterion measure enabling to find which success factors were most relevant.
-		Positive/Negative aspects additionally allow to collect qualitative data on the success of the surveyed resource. 
-	-->
-	
-	<qu:Page name="Overall Success" 
-	      qid="TAM2.OS"
-	      minval="1" 
-	      maxval="7"
-	      minlabel="strongly disagree" 
-	      maxlabel="strongly agree"  
-		  required="true"
-	      xsi:type="qu:OrdinalScaleQuestionPageType">
-		<qu:Instructions>
-			Altogether, ${SURVEY.RESOURCE} is a success.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Negative Aspects" 
-	      qid="TAM2.N"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most negative aspects about ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
-	<qu:Page name="Positive Aspects" 
-	      qid="TAM2.P"
-		  required="false"
-	      xsi:type="qu:FreeTextQuestionPageType">
-		<qu:Instructions>
-			List the most positive aspects about ${SURVEY.RESOURCE}.
-		</qu:Instructions>
-	</qu:Page>
-	
 </qu:Questionnaire>
