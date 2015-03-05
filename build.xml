@@ -327,10 +327,9 @@
         </java>
     </target>
 	
-    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1, generate_anonymous_agent">
+    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1">
 <echo file="${passphrases.path}" append="false">agent-service-${service.name}.xml;${service.password}
 agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}
-agent-user-${las2peer_anonymous.name}.xml;${las2peer_anonymous.password}
 </echo>
     </target>
 	
