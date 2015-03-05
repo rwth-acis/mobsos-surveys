@@ -5,4 +5,11 @@ cd ${SCRIPTDIR}/../
 BASE=${PWD}
 export CLASSPATH="${PWD}/lib/*"
 
-java -cp "${CLASSPATH}" i5.las2peer.tools.ServiceAgentGenerator i5.las2peer.servicePackage.ServiceClass SampleServicePass
+if [[ "$#" -ne 2 ]]; then
+	echo "Syntax error!"
+	echo ""
+    echo "Usage: start_ServiceAgentGenerator <service.canonical.class.name> <service.password>";
+else
+	java -cp "${CLASSPATH}" i5.las2peer.tools.ServiceAgentGenerator $1 $2
+fi
+

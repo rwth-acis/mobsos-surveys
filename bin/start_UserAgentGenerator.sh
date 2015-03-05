@@ -5,4 +5,10 @@ cd ${SCRIPTDIR}/../
 BASE=${PWD}
 export CLASSPATH="${PWD}/lib/*"
 
-java -cp "${CLASSPATH}" i5.las2peer.tools.UserAgentGenerator userAPass "User A" usera@mail.com
+if [[ "$#" -ne 3 ]]; then
+	echo "Syntax error!"
+	echo ""
+    echo "Usage: start_UserAgentGenerator <user.name> <user.pass> <user.mail>";
+else
+	java -cp "${CLASSPATH}" i5.las2peer.tools.UserAgentGenerator $2 $1 $3
+fi
