@@ -2316,7 +2316,7 @@ public class SurveyService extends Service {
 	@Path("/")
 	public HttpResponse serveIndexPage(@HeaderParam(name="accept-language", defaultValue="") String lang){
 		String onAction = "serving index page";
-
+		this.logMessage("Accessed index page");
 		String html = "";
 		// start off with template
 		try {
