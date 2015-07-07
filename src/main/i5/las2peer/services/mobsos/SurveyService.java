@@ -202,7 +202,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires")
-	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang){
+	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
 		String onAction = "retrieving questionnaires HTML";
 
 		// only respond with template; nothing to be adapted
@@ -515,7 +515,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires/{id}")
-	public HttpResponse getQuestionnaireHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+	public HttpResponse getQuestionnaireHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving individual questionnaire HTML";
 
@@ -922,7 +922,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys")
-	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="") String lang){
+	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
 
 		String onAction = "retrieving surveys HTML";
 
@@ -1255,7 +1255,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}")
-	public HttpResponse getSurveyHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
 		String onAction = "retrieving individual survey HTML";
 
 		try {
@@ -1489,7 +1489,7 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 400, message = "Survey questionnaire form invalid. Cause: ..."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist. <b>-or-</b> Survey questionnaire not set. <b>-or-</b> Survey questionnaire does not define form.")
 	})
-	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
 
@@ -1891,7 +1891,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/responses")
-	public HttpResponse getSurveyResponsesHTML(@HeaderParam(name="accept-language", defaultValue="") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyResponsesHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving responses HTML for survey " + id;
 
@@ -2284,7 +2284,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("redirect")
-	public HttpResponse redirectCallback(@HeaderParam(name="accept-language", defaultValue="") String lang){
+	public HttpResponse redirectCallback(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
 		String onAction = "processing OpenID Connect redirect Callback";
 
 		String html = "";
@@ -2314,7 +2314,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("/")
-	public HttpResponse serveIndexPage(@HeaderParam(name="accept-language", defaultValue="") String lang){
+	public HttpResponse serveIndexPage(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
 		String onAction = "serving index page";
 		this.logMessage("Accessed index page");
 		String html = "";
