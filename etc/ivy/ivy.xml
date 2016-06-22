@@ -6,8 +6,8 @@
     </publications>
     <dependencies>
 
-        <dependency org="i5" name="las2peer" rev="0.3-SNAPSHOT" />
-        <dependency org="i5" name="las2peer-web-connector" rev="0.3-SNAPSHOT"/>
+        <dependency org="i5" name="las2peer" rev="0.5-SNAPSHOT" changing="true" />
+        <dependency org="i5" name="las2peer-web-connector" rev="0.5-SNAPSHOT" changing="true" />
 		
 		<!-- Third-party library dependencies -->
         <dependency org="junit" name="junit" rev="4.11"/>
@@ -15,6 +15,8 @@
 		<dependency org="mysql" name="mysql-connector-java" rev="5.1.6" />
 		<dependency org="org.apache.commons" name="commons-pool2" rev="2.2"/>
 		<dependency org="org.apache.commons" name="commons-dbcp2" rev="2.0"/>	
+		<dependency org="io.swagger" name="swagger-annotations" rev="1.5.9"/>
+		<dependency org="commons-dbcp" name="commons-dbcp" rev="1.2.2"/>
 		
     </dependencies>
 </ivy-module>

@@ -36,20 +36,28 @@ import i5.las2peer.api.Service;
 import i5.las2peer.restMapper.HttpResponse;
 import i5.las2peer.restMapper.MediaType;
 import i5.las2peer.restMapper.RESTMapper;
-import i5.las2peer.restMapper.annotations.Consumes;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.HeaderParam;
+
 import i5.las2peer.restMapper.annotations.ContentParam;
-import i5.las2peer.restMapper.annotations.DELETE;
-import i5.las2peer.restMapper.annotations.GET;
-import i5.las2peer.restMapper.annotations.HeaderParam;
-import i5.las2peer.restMapper.annotations.POST;
-import i5.las2peer.restMapper.annotations.PUT;
-import i5.las2peer.restMapper.annotations.Path;
-import i5.las2peer.restMapper.annotations.PathParam;
-import i5.las2peer.restMapper.annotations.Produces;
-import i5.las2peer.restMapper.annotations.QueryParam;
 import i5.las2peer.restMapper.annotations.Version;
-import i5.las2peer.restMapper.annotations.swagger.ApiInfo;
-import i5.las2peer.restMapper.annotations.swagger.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Contact;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.License;
+import io.swagger.annotations.SwaggerDefinition;
+
 import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.UserAgent;
 
@@ -138,18 +146,26 @@ import org.xml.sax.SAXException;
  */
 @Path("mobsos-surveys")
 @Version("0.1")
-@ApiInfo(
-		title="MobSOS Surveys",
-		description="<p>A simple RESTful service for online survey management.</p><p>MobSOS Surveys is part of the MobSOS "
-				+ "Tool Set dedicated to exploring, modeling, and measuring Community Information System (CIS) "
-				+ "Success as a complex construct established by multiple dimensions and factors. As part of "
-				+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
-				+ "measurements of CIS Success.</p>", 
-				termsOfServiceUrl="",
-				contact="renzel@dbis.rwth-aachen.de",
-				license="MIT",
-				licenseUrl="https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE"
-		)
+@SwaggerDefinition(
+		info = @Info(
+				title = "MobSOS Surveys",
+				version = "0.1",
+						description="<p>A simple RESTful service for online survey management.</p><p>MobSOS Surveys is part of the MobSOS "
+								+ "Tool Set dedicated to exploring, modeling, and measuring Community Information System (CIS) "
+								+ "Success as a complex construct established by multiple dimensions and factors. As part of "
+								+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
+								+ "measurements of CIS Success.</p>", 
+				termsOfService = "",
+				contact = @Contact(
+						name = "Dominik Renzel",
+						url = "",
+						email = "renzel@dbis.rwth-aachen.de"
+				),
+				license = @License(
+						name = "MIT",
+						url = "https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE"
+				)
+		))
 public class SurveyService extends Service {
 
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
@@ -201,14 +217,15 @@ public class SurveyService extends Service {
 
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	@Path("questionnaires")
-	public HttpResponse getQuestionnairesHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
+	@Path("/questionnaires")
+	public HttpResponse getQuestionnairesHTML(@HeaderParam("accept-language") String lang){
 		String onAction = "retrieving questionnaires HTML";
-
+		Scanner scanner;
 		// only respond with template; nothing to be adapted
 		try {
 			// load template
-			String html = new Scanner(new File("./etc/html/questionnaires-template.html")).useDelimiter("\\A").next();
+			scanner = new Scanner(new File("./etc/html/questionnaires-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
 
 			// localize template
 			html = i18n(html, lang);
@@ -225,6 +242,7 @@ public class SurveyService extends Service {
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
+			scanner.close();
 			return result;
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
@@ -238,15 +256,16 @@ public class SurveyService extends Service {
 	 * @throws SQLException 
 	 */
 	@GET
+	@Path("/questionnaires")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("questionnaires")
-	@ResourceListApi(description = "Manage questionnaires")
-	@Summary("search or list questionnaires.")
-	@Notes("query parameter matches questionnaire name, description.")
-	@ApiResponses(value={
-			@ApiResponse(code = 200, message = "Questionnaires data (TODO: introduce Swagger models)"),
+	@ApiResponses(value = {
+			@ApiResponse(code = HttpURLConnection.HTTP_OK, message = "Questionnaires data (TODO: introduce Swagger models)"),
+			@ApiResponse(code = HttpURLConnection.HTTP_NOT_FOUND, message = "Error - 404"),
+			@ApiResponse(code = HttpURLConnection.HTTP_BAD_REQUEST, message = "Error Bad Request"),
 	})
-	public HttpResponse getQuestionnaires(@QueryParam(name = "full" , defaultValue = "1" ) int full, @QueryParam(name="q",defaultValue="") String query){
+	@ApiOperation(value = "getQuestionnaires",
+	notes = "Query parameter matches questionnaire name, description.")
+	public HttpResponse getQuestionnaires(@QueryParam("full")  int full, @QueryParam("q")  String query){
 		String onAction = "retrieving questionnaires";
 
 		try{
@@ -326,8 +345,8 @@ public class SurveyService extends Service {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires")
-	@Summary("create new questionnaire.")
-	@Notes("Requires authentication.")
+	@ApiOperation(value = "createQuestionnaire",
+	notes ="Requires authentication.")
 	@ApiResponses(value={
 			@ApiResponse(code = 201, message = "Questionnaire created successfully."),
 			@ApiResponse(code = 400, message = "Questionnaire data invalid."),
@@ -336,7 +355,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse createQuestionnaire(@ContentParam String content){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to create questionnaires!");
 			noauth.setStatus(401);
 		}
@@ -394,10 +413,10 @@ public class SurveyService extends Service {
 	 * This method should be only be used for development and with absolute caution!
 	 */
 	@DELETE
-	@Path("questionnaires")
+	@Path("/questionnaires")
 	public HttpResponse deleteQuestionnaires(){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaires!");
 			noauth.setStatus(401);
 		}
@@ -455,8 +474,8 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
-	@Summary("retrieve given questionnaire.")
-	@Notes("Use parent resource to retrieve list of existing questionnaires. ")
+	@ApiOperation(value = "getQuestionnaire",
+	notes ="Use parent resource to retrieve list of existing questionnaires.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaire data (TODO: introduce Swagger models)"),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist.")	
@@ -515,7 +534,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires/{id}")
-	public HttpResponse getQuestionnaireHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
+	public HttpResponse getQuestionnaireHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving individual questionnaire HTML";
 
@@ -566,8 +585,8 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("questionnaires/{id}")
-	@Summary("update given questionnaire.")
-	@Notes("Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
+	@ApiOperation(value = "updateQuestionnaire",
+	notes ="Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaire updated successfully."),
 			@ApiResponse(code = 400, message = "Questionnaire data invalid."),
@@ -576,7 +595,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse updateQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to update questionnaire!");
 			noauth.setStatus(401);
 		}
@@ -663,8 +682,8 @@ public class SurveyService extends Service {
 	 */
 	@DELETE
 	@Path("questionnaires/{id}")
-	@Summary("delete given questionnaire.")
-	@Notes("Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
+	@ApiOperation(value = "deleteQuestionnaire",
+	notes ="Requires authentication. Use parent resource to retrieve list of existing questionnaires.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaire deleted successfully."),
 			@ApiResponse(code = 401, message = "Questionnaire may only be deleted by its owner."),
@@ -672,7 +691,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse deleteQuestionnaire(@PathParam("id") int id){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete questionnaire!");
 			noauth.setStatus(401);
 		}
@@ -739,8 +758,8 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
-	@Summary("Download form of a given questionnaire.")
-	@Notes("Use parent resource to retrieve list of existing surveys. Response body contains XML document compliant with the MobSOS Surveys XML Schema.")
+	@ApiOperation(value = "downloadQuestionnaireForm",
+	notes ="Use parent resource to retrieve list of existing surveys. Response body contains XML document compliant with the MobSOS Surveys XML Schema.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaire form data."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist -or- Questionnaire does not define a form.")	
@@ -824,8 +843,8 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
-	@Summary("Upload for for given questionnaire.")
-	@Notes("Requires authentication and ownership of questionnaire.")
+	@ApiOperation(value = "uploadQuestionnaireForm",
+	notes ="Requires authentication and ownership of questionnaire.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaire form upload successful."),
 			@ApiResponse(code = 400, message = "Questionnaire form data invalid."),
@@ -834,7 +853,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse uploadQuestionnaireForm(@PathParam("id") int id, @ContentParam String formXml){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to upload questionnaire form!");
 			noauth.setStatus(401);
 		}
@@ -922,7 +941,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys")
-	public HttpResponse getSurveysHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
+	public HttpResponse getSurveysHTML(@HeaderParam("accept-language") String lang){
 
 		String onAction = "retrieving surveys HTML";
 
@@ -966,13 +985,12 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
-	@ResourceListApi(description = "Manage surveys")
-	@Summary("search or list questionnaires.")
-	@Notes("query parameter matches questionnaire name, description.")
+	@ApiOperation(value = "getSurveys",
+	notes ="Query parameter matches questionnaire name, description.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaires data (TODO: introduce Swagger models)"),
 	})
-	public HttpResponse getSurveys(@QueryParam(defaultValue = "1", name = "full") int full, @QueryParam(defaultValue = "", name="q") String query)
+	public HttpResponse getSurveys(@QueryParam("full") int full, @QueryParam("q") String query)
 	{
 
 		String onAction = "retrieving surveys";
@@ -1053,8 +1071,8 @@ public class SurveyService extends Service {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
-	@Summary("create new survey.")
-	@Notes("Requires authentication.")
+	@ApiOperation(value = "createSurvey",
+	notes ="Requires authentication.")
 	@ApiResponses(value={
 			@ApiResponse(code = 201, message = "Survey URL & ID (TODO: introduce Swagger models)"),
 			@ApiResponse(code = 400, message = "Survey data invalid."),
@@ -1063,7 +1081,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse createSurvey(@ContentParam String data)
 	{
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to create surveys!");
 			noauth.setStatus(401);
 		}
@@ -1124,7 +1142,7 @@ public class SurveyService extends Service {
 	@Path("surveys")
 	public HttpResponse deleteSurveys(){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete surveys!");
 			noauth.setStatus(401);
 		}
@@ -1174,8 +1192,8 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
-	@Summary("retrieve given survey.")
-	@Notes("Use <b>/surveys</b> to retrieve list of existing surveys. ")
+	@ApiOperation(value = "getSurvey",
+	notes ="Use <b>/surveys</b> to retrieve list of existing surveys.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey data (TODO: introduce Swagger models)"),
 			@ApiResponse(code = 404, message = "Survey does not exist.")	
@@ -1255,7 +1273,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}")
-	public HttpResponse getSurveyHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
 		String onAction = "retrieving individual survey HTML";
 
 		try {
@@ -1305,8 +1323,8 @@ public class SurveyService extends Service {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}")
-	@Summary("update given survey.")
-	@Notes("Requires authentication. Use parent resource to retrieve list of existing surveys.")
+	@ApiOperation(value = "updateSurvey",
+	notes ="Requires authentication. Use parent resource to retrieve list of existing surveys.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey updated successfully."),
 			@ApiResponse(code = 400, message = "Survey data invalid."),
@@ -1315,7 +1333,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse updateSurvey(@PathParam("id") int id, @ContentParam String content){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to update survey!");
 			noauth.setStatus(401);
 		}
@@ -1404,8 +1422,8 @@ public class SurveyService extends Service {
 	 */
 	@DELETE
 	@Path("surveys/{id}")
-	@Summary("delete given survey.")
-	@Notes("Requires authentication. Use parent resource to retrieve list of existing surveys.")
+	@ApiOperation(value = "deleteSurvey",
+	notes ="Requires authentication. Use parent resource to retrieve list of existing surveys.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey deleted successfully."),
 			@ApiResponse(code = 401, message = "Survey may only be deleted by its owner."),
@@ -1413,7 +1431,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse deleteSurvey(@PathParam("id") int id){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete survey!");
 			noauth.setStatus(401);
 		}
@@ -1482,14 +1500,14 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/questionnaire")
-	@Summary("Download questionnaire form for given survey. Enables response submission.")
-	@Notes("Can be used with or without authentication, including response submission.")
+	@ApiOperation(value = "getSurveyQuestionnaireFormHTML",
+	notes ="Can be used with or without authentication, including response submission.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey questionnaire HTML representation."),
 			@ApiResponse(code = 400, message = "Survey questionnaire form invalid. Cause: ..."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist. <b>-or-</b> Survey questionnaire not set. <b>-or-</b> Survey questionnaire does not define form.")
 	})
-	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
 
@@ -1559,7 +1577,7 @@ public class SurveyService extends Service {
 			}
 
 			// adapt form template to concrete survey and user
-			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),null);
+			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getContext().getMainAgent(),null);
 
 			//String adaptedFormXml = formXml;
 
@@ -1591,7 +1609,7 @@ public class SurveyService extends Service {
 			html = fillPlaceHolder(html,"OIDC_CLNT_ID", oidcClientId);
 
 			// do all adaptation to user and survey
-			String adaptHtml = adaptForm(html, survey, (UserAgent) this.getActiveAgent(), null);
+			String adaptHtml = adaptForm(html, survey, (UserAgent) this.getContext().getMainAgent(), null);
 
 			adaptHtml = i18n(adaptHtml, lang);
 
@@ -1773,7 +1791,6 @@ public class SurveyService extends Service {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/questionnaire")
-	@Summary("Set questionnaire for given survey.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey questionnaire set."),
 			@ApiResponse(code = 400, message = "Invalid JSON for setting survey questionnaire."),
@@ -1781,7 +1798,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse setSurveyQuestionnaire(@PathParam("id") int id, @ContentParam String content){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to set questionnaire for survey!");
 			noauth.setStatus(401);
 		}
@@ -1891,7 +1908,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/responses")
-	public HttpResponse getSurveyResponsesHTML(@HeaderParam(name="accept-language", defaultValue="en-US") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyResponsesHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving responses HTML for survey " + id;
 
@@ -1940,13 +1957,13 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_CSV)
 	@Path("surveys/{id}/responses")
-	@Summary("retrieve response data for given survey.")
-	@Notes("Use resource <i>/surveys</i> to retrieve list of existing surveys.")
+	@ApiOperation(value = "getSurveyResponses",
+	notes ="Use resource <i>/surveys</i> to retrieve list of existing surveys.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey response data in CSV format."),
 			@ApiResponse(code = 404, message = "Survey does not exist -or- No questionnaire defined for survey.")	
 	})
-	public HttpResponse getSurveyResponses(@PathParam("id") int id, @QueryParam(name = "sepline" , defaultValue = "0" ) int sepline, @QueryParam(name = "sep" , defaultValue = "," ) String sep){
+	public HttpResponse getSurveyResponses(@PathParam("id") int id, @QueryParam("sepline") int sepline, @QueryParam("sep") String sep){
 
 		String onAction = "retrieving responses for survey " + id;
 
@@ -2035,7 +2052,6 @@ public class SurveyService extends Service {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/responses")
-	@Summary("submit response data to given survey.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey response submitted successfully."),
 			@ApiResponse(code = 400, message = "Survey response invalid -or- questionnaire form invalid. Cause: ..."),
@@ -2127,7 +2143,7 @@ public class SurveyService extends Service {
 
 			String sub = (String) getActiveUserInfo().get("sub");
 
-			if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+			if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 				sub += now.getTime();
 			}
 
@@ -2215,7 +2231,6 @@ public class SurveyService extends Service {
 
 	@DELETE
 	@Path("surveys/{id}/responses")
-	@Summary("delete response data for given survey.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Survey responses deleted successfully."),
 			@ApiResponse(code = 401, message = "Survey responses may only be deleted by survey owner."),
@@ -2223,7 +2238,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse deleteSurveyResponses(@PathParam("id") int id){
 
-		if(getActiveAgent().getId() == getActiveNode().getAnonymous().getId()){
+		if(getContext().getMainAgent().getId() == getContext().getLocalNode().getAnonymous().getId()){
 			HttpResponse noauth = new HttpResponse("Please authenticate to delete responses for survey!");
 			noauth.setStatus(401);
 			return noauth;
@@ -2284,7 +2299,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("redirect")
-	public HttpResponse redirectCallback(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
+	public HttpResponse redirectCallback(@HeaderParam("accept-language") String lang){
 		String onAction = "processing OpenID Connect redirect Callback";
 
 		String html = "";
@@ -2314,7 +2329,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("/")
-	public HttpResponse serveIndexPage(@HeaderParam(name="accept-language", defaultValue="en-US") String lang){
+	public HttpResponse serveIndexPage(@HeaderParam("accept-language") String lang){
 		String onAction = "serving index page";
 		this.logMessage("Accessed index page");
 		String html = "";
@@ -2344,10 +2359,9 @@ public class SurveyService extends Service {
 	}
 
 	// ================= Swagger Resource Listing & API Declarations =====================
-
+	/*
 	@GET
 	@Path("api-docs")
-	@Summary("retrieve Swagger 1.2 resource listing.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Swagger 1.2 compliant resource listing"),
 			@ApiResponse(code = 404, message = "Swagger resource listing not available due to missing annotations."),
@@ -2360,7 +2374,6 @@ public class SurveyService extends Service {
 	@GET
 	@Path("api-docs/{tlr}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Summary("retrieve Swagger 1.2 API declaration for given top-level resource.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Swagger 1.2 compliant API declaration"),
 			@ApiResponse(code = 404, message = "Swagger API declaration not available due to missing annotations."),
@@ -2368,7 +2381,7 @@ public class SurveyService extends Service {
 	public HttpResponse getSwaggerApiDeclaration(@PathParam("tlr") String tlr){
 		return RESTMapper.getSwaggerApiDeclaration(this.getClass(),tlr, epUrl);
 	}
-
+*/
 	// ================= Static Content Hosting ===================
 	// 
 	// The browser frontend part of this service, in particular the HTML code generated from templates in ./etc/html 
@@ -2529,19 +2542,19 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_CSV)
 	@Path("surveys/{id}/responses")
-	@Summary("retrieve response data for given survey.")
-	@Notes("Use resource <i>/surveys</i> to retrieve list of existing surveys.")
+	@ApiOperation(value = "getFeedback",
+	notes ="Use resource <i>/surveys</i> to retrieve list of existing surveys.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Client feedback data"),
 			@ApiResponse(code = 404, message = "Client does not exist.")	
 	})
-	public HttpResponse getFeedback(@PathParam(value="client_id") String cid,@QueryParam(name = "sep", defaultValue = ",") String sep, @QueryParam(name="sepline", defaultValue = "0") int sepline){
+	public HttpResponse getFeedback(@PathParam(value="client_id") String cid,@QueryParam("sep") String sep, @QueryParam("sepline") int sepline){
 
 		String onAction = "retrieving client feedback";
 
 		try{
 			// authentication required for submitting response
-			if(this.getActiveAgent() != this.getActiveNode().getAnonymous()){
+			if(this.getContext().getMainAgent() != this.getContext().getLocalNode().getAnonymous()){
 				HttpResponse result = new HttpResponse("Client feedback retrieval requires authentication.");
 				result.setStatus(401);
 				return result;
@@ -2592,7 +2605,6 @@ public class SurveyService extends Service {
 	@PUT
 	@Path("feedback/{client_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Summary("Submit feedback for a given client as numeric rating and comment.")
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Client feedback submission complete."),
 			@ApiResponse(code = 400, message = "Client feedback data invalid"),
@@ -2601,7 +2613,7 @@ public class SurveyService extends Service {
 	})
 	public HttpResponse sumbitFeedback(@PathParam(value="client_id") String cid, @ContentParam String data){
 
-		UserAgent me = (UserAgent) getActiveAgent();
+		UserAgent me = (UserAgent) getContext().getMainAgent();
 		JSONObject mej = (JSONObject) JSONValue.parse(me.getUserData().toString());
 
 		JSONObject fb;
@@ -2662,7 +2674,7 @@ public class SurveyService extends Service {
 		try{
 			// if community not found, return 404
 			try{
-				this.getActiveNode().getAgent(cid);
+				this.getContext().getLocalNode().getAgent(cid);
 			} catch (AgentNotKnownException e){
 				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
 				result.setStatus(404);
@@ -2720,7 +2732,7 @@ public class SurveyService extends Service {
 
 			int surveyId = id;
 			long communityId = cid;
-			long userId = this.getActiveAgent().getId();
+			long userId = this.getContext().getMainAgent().getId();
 
 			Iterator<String> it = answerFieldTable.keySet().iterator();
 			while(it.hasNext()){
@@ -2764,7 +2776,7 @@ public class SurveyService extends Service {
 			// if community not found, return 404
 			try{
 
-				Agent a = this.getActiveNode().getAgent(cid);
+				Agent a = this.getContext().getLocalNode().getAgent(cid);
 				if(!(a instanceof GroupAgent)){
 					HttpResponse result = new HttpResponse("Agent " + cid + " does not represent a community!");
 					result.setStatus(400);
@@ -2812,7 +2824,7 @@ public class SurveyService extends Service {
 
 			String formXml = rs.getString(1);
 
-			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),community);
+			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getContext().getMainAgent(),community);
 
 			Document form;
 			// before returning form, make sure it's still valid (may be obsolete step...)
@@ -2832,7 +2844,7 @@ public class SurveyService extends Service {
 
 			String text = new Scanner(new File("./etc/html/questionnaire-template.html")).useDelimiter("\\A").next();
 
-			String adaptText = adaptForm(text, survey, (UserAgent) this.getActiveAgent(), community);
+			String adaptText = adaptForm(text, survey, (UserAgent) this.getContext().getMainAgent(), community);
 
 			Vector<String> qpages = new Vector<String>();
 			Vector<String> navpills = new Vector<String>();
@@ -2965,7 +2977,7 @@ public class SurveyService extends Service {
 			// if community not found, return 404
 			try{
 
-				Agent a = this.getActiveNode().getAgent(cid);
+				Agent a = this.getContext().getLocalNode().getAgent(cid);
 				if(!(a instanceof GroupAgent)){
 					HttpResponse result = new HttpResponse("Agent " + cid + " does not represent a community!");
 					result.setStatus(400);
@@ -3013,7 +3025,7 @@ public class SurveyService extends Service {
 
 			String formXml = rs.getString(1);
 
-			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getActiveAgent(),community);
+			String adaptedFormXml = adaptForm(formXml,survey, (UserAgent) this.getContext().getMainAgent(),community);
 
 			// before returning form, make sure it's still valid (may be obsolete step...)
 			try{
@@ -3050,7 +3062,7 @@ public class SurveyService extends Service {
 
 			// if community not found, return 404
 			try{
-				community = (GroupAgent) this.getActiveNode().getAgent(cid);
+				community = (GroupAgent) this.getContext().getLocalNode().getAgent(cid);
 			} catch (AgentNotKnownException e){
 				HttpResponse result = new HttpResponse("Community " + cid + " does not exist!");
 				result.setStatus(404);
@@ -3062,7 +3074,7 @@ public class SurveyService extends Service {
 			}
 
 			// allow access to answer data only, if current user is either survey owner or member of given community
-			if(exown == -1 || !community.isMember(this.getActiveAgent())){
+			if(exown == -1 || !community.isMember(this.getContext().getMainAgent())){
 				HttpResponse result = new HttpResponse("Access to answer information only for owner of survey " + id + " and members of community " + cid);
 				result.setStatus(401);
 				return result;
@@ -4336,8 +4348,8 @@ public class SurveyService extends Service {
 
 	private JSONObject getActiveUserInfo() throws ParseException {
 
-		if(this.getActiveAgent() instanceof UserAgent){
-			UserAgent me = (UserAgent) this.getActiveAgent();
+		if(this.getContext().getMainAgent() instanceof UserAgent){
+			UserAgent me = (UserAgent) this.getContext().getMainAgent();
 			JSONObject o;
 
 			if(me.getUserData() != null){
@@ -4346,7 +4358,7 @@ public class SurveyService extends Service {
 			} else {
 				o = new JSONObject();
 
-				if(getActiveNode().getAnonymous().getId() == getActiveAgent().getId()){
+				if(getContext().getLocalNode().getAnonymous().getId() == getContext().getMainAgent().getId()){
 					o.put("sub","anonymous");		
 				} else {
 
