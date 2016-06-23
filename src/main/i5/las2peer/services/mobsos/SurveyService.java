@@ -39,6 +39,7 @@ import i5.las2peer.restMapper.RESTMapper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -253,7 +254,6 @@ public class SurveyService extends Service {
 	 * TODO: write documentation
 	 * Retrieves a list of all questionnaires.
 	 * @return
-	 * @throws SQLException 
 	 */
 	@GET
 	@Path("/questionnaires")
@@ -265,7 +265,7 @@ public class SurveyService extends Service {
 	})
 	@ApiOperation(value = "getQuestionnaires",
 	notes = "Query parameter matches questionnaire name, description.")
-	public HttpResponse getQuestionnaires(@QueryParam("full")  int full, @QueryParam("q")  String query){
+	public HttpResponse getQuestionnaires(@QueryParam("full") @DefaultValue("1")  int full, @QueryParam("q") @DefaultValue("") String query){
 		String onAction = "retrieving questionnaires";
 
 		try{
@@ -990,7 +990,7 @@ public class SurveyService extends Service {
 	@ApiResponses(value={
 			@ApiResponse(code = 200, message = "Questionnaires data (TODO: introduce Swagger models)"),
 	})
-	public HttpResponse getSurveys(@QueryParam("full") int full, @QueryParam("q") String query)
+	public HttpResponse getSurveys(@QueryParam("full") @DefaultValue("1") int full, @QueryParam("q") @DefaultValue("") String query)
 	{
 
 		String onAction = "retrieving surveys";
@@ -2432,6 +2432,59 @@ public class SurveyService extends Service {
 	}
 
 	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
+	
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("resource-meta")
+	public HttpResponse getResourceMetadata(@ContentParam String uri){
+
+		String onAction = "retrieving resource metadata for URI " + uri ;
+
+		try {
+
+			Connection conn = null;
+			PreparedStatement stmt = null;
+			ResultSet rset = null;
+
+			try {
+				conn = dataSource.getConnection();
+				stmt = conn.prepareStatement("select * from " + jdbcSchema + ".resource where uri = ?");
+				stmt.setString(1, uri);
+
+				rset = stmt.executeQuery();
+
+				if (!rset.isBeforeFirst()){
+					HttpResponse result = new HttpResponse("No metadata found for resource " + uri + "!");
+					result.setStatus(404);
+					return result;
+				}
+				rset.next();
+
+				JSONObject meta = new JSONObject();
+
+				meta.put("name",rset.getString("name"));
+				meta.put("description",rset.getString("description"));
+
+				HttpResponse result = new HttpResponse(meta.toJSONString());
+				result.setStatus(200);
+				return result;
+
+			} catch(SQLException | UnsupportedOperationException e) {
+				return internalError(onAction);
+			} 
+			finally {
+				try { if (rset != null) rset.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (stmt != null) stmt.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+				try { if (conn != null) conn.close(); } catch(Exception e) {e.printStackTrace(); return internalError(onAction);}
+			}
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+			return internalError(onAction);
+		}
+	}
+	
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -3606,7 +3659,6 @@ public class SurveyService extends Service {
 					}
 				} 
 				else if(key.equals("resource")){
-
 					HttpResponse h = getClientMetadata((String) o.get(key));
 					if(h.getStatus()==404){
 						throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be an existing OpenID Client ID.");

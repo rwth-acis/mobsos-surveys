@@ -45,7 +45,7 @@
         </fileset>
     </path>
 	
-    <property name="lib.junit" location="${lib}/junit-4.11.jar" />
+    <property name="lib.junit" location="${lib}/junit-4.12.jar" />
 	
 	
     <!-- Ivy Installation (Tool to fetch Libraries) -->
@@ -232,9 +232,9 @@
             classpath="${tmp.classes}"
             classpathref="libraries"
             >
-            <packageset dir="${src.main}" defaultexcludes="yes">
-                <include name="/**" />
-            </packageset>
+        	<packageset dir="${src.main}" defaultexcludes="yes">
+	            <include name="i5/las2peer/**" />
+	        </packageset>
         </javadoc>
     </target>
 	
