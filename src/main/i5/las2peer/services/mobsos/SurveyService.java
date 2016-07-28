@@ -534,7 +534,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("questionnaires/{id}")
-	public HttpResponse getQuestionnaireHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
+	public HttpResponse getQuestionnaireHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving individual questionnaire HTML";
 
@@ -941,7 +941,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys")
-	public HttpResponse getSurveysHTML(@HeaderParam("accept-language") String lang){
+	public HttpResponse getSurveysHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang){
 
 		String onAction = "retrieving surveys HTML";
 
@@ -1507,7 +1507,7 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 400, message = "Survey questionnaire form invalid. Cause: ..."),
 			@ApiResponse(code = 404, message = "Questionnaire does not exist. <b>-or-</b> Survey questionnaire not set. <b>-or-</b> Survey questionnaire does not define form.")
 	})
-	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyQuestionnaireFormHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "downloading questionnaire form for survey " + id;
 
@@ -1908,7 +1908,7 @@ public class SurveyService extends Service {
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	@Path("surveys/{id}/responses")
-	public HttpResponse getSurveyResponsesHTML(@HeaderParam("accept-language") String lang, @PathParam("id") int id){
+	public HttpResponse getSurveyResponsesHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang, @PathParam("id") int id){
 
 		String onAction = "retrieving responses HTML for survey " + id;
 
@@ -1963,7 +1963,7 @@ public class SurveyService extends Service {
 			@ApiResponse(code = 200, message = "Survey response data in CSV format."),
 			@ApiResponse(code = 404, message = "Survey does not exist -or- No questionnaire defined for survey.")	
 	})
-	public HttpResponse getSurveyResponses(@PathParam("id") int id, @QueryParam("sepline") int sepline, @QueryParam("sep") String sep){
+	public HttpResponse getSurveyResponses(@PathParam("id") int id, @QueryParam("sepline") @DefaultValue("0") int sepline, @QueryParam("sep") @DefaultValue(",") String sep){
 
 		String onAction = "retrieving responses for survey " + id;
 

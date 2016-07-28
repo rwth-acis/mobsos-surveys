@@ -225,7 +225,7 @@ public class SurveyServiceTest {
 				
 				//System.out.println("List of Questionnaire URLs: " + result.getResponse());
 				assertEquals(200,result.getHttpCode());
-				assertEquals("application/json", result.getHeader("Content-Type"));
+				assertTrue(result.getHeader("Content-Type").contains("application/json"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
@@ -246,7 +246,7 @@ public class SurveyServiceTest {
 				//System.out.println("List of Questionnaires: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
-				assertEquals("application/json", result.getHeader("Content-Type"));
+				assertTrue(result.getHeader("Content-Type").contains("application/json"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
@@ -615,7 +615,7 @@ public class SurveyServiceTest {
 
 			// download form again. This should result in success.
 			downl = c1.sendRequest("GET", url, "");
-			assertEquals("text/xml",downl.getHeader("Content-Type"));
+			assertTrue(downl.getHeader("Content-Type").contains("text/xml"));
 			assertEquals(200, downl.getHttpCode());
 
 			// try to upload form as different user than questionnaire owner. Should fail with unauthorized.
@@ -662,7 +662,7 @@ public class SurveyServiceTest {
 				//System.out.println("List of Survey URLs: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
-				assertEquals("application/json", result.getHeader("Content-Type"));
+				assertTrue(result.getHeader("Content-Type").contains("application/json"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
@@ -683,7 +683,7 @@ public class SurveyServiceTest {
 				//System.out.println("List of surveys: " + result.getResponse());
 
 				assertEquals(200,result.getHttpCode());
-				assertEquals("application/json", result.getHeader("Content-Type"));
+				assertTrue(result.getHeader("Content-Type").contains("application/json"));
 				Object o = JSONValue.parseWithException(result.getResponse().trim());
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
