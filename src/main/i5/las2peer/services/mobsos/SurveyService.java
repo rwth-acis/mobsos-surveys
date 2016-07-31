@@ -76,7 +76,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.sql.Types;
+//import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -221,12 +221,13 @@ public class SurveyService extends Service {
 	@Path("/questionnaires")
 	public HttpResponse getQuestionnairesHTML(@HeaderParam("accept-language") String lang){
 		String onAction = "retrieving questionnaires HTML";
-		Scanner scanner;
 		// only respond with template; nothing to be adapted
 		try {
 			// load template
+			Scanner scanner;
 			scanner = new Scanner(new File("./etc/html/questionnaires-template.html"));
 			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
 
 			// localize template
 			html = i18n(html, lang);
@@ -243,7 +244,6 @@ public class SurveyService extends Service {
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
 			result.setStatus(200);
-			scanner.close();
 			return result;
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
@@ -255,6 +255,7 @@ public class SurveyService extends Service {
 	 * Retrieves a list of all questionnaires.
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@GET
 	@Path("/questionnaires")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -341,6 +342,7 @@ public class SurveyService extends Service {
 	 * @param content
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -551,8 +553,9 @@ public class SurveyService extends Service {
 		// adapt template to specific questionnaire
 		try {
 			// load template from file
-			String html = new Scanner(new File("./etc/html/questionnaire-id-template.html")).useDelimiter("\\A").next();
-
+			Scanner scanner = new Scanner(new File("./etc/html/questionnaire-id-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
 			// localize template
 			html = i18n(html, lang);
 
@@ -727,7 +730,7 @@ public class SurveyService extends Service {
 				s = c.prepareStatement("delete from "+ jdbcSchema + ".questionnaire where id = ?");
 				s.setInt(1, id);
 
-				int r = s.executeUpdate();
+				s.executeUpdate();
 
 				HttpResponse result = new HttpResponse("Questionnaire " + id + " deleted successfully.");
 				result.setStatus(200);
@@ -755,6 +758,7 @@ public class SurveyService extends Service {
 	 * @param id
 	 * @return
 	 */
+	
 	@GET
 	@Produces(MediaType.TEXT_XML)
 	@Path("questionnaires/{id}/form")
@@ -896,7 +900,7 @@ public class SurveyService extends Service {
 						return result;
 					}
 
-					String lang = form.getDocumentElement().getAttribute("xml:lang");
+					//String lang = form.getDocumentElement().getAttribute("xml:lang");
 					//System.out.println("Language detected: " + lang);
 
 				} catch (SAXException e){
@@ -948,8 +952,10 @@ public class SurveyService extends Service {
 		// only respond with template; nothing to be adapted
 		try {
 			// load template from file
-			String html = new Scanner(new File("./etc/html/surveys-template.html")).useDelimiter("\\A").next();
-
+			Scanner scanner = new Scanner(new File("./etc/html/surveys-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			
 			// localize template
 			html = i18n(html, lang);
 
@@ -982,6 +988,7 @@ public class SurveyService extends Service {
 	 * @param query
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("surveys")
@@ -1067,6 +1074,7 @@ public class SurveyService extends Service {
 	 * @param data
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -1289,8 +1297,9 @@ public class SurveyService extends Service {
 
 		// adapt template to specific survey
 		try {
-			String html = new Scanner(new File("./etc/html/survey-id-template.html")).useDelimiter("\\A").next();
-
+			Scanner scanner = new Scanner(new File("./etc/html/survey-id-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
 			// localize template
 			html = i18n(html, lang);
 
@@ -1467,7 +1476,7 @@ public class SurveyService extends Service {
 				s = c.prepareStatement("delete from "+ jdbcSchema + ".survey where id = ?");
 				s.setInt(1, id);
 
-				int r = s.executeUpdate();
+				s.executeUpdate();
 
 				// TODO: check return value of update to see if deletion really occurred
 				//System.out.println("Result: " + r);
@@ -1598,8 +1607,10 @@ public class SurveyService extends Service {
 			// now start to transform XML into ready-to-use HTML
 
 			// start off with template
-			String html = new Scanner(new File("./etc/html/survey-form-template.html")).useDelimiter("\\A").next();
-
+			Scanner scanner = new Scanner(new File("./etc/html/survey-form-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			
 			// fill in placeholders
 			html = fillPlaceHolder(html,"EP_URL", epUrl);
 			html = fillPlaceHolder(html,"SC_URL", staticContentUrl);
@@ -1925,8 +1936,10 @@ public class SurveyService extends Service {
 
 		// adapt template to specific survey
 		try {
-			String html = new Scanner(new File("./etc/html/survey-id-responses-template.html")).useDelimiter("\\A").next();
-
+			Scanner scanner = new Scanner(new File("./etc/html/survey-id-responses-template.html"));
+			String html = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			
 			// localize template
 			html = i18n(html, lang);
 
@@ -1941,7 +1954,10 @@ public class SurveyService extends Service {
 
 			// finally return resulting HTML
 			HttpResponse result = new HttpResponse(html);
+			result.setHeader("Access-Control-Allow-Origin", "*");
+			result.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 			result.setStatus(200);
+			
 			return result;
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
@@ -2048,7 +2064,7 @@ public class SurveyService extends Service {
 		}
 	}
 
-
+	@SuppressWarnings("unchecked")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("surveys/{id}/responses")
@@ -2301,11 +2317,12 @@ public class SurveyService extends Service {
 	@Path("redirect")
 	public HttpResponse redirectCallback(@HeaderParam("accept-language") String lang){
 		String onAction = "processing OpenID Connect redirect Callback";
-
 		String html = "";
 		// start off with template
 		try {
-			html = new Scanner(new File("./etc/html/redirect-callback.html")).useDelimiter("\\A").next();
+			Scanner scanner = new Scanner(new File("./etc/html/redirect-callback.html"));
+			html = scanner.useDelimiter("\\A").next();
+			scanner.close();
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
@@ -2335,7 +2352,9 @@ public class SurveyService extends Service {
 		String html = "";
 		// start off with template
 		try {
-			html = new Scanner(new File("./etc/html/index.html")).useDelimiter("\\A").next();
+			Scanner scanner = new Scanner(new File("./etc/html/index.html"));
+			html = scanner.useDelimiter("\\A").next();
+			scanner.close();
 		} catch (FileNotFoundException e) {
 			return internalError(onAction);
 		}
@@ -2396,10 +2415,12 @@ public class SurveyService extends Service {
 	@Path("/js/{filename}")
 	public HttpResponse serveJS(@PathParam("filename") String filename){
 
-		String onAction = "serving JavaScript";
+		//String onAction = "serving JavaScript";
 
 		try {
-			String js = new Scanner(new File("./etc/webapp/js/" + filename)).useDelimiter("\\A").next();
+			Scanner scanner = new Scanner(new File("./etc/webapp/js/" + filename)); 
+			String js = scanner.useDelimiter("\\A").next();
+			scanner.close();
 			HttpResponse result = new HttpResponse(js);
 			result.setStatus(200);
 			return result;
@@ -2416,10 +2437,12 @@ public class SurveyService extends Service {
 	@Path("/css/{filename}")
 	public HttpResponse serveCSS(@PathParam("filename") String filename){
 
-		String onAction = "serving CSS";
+		//String onAction = "serving CSS";
 
 		try {
-			String js = new Scanner(new File("./etc/webapp/css/" + filename)).useDelimiter("\\A").next();
+			Scanner scanner = new Scanner(new File("./etc/webapp/css/" + filename));
+			String js = scanner.useDelimiter("\\A").next();
+			scanner.close();
 			HttpResponse result = new HttpResponse(js);
 			result.setStatus(200);
 			return result;
@@ -2432,7 +2455,7 @@ public class SurveyService extends Service {
 	}
 
 	// ============= RESOURCE INFORMATION (WORKAROUND) ==============
-	
+	@SuppressWarnings("unchecked")
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("resource-meta")
@@ -2485,7 +2508,7 @@ public class SurveyService extends Service {
 		}
 	}
 	
-
+	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("oidc/clients")
@@ -2537,6 +2560,7 @@ public class SurveyService extends Service {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("oidc/clients/{id}")
@@ -2613,7 +2637,7 @@ public class SurveyService extends Service {
 				return result;
 			}
 			else{
-				JSONObject r = new JSONObject(); //result to return in HTTP response
+				//JSONObject r = new JSONObject(); //result to return in HTTP response
 
 				Connection c = null;
 				PreparedStatement s = null;
@@ -3230,7 +3254,7 @@ public class SurveyService extends Service {
 		String adaptedform = new String(data);
 
 		// replace any occurring author tags within questionnaire form
-		Vector<String> foundTags = new Vector<String>();
+		//Vector<String> foundTags = new Vector<String>();
 		while(m.find()){
 			String tag = m.group().substring(2,m.group().length()-1);
 			adaptedform = adaptedform.replaceAll("\\$\\{"+tag+"\\}",value);
@@ -3518,6 +3542,7 @@ public class SurveyService extends Service {
 	/**
 	 * Marshals survey data in a result set from the MobSOS database to a JSON representation.
 	 */
+	@SuppressWarnings("unchecked")
 	private JSONObject readSurveyFromResultSet(ResultSet rs) throws SQLException{
 
 		JSONObject o = new JSONObject();
@@ -3554,10 +3579,10 @@ public class SurveyService extends Service {
 	/**
 	 * Marshals questionnaire data in a result set from the MobSOS database to a JSON representation.
 	 */
+	@SuppressWarnings("unchecked")
 	private JSONObject readQuestionnaireFromResultSet(ResultSet rs) throws SQLException{
 
 		JSONObject o = new JSONObject();
-
 		o.put("id",rs.getInt("id"));
 		o.put("name",rs.getString("name"));
 		o.put("description",rs.getString("description"));
@@ -3952,6 +3977,7 @@ public class SurveyService extends Service {
 	 * @param response
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private JSONObject convertResponseXMLtoJSON(Document response){
 
 		JSONObject result = new JSONObject();
@@ -3974,6 +4000,7 @@ public class SurveyService extends Service {
 	 * @param response
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private JSONObject validateResponse(Document form, JSONObject response){
 		JSONObject result = new JSONObject();
 
@@ -4158,6 +4185,7 @@ public class SurveyService extends Service {
 	 * @param questionnaireDocument
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private JSONObject extractQuestionInformation(Document questionnaireDocument){
 
 		JSONObject questions = new JSONObject();
@@ -4297,6 +4325,7 @@ public class SurveyService extends Service {
 	 * @param form
 	 * @throws SQLException 
 	 */
+	@SuppressWarnings("unchecked")
 	private void createResponseView(int sid, Document form) throws SQLException{
 		try{
 			JSONObject questions = extractQuestionInformation(form);
@@ -4398,6 +4427,7 @@ public class SurveyService extends Service {
 		return t;
 	}
 
+	@SuppressWarnings("unchecked")
 	private JSONObject getActiveUserInfo() throws ParseException {
 
 		if(this.getContext().getMainAgent() instanceof UserAgent){
