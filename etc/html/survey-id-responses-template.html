@@ -187,7 +187,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						function(d,t){
 
 							pd = encodeURIComponent(d);
-							
+							console.log(d);
+							console.log(pd);
 							var a = $("#dl");
 							a.attr("download","survey-responses-${ID}.csv");
 							a.attr("href","data:application/csv;charset=utf-8,"+pd);
@@ -247,7 +248,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				
 
 			});
-			
 			update();
 		}
 		
@@ -266,8 +266,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				function(d,type){
 				
 					csvd = parseCSV(d);
+					csvd = csvd.sort(function(a,b){
+					var aVal = parseInt(a[0].replace ( /[^\d]/g, '' ),10);
+					//console.log(a[0].replace ( /[^\d]/g, '' ));
+					var bVal = parseInt(b[0].replace ( /[^\d]/g, '' ),10);
+					  if(aVal == bVal){
+					    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+					  }
+
+					  return aVal > bVal ? 1 : -1;
+					});
 					var res = separateData(csvd);
-					
 					renderBoxplot(res.num);
 					renderText(res.txt);
 					
@@ -285,13 +294,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			for(i in data){
 				html += "<li>";
 				html += "<b>" + data[i][0] + "</b>: <ul>";
+
 				for(k in data[i][1]){
-					html += "<li><i>" + data[i][1][k] + "</i></li>";
+					html += "<li><i><div id=\"comment"+i+"-"+k+"\"></div></i></li>";
 				}
 				html += "</ul></li>";
 			}
 			html += "</ul>";
 			$("#txt").html(html);
+			for(i in data){
+				for(k in data[i][1]){
+					$("#comment"+i+"-"+k).text(data[i][1][k]);
+				}
+			}
 		}
 		
 		function renderBoxplot(data){
@@ -353,7 +368,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			  .data(data)
 			  .enter().append("g")
 				.attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + margin.top + ")"; } )
-			  .call(chart.width(x.rangeBand()));
+			  .call(function(gs){ 
+			  	var v = chart.width(x.rangeBand());
+			  	return v.call(this, gs); 
+			   }); //chart.width(x.rangeBand()));
 
 			/*
 			// add a title

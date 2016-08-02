@@ -156,9 +156,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						}
 					);
 					
-					$("#s_name").html(decodeURIComponent(data.name))
-					$("#s_org").html("<img src='" + data.logo + "' height='20'> " + decodeURIComponent(data.organization));
-					$("#s_desc").html(""+decodeURIComponent(data.description));
+					$("#s_name").text(decodeURIComponent(data.name))
+					$("#s_org").html("<img src='" + data.logo + "' height='20'><div id='org' style='display:inline;margin:5px'></div>");
+					$("#org").text(decodeURIComponent(data.organization));
+					$("#s_desc").text(""+decodeURIComponent(data.description));
 					$("#s_resource").html(data.resource);
 					
 					$("#s_start").html(moment.utc(data.start).format("llll"));

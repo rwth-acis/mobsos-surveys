@@ -123,9 +123,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			client.getQuestionnaire(${ID},
 				function(d){
 					
-					$("#qname").html(decodeURIComponent(d.name))
-					$("#qorg").html("<img src='" + d.logo + "' height='20'> " + decodeURIComponent(d.organization));
-					$("#qdesc").html(""+decodeURIComponent(d.description));
+					$("#qname").text(decodeURIComponent(d.name))
+					$("#qorg").html("<img src='" + d.logo + "' height='20'><div id='org'></div> ");
+					$("#org").text(decodeURIComponent(d.organization));
+					$("#qdesc").text(""+decodeURIComponent(d.description));
 					
 					// check owner
 					if(!client.isAnonymous()){
