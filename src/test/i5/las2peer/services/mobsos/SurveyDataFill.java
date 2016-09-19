@@ -31,50 +31,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package i5.las2peer.services.mobsos;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeXml10;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringWriter;
+import java.net.URL;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.w3c.dom.Document;
+
 import i5.las2peer.p2p.LocalNode;
 import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.Agent;
-import i5.las2peer.security.GroupAgent;
 import i5.las2peer.security.ServiceAgent;
 import i5.las2peer.security.UserAgent;
 import i5.las2peer.testing.MockAgentFactory;
 import i5.las2peer.webConnector.WebConnector;
 import i5.las2peer.webConnector.client.ClientResponse;
 import i5.las2peer.webConnector.client.MiniClient;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.w3c.dom.Document;
-
-import com.mysql.jdbc.EscapeTokenizer;
-
 
 /**
  * JUnit Test Class for MobSOS Survey Service
@@ -95,7 +78,6 @@ public class SurveyDataFill {
 
 	private static final String testServiceClass = "i5.las2peer.services.mobsos.SurveyService";
 
-
 	/**
 	 * Called before the tests start.
 	 * 
@@ -106,7 +88,7 @@ public class SurveyDataFill {
 	@BeforeClass
 	public static void startServer() throws Exception {
 
-		//start node
+		// start node
 		node = LocalNode.newNode();
 
 		user = MockAgentFactory.getAdam();
@@ -122,53 +104,46 @@ public class SurveyDataFill {
 
 		node.registerReceiver(testService);
 
-		//start connector
-		logStream = new ByteArrayOutputStream ();
+		// start connector
+		logStream = new ByteArrayOutputStream();
 
-		//connector = new WebConnector(true,HTTP_PORT,false,1000,"./etc/xmlc");
-		connector = new WebConnector(true,HTTP_PORT,false,1000);
+		// connector = new WebConnector(true,HTTP_PORT,false,1000,"./etc/xmlc");
+		connector = new WebConnector(true, HTTP_PORT, false, 1000);
 
 		connector.setSocketTimeout(10000);
-		connector.setLogStream(new PrintStream (logStream));
+		connector.setLogStream(new PrintStream(logStream));
 
-
-		connector.start ( node );
-		Thread.sleep(1000); //wait a second for the connector to become ready
-
-		connector.updateServiceList();
+		connector.start(node);
+		Thread.sleep(1000); // wait a second for the connector to become ready
 
 		c1 = new MiniClient();
 		c1.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
 		c1.setLogin(Long.toString(user.getId()), "adamspass");
 
-		//String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
-		//System.out.println(xml);
+		// String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
+		// System.out.println(xml);
 
-		//avoid timing errors: wait for the repository manager to get all services before continuing
+		// avoid timing errors: wait for the repository manager to get all services before continuing
 
-		try
-		{
+		try {
 			System.out.println("waiting..");
 			Thread.sleep(5000);
-		}
-		catch(InterruptedException e)
-		{
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
 		// first delete all surveys & questionnaires
-		c1.sendRequest("DELETE", "mobsos/surveys","");
-		c1.sendRequest("DELETE", "mobsos/questionnaires","");
+		c1.sendRequest("DELETE", "mobsos/surveys", "");
+		c1.sendRequest("DELETE", "mobsos/questionnaires", "");
 	}
 
 	/**
-	 * Called after the tests have finished.
-	 * Shuts down the server and prints out the connector log file for reference.
+	 * Called after the tests have finished. Shuts down the server and prints out the connector log file for reference.
 	 * 
 	 * @throws Exception
 	 */
 	@AfterClass
-	public static void shutDownServer () throws Exception {
+	public static void shutDownServer() throws Exception {
 
 		connector.stop();
 		node.shutDown();
@@ -186,169 +161,184 @@ public class SurveyDataFill {
 	}
 
 	@Test
-	public void createQuestionnaires(){
+	public void createQuestionnaires() {
 
 		// SUS Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","System Usability Scale (SUS)");
-			q.put("description","A simple questionnaire for measuring usability and learnability. The SUS questionnaire is based on: Brooke, J. (1996) \"SUS: A quick and dirty usability scale\". In: Usability Evaluation in Industry. The two different factors of usability and learnability stem from a study by Lewis, J. R. & Sauro, J. (2009) \"The Factor Structure of the System Usability Scale\".");
+			JSONObject q = new JSONObject();
+			q.put("name", "System Usability Scale (SUS)");
+			q.put("description",
+					"A simple questionnaire for measuring usability and learnability. The SUS questionnaire is based on: Brooke, J. (1996) \"SUS: A quick and dirty usability scale\". In: Usability Evaluation in Industry. The two different factors of usability and learnability stem from a study by Lewis, J. R. & Sauro, J. (2009) \"The Factor Structure of the System Usability Scale\".");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/sus-questionnaire-en.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// SUMI Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","System Usability Measurement Inventory (SUMI)");
-			q.put("description","Software Usability Measurement Inventory. An extensive questionnaire on software usability. The SUMI questionnaire is based on: Kirakowski, J. (1996) \"The software usability measurement inventory: background and usage\". In: Usability Evaluation in Industry. Its use is proposed in ISO 9241, a multi-part standard from the International Organization for Standardization (ISO) covering ergonomics of human-computer interaction.");
+			JSONObject q = new JSONObject();
+			q.put("name", "System Usability Measurement Inventory (SUMI)");
+			q.put("description",
+					"Software Usability Measurement Inventory. An extensive questionnaire on software usability. The SUMI questionnaire is based on: Kirakowski, J. (1996) \"The software usability measurement inventory: background and usage\". In: Usability Evaluation in Industry. Its use is proposed in ISO 9241, a multi-part standard from the International Organization for Standardization (ISO) covering ergonomics of human-computer interaction.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/sumi-questionnaire-en.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// USE Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","Usefulness, Satisfaction, and Ease-of-Use (USE)");
-			q.put("description","A questionnaire for measuring usability in terms of Usefulness, Satisfaction, and Ease of use/learning. The USE questionnaire is based on: Lund, A.M. (2001) \"Measuring Usability with the USE Questionnaire\". STC Usability SIG Newsletter, 8:2.");
+			JSONObject q = new JSONObject();
+			q.put("name", "Usefulness, Satisfaction, and Ease-of-Use (USE)");
+			q.put("description",
+					"A questionnaire for measuring usability in terms of Usefulness, Satisfaction, and Ease of use/learning. The USE questionnaire is based on: Lund, A.M. (2001) \"Measuring Usability with the USE Questionnaire\". STC Usability SIG Newsletter, 8:2.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/use-questionnaire.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// UEQ Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","User Experience Questionnaire (UEQ)");
-			q.put("description","A simple questionnaire for measuring user experience. The UEQ Questionnaire is based on: Laugwitz, Held, and Schrepp (2008) \"Construction and Evaluation of a User Experience Questionnaire\". In: USAB 2008, LNCS 5298, pp. 63-76. The scale items load on the six factors Attractiveness, Perspicuity, Efficiency, Dependability, Stimulation, and Novelty.");
+			JSONObject q = new JSONObject();
+			q.put("name", "User Experience Questionnaire (UEQ)");
+			q.put("description",
+					"A simple questionnaire for measuring user experience. The UEQ Questionnaire is based on: Laugwitz, Held, and Schrepp (2008) \"Construction and Evaluation of a User Experience Questionnaire\". In: USAB 2008, LNCS 5298, pp. 63-76. The scale items load on the six factors Attractiveness, Perspicuity, Efficiency, Dependability, Stimulation, and Novelty.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/ueq-questionnaire-en.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// TAM Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","Technology Acceptance Model (TAM)");
-			q.put("description","A questionnaire for measuring usability in terms of perceived usefulness and ease-of-Use. The TAM questionnaire is based on: Davis, Fred D. (1989) \"Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology\". MIS Quarterly 13, pp. 319-340.");
+			JSONObject q = new JSONObject();
+			q.put("name", "Technology Acceptance Model (TAM)");
+			q.put("description",
+					"A questionnaire for measuring usability in terms of perceived usefulness and ease-of-Use. The TAM questionnaire is based on: Davis, Fred D. (1989) \"Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology\". MIS Quarterly 13, pp. 319-340.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/tam-questionnaire.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// TAM2 Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","Technology Acceptance Model 2 (TAM2)");
-			q.put("description","A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use and explains perceived usefulness and usage intentions in terms of social influence and cognitive instrumental processes. The TAM2 Questionnaire is based on: Venkatesh, Viswanath and Davis, Fred D. (2000) \"A Theoretical Extension of the Technology Acceptance Model: Four Longitudinal Field Studies\". Management Science 46(2):186-204.");
+			JSONObject q = new JSONObject();
+			q.put("name", "Technology Acceptance Model 2 (TAM2)");
+			q.put("description",
+					"A questionnaire for measuring Usability in terms of Perceived Usefulness and Perceived Ease-of-Use and explains perceived usefulness and usage intentions in terms of social influence and cognitive instrumental processes. The TAM2 Questionnaire is based on: Venkatesh, Viswanath and Davis, Fred D. (2000) \"A Theoretical Extension of the Technology Acceptance Model: Four Longitudinal Field Studies\". Management Science 46(2):186-204.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/tam2-questionnaire.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// IS-Impact Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","IS-Impact Model");
-			q.put("description","A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) \"Re-conceptualizing information system success: the IS-Impact Measurement Model\". Journal of the Association for Information Systems, 9(7). pp. 377-408.");
+			JSONObject q = new JSONObject();
+			q.put("name", "IS-Impact Model");
+			q.put("description",
+					"A questionnaire for measuring impact and quality of an Information System in the dimensions Individual Impact, Organizational Impact, Information Quality, and System Quality. The IS-Impact Questionnaire is based on: Gable, Guy G. and Sedera, Darshana and Chan, Taizan (2008) \"Re-conceptualizing information system success: the IS-Impact Measurement Model\". Journal of the Association for Information Systems, 9(7). pp. 377-408.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/is-impact-questionnaire.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// EUCS Questionnaire (engl.)
-		try{
+		try {
 
-			JSONObject q = new JSONObject(); 
-			q.put("name","End-User Computing Satisfaction (EUCS)");
-			q.put("description","A simple questionnaire for measuring end-user computing satisfaction in the dimensions Content, Accuracy, Format, Ease-of-Use and Timeliness. The EUCS Questionnaire is based on: Doll, W. J. & Torkzadeh, G. (1988) \"The Measurement of End-User Computing Satisfaction\". MIS Quarterly 12(2):259-274.");
+			JSONObject q = new JSONObject();
+			q.put("name", "End-User Computing Satisfaction (EUCS)");
+			q.put("description",
+					"A simple questionnaire for measuring end-user computing satisfaction in the dimensions Content, Accuracy, Format, Ease-of-Use and Timeliness. The EUCS Questionnaire is based on: Doll, W. J. & Torkzadeh, G. (1988) \"The Measurement of End-User Computing Satisfaction\". MIS Quarterly 12(2):259-274.");
 			q.put("lang", "en-US");
-			q.put("organization", "Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo","http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+			q.put("organization",
+					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
+			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
 
 			String qfuri = "./doc/xml/questionnaires/eucs-questionnaire-en.xml";
 
 			URL qu = createQuestionnaire(q, qfuri);
 
 			System.out.println("Created questionnaire " + qfuri + ": " + qu);
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException{
+	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException {
 
 		// first add a new questionnaire
-		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires",q.toJSONString(),"application/json","*/*", new Pair[]{});
+		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", q.toJSONString(), "application/json",
+				"*/*", new Pair[] {});
 		JSONObject o;
-		
-		
 
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
 
@@ -373,12 +363,10 @@ public class SurveyDataFill {
 		}
 
 		// upload questionnaire form XML
-		ClientResponse result=c1.sendRequest("PUT", u.getPath() + "/form",qform,"text/xml","*/*", new Pair[]{});
-
+		ClientResponse result = c1.sendRequest("PUT", u.getPath() + "/form", qform, "text/xml", "*/*", new Pair[] {});
 
 		return u;
 
 	}
 
 }
-

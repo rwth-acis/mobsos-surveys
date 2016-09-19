@@ -6,8 +6,8 @@
     </publications>
     <dependencies>
 
-        <dependency org="i5" name="las2peer" rev="0.5-SNAPSHOT" changing="true" />
-        <dependency org="i5" name="las2peer-web-connector" rev="0.5-SNAPSHOT" changing="true" />
+        <dependency org="i5" name="las2peer" rev="0.6-SNAPSHOT" changing="true" />
+        <dependency org="i5" name="las2peer-web-connector" rev="0.6-SNAPSHOT" changing="true" />
 		
 		<!-- Third-party library dependencies -->
         <dependency org="junit" name="junit" rev="4.11"/>
