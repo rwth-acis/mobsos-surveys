@@ -167,18 +167,11 @@ public class SurveyService extends RESTService {
 	private Validator validator;
 
 	// fields read from service configuration file
-	private String epUrl = "http://localhost:8080/mobsos-surveys/";
-	private String questionnaireSchemaPath = "./doc/xml/mobsos-questionnaire.xsd";
-	private String jdbcDriverClassName = "com.mysql.jdbc.Driver";
-	private String jdbcUrl = "jdbc:mysql://localhost:3306/";
-	private String jdbcSchema = "mobsos", jdbcLogin = "root", jdbcPass = "";
-	private String oidcSchema = "openidconnect";
-	private String oidcProviderName = "Learning Layers";
-	private String oidcProviderLogo = "https://api.learning-layers.eu/logo.png";
-	private String oidcProviderUrl = "https://api.learning-layers.eu/o/oauth2";
-	private String oidcClientId = "f405d2a1-d4a3-4b6a-abab-65896c1167dc";
+	private String epUrl, questionnaireSchemaPath;
+	private String jdbcDriverClassName, jdbcUrl, jdbcSchema, jdbcLogin, jdbcPass;
+	private String oidcSchema, oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
 
-	private String staticContentUrl = "http://dbis.rwth-aachen.de/las2peer/mobsos-surveys/";
+	private String staticContentUrl;
 
 	public SurveyService() {
 
