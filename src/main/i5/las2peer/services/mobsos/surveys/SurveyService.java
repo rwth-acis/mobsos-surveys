@@ -2756,7 +2756,6 @@ public class SurveyService extends RESTService {
 	@Path("/")
 	public HttpResponse serveIndexPage(@HeaderParam("accept-language") String lang) {
 		String onAction = "serving index page";
-		this.logMessage("Accessed index page");
 		String html = "";
 		// start off with template
 		try {
@@ -4255,6 +4254,7 @@ public class SurveyService extends RESTService {
 
 					// do not iterate over all locales found, but only use first option with highest preference.
 
+					@SuppressWarnings("unused")
 					Locale l = null;
 
 					if (m.find()) {
@@ -4346,6 +4346,7 @@ public class SurveyService extends RESTService {
 
 					// do not iterate over all locales found, but only use first option with highest preference.
 
+					@SuppressWarnings("unused")
 					Locale l = null;
 
 					if (m.find()) {
@@ -4738,6 +4739,7 @@ public class SurveyService extends RESTService {
 	 * @param doc
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private String getStringFromDoc(org.w3c.dom.Document doc) {
 		DOMImplementationLS domImplementation = (DOMImplementationLS) doc.getImplementation();
 		LSSerializer lsSerializer = domImplementation.createLSSerializer();
@@ -4838,6 +4840,7 @@ public class SurveyService extends RESTService {
 	 * 
 	 * @param ds
 	 */
+	@SuppressWarnings("unused")
 	private static void printDataSourceStats(DataSource ds) {
 		System.out.println("Data Source Stats: ");
 		BasicDataSource bds = (BasicDataSource) ds;

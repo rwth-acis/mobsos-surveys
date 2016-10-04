@@ -83,7 +83,7 @@ public class SurveyServiceTest {
 	private static MiniClient c1, c2, c3, ac;
 	private static ByteArrayOutputStream logStream;
 
-	private static UserAgent user1, user2, user3, anon;
+	private static UserAgent user1, user2, user3;
 	private static GroupAgent group1, group2;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
@@ -105,7 +105,6 @@ public class SurveyServiceTest {
 		user1 = MockAgentFactory.getAdam();
 		user2 = MockAgentFactory.getAbel();
 		user3 = MockAgentFactory.getEve();
-		anon = MockAgentFactory.getAnonymous();
 		user1.unlockPrivateKey("adamspass");
 		user2.unlockPrivateKey("abelspass");
 		user3.unlockPrivateKey("evespass");
@@ -274,6 +273,7 @@ public class SurveyServiceTest {
 			assertTrue(jo.keySet().contains("url"));
 			String urlStr = (String) jo.get("url");
 			// instantiate new URL to see if result field URL contains a valid URL (throws MalformedURLException if not)
+			@SuppressWarnings("unused")
 			URL url = new URL(urlStr);
 
 		} catch (ParseException e) {
@@ -727,6 +727,7 @@ public class SurveyServiceTest {
 			assertTrue(jo.keySet().contains("url"));
 			String urlStr = (String) jo.get("url");
 			// instantiate new URL to see if result field URL contains a valid URL (throws MalformedURLException if not)
+			@SuppressWarnings("unused")
 			URL url = new URL(urlStr);
 
 		} catch (ParseException e) {

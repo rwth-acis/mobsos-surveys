@@ -50,8 +50,8 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import i5.las2peer.p2p.LocalNode;
+import i5.las2peer.p2p.ServiceNameVersion;
 import i5.las2peer.restMapper.data.Pair;
-import i5.las2peer.security.Agent;
 import i5.las2peer.security.ServiceAgent;
 import i5.las2peer.security.UserAgent;
 import i5.las2peer.testing.MockAgentFactory;
@@ -76,7 +76,8 @@ public class SurveyDataFill {
 	private static ByteArrayOutputStream logStream;
 	private static UserAgent user;
 
-	private static final String testServiceClass = "i5.las2peer.services.mobsos.SurveyService";
+	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
+			"i5.las2peer.services.mobsos.SurveyService", "0.2");
 
 	/**
 	 * Called before the tests start.
@@ -93,13 +94,11 @@ public class SurveyDataFill {
 
 		user = MockAgentFactory.getAdam();
 
-		Agent[] as;
-
 		node.storeAgent(user);
 
 		node.launch();
 
-		ServiceAgent testService = ServiceAgent.generateNewAgent(testServiceClass, "a pass");
+		ServiceAgent testService = ServiceAgent.createServiceAgent(testServiceClass, "a pass");
 		testService.unlockPrivateKey("a pass");
 
 		node.registerReceiver(testService);
@@ -110,7 +109,6 @@ public class SurveyDataFill {
 		// connector = new WebConnector(true,HTTP_PORT,false,1000,"./etc/xmlc");
 		connector = new WebConnector(true, HTTP_PORT, false, 1000);
 
-		connector.setSocketTimeout(10000);
 		connector.setLogStream(new PrintStream(logStream));
 
 		connector.start(node);
@@ -122,15 +120,6 @@ public class SurveyDataFill {
 
 		// String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
 		// System.out.println(xml);
-
-		// avoid timing errors: wait for the repository manager to get all services before continuing
-
-		try {
-			System.out.println("waiting..");
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
 		// first delete all surveys & questionnaires
 		c1.sendRequest("DELETE", "mobsos/surveys", "");
@@ -160,6 +149,7 @@ public class SurveyDataFill {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void createQuestionnaires() {
 
@@ -336,6 +326,7 @@ public class SurveyDataFill {
 	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException {
 
 		// first add a new questionnaire
+		@SuppressWarnings("unchecked")
 		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", q.toJSONString(), "application/json",
 				"*/*", new Pair[] {});
 		JSONObject o;
@@ -363,6 +354,7 @@ public class SurveyDataFill {
 		}
 
 		// upload questionnaire form XML
+		@SuppressWarnings({ "unchecked", "unused" })
 		ClientResponse result = c1.sendRequest("PUT", u.getPath() + "/form", qform, "text/xml", "*/*", new Pair[] {});
 
 		return u;

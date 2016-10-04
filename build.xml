@@ -1,7 +1,6 @@
 <project name="MobSOS Surveys" default="jar" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 	
 	<property name="ivy.organisation" value="i5" />
-	<property name="ivy.module" value="mobsos-surveys" />
 	<property name="ivy.revision" value="0.1" />
 	<property name="ivy.deliver.revision" value="${ivy.revision}" />
 	<property name="ivy.pom.version" value="${ivy.revision}" />
@@ -48,41 +47,36 @@
     <property name="lib.junit" location="${lib}/junit-4.12.jar" />
 	
 	
-    <!-- Ivy Installation (Tool to fetch Libraries) -->
-    <property name="ivy.install.version" value="2.3.0" />
-    <property name="ivy.jar.dir" value="${basedir}/etc/ivy" />
-    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
-    <property name="ivy.settings.file" value="${ivy.jar.dir}/ivysettings.xml" />
-    <property name="ivy.dep.file" value="${ivy.jar.dir}/ivy.xml" />
-	
-    <!-- Download Ivy from Web Site so that it can be used without any special Installation -->
-	<target name="download-ivy" unless="skip.download">
-        <mkdir dir="${ivy.jar.dir}"/>
-        <echo message="installing ivy..."/>
-        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
-            dest="${ivy.jar.file}" usetimestamp="true" skipexisting="true"/>
-    </target>
-	
-    <!-- Try to load Ivy here from local Ivy directory -->
-    <target name="install-ivy" depends="download-ivy" description="--> install ivy">
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    </target>
-	
-	
-	<target name="cleancache" description="cleans ivy cache" depends="install-ivy">
-		<ivy:cleancache />
-	</target>
-	
-    <!-- Get Dependencies from our Maven Repository via Ivy -->
-    <target name="get_deps" depends="install-ivy" description="--> resolve dependencies">
-		<ivy:settings>
-            <credentials host="role.dbis.rwth-aachen.de:9911/archiva"  realm="Repository internal"/>
-        </ivy:settings>
-        <ivy:retrieve type="jar, bundle" sync="true"/>
-    </target>
+	<!-- Ivy Installation (Tool to fetch Libraries) -->
+	    <property name="ivy.install.version" value="2.4.0" />
+	    <property name="ivy.jar.dir" value="${basedir}/etc/ivy" />
+	    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	    <property name="ivy.settings.file" value="${ivy.jar.dir}/ivysettings.xml" />
+	    <property name="ivy.dep.file" value="${ivy.jar.dir}/ivy.xml" />
+	    <!-- Download Ivy from Web Site so that it can be used without any special Installation -->
+	    <target name="download-ivy" unless="skip.download">
+	        <mkdir dir="${ivy.jar.dir}"/>
+	        <echo message="installing ivy..."/>
+	        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+	            dest="${ivy.jar.file}" usetimestamp="true" skipexisting="true"/>
+	    </target>
+	    <!-- Try to load Ivy here from local Ivy directory -->
+	    <target name="install-ivy" depends="download-ivy">
+	        <path id="ivy.lib.path">
+	            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+	        </path>
+	        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+	    </target>
+
+
+	<!-- Get Dependencies from our Maven Repository via Ivy -->
+	    <target name="get_deps" depends="install-ivy" description="--> resolve dependencies">
+	        <ivy:settings>
+	            <credentials host="role.dbis.rwth-aachen.de:9911/archiva"  realm="Repository internal"/>
+	        </ivy:settings>
+	    	<ivy:retrieve type="jar, bundle" conf="platform" pattern="${lib}/[artifact]-[revision].[ext]"/>
+	    	<ivy:retrieve type="jar, bundle" conf="bundle" pattern="${service}/[artifact]-[revision].[ext]"/>
+	    </target>
 	
 	<target name="deploy-snapshot" depends="jar">
 		
