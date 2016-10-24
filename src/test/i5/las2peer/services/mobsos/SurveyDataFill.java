@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.HashMap;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -51,9 +52,9 @@ import org.w3c.dom.Document;
 
 import i5.las2peer.p2p.LocalNode;
 import i5.las2peer.p2p.ServiceNameVersion;
-import i5.las2peer.restMapper.data.Pair;
 import i5.las2peer.security.ServiceAgent;
 import i5.las2peer.security.UserAgent;
+import i5.las2peer.services.mobsos.surveys.SurveyService;
 import i5.las2peer.testing.MockAgentFactory;
 import i5.las2peer.webConnector.WebConnector;
 import i5.las2peer.webConnector.client.ClientResponse;
@@ -77,7 +78,7 @@ public class SurveyDataFill {
 	private static UserAgent user;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
-			"i5.las2peer.services.mobsos.SurveyService", "0.2");
+			SurveyService.class.getCanonicalName(), "0.2");
 
 	/**
 	 * Called before the tests start.
@@ -326,9 +327,8 @@ public class SurveyDataFill {
 	public URL createQuestionnaire(JSONObject q, String qfuri) throws IOException {
 
 		// first add a new questionnaire
-		@SuppressWarnings("unchecked")
 		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", q.toJSONString(), "application/json",
-				"*/*", new Pair[] {});
+				"*/*", new HashMap<String, String>());
 		JSONObject o;
 
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
@@ -354,8 +354,7 @@ public class SurveyDataFill {
 		}
 
 		// upload questionnaire form XML
-		@SuppressWarnings({ "unchecked", "unused" })
-		ClientResponse result = c1.sendRequest("PUT", u.getPath() + "/form", qform, "text/xml", "*/*", new Pair[] {});
+		c1.sendRequest("PUT", u.getPath() + "/form", qform, "text/xml", "*/*", new HashMap<String, String>());
 
 		return u;
 

@@ -28,7 +28,7 @@
 	
     <property name="tmp.classes" location="${tmp}/classes" />
     <property name="tmp.junit" location="${tmp}/test" />
-	<property name="junit.report" location="${tmp}/test_reports" />
+    <property name="junit.report" location="${export}/test_reports" />
 	
 	
     <property name="export" location="export" />
@@ -151,8 +151,8 @@
         <javac srcdir="${src.main}"
             destdir="${tmp.classes}"
             classpathref="libraries"
-            source="1.7"
-            target="1.7"
+            source="1.8"
+            target="1.8"
             debug="on"
             encoding="UTF-8"
             />
@@ -164,22 +164,21 @@
         </copy>
     </target>
 	
-    <target name="compile_junit" depends="init_compile">
-        <javac srcdir="${src.junit}"
-            destdir="${tmp.junit}"
-            classpath="${tmp.classes}:${lib.junit}"
-            classpathref="libraries"
-            source="1.7"
-            target="1.7"
-            debug="on"
-            encoding="UTF-8"
-            />
-        <copy todir="${tmp.junit}">
-            <fileset dir="${src.junit}">
-                <include name="**/*.xml" />
-            </fileset>
-        </copy>
-    </target>
+	<target name="compile_junit" depends="init_compile">
+	        <javac srcdir="${src.junit}"
+	            destdir="${tmp.junit}"
+	            classpath="${tmp.classes}:${lib.junit}"
+	            classpathref="libraries"
+	            debug="on"
+	            encoding="UTF-8"
+	        	includeantruntime="false"
+	            />
+	        <copy todir="${tmp.junit}">
+	            <fileset dir="${src.junit}">
+	                <include name="**/*.xml" />
+	            </fileset>
+	        </copy>
+	    </target>
 	
     <target name="compile_all" depends="compile_main, compile_junit" />
 	
@@ -219,7 +218,7 @@
             author="true"
             version="true"
             use="true"
-            source="1.7"
+            source="1.8"
             windowtitle="Service Documentation"
             failonerror="yes"
             encoding="utf8"
@@ -233,34 +232,33 @@
     </target>
 	
 	
-    <!-- JUnit Testing -->
-    <target name="junit" depends="junit_tests, junit_clean" />
-	
-    <target name="init_junit" depends="init_general">
-        <mkdir dir="${junit.report}" />
-    </target>
-	
-    <target name="junit_clean">
-        <delete dir="${tmp.junit}" />
-    </target>
-	
-    <target name="junit_tests" depends="init_junit, compile_all">
-        <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="yes" dir=".">
-            <classpath>
-				<pathelement path="." />
-                <pathelement path="${tmp.classes}" />
-                <pathelement path="${tmp.junit}" />
-                <pathelement path="${lib.junit}" />
-                <path refid="libraries"/>
-            </classpath>
-            <formatter type="plain" />
-            <batchtest fork="yes" todir="${junit.report}">
-                <fileset dir="${tmp.junit}">
-                    <include name="**/*Test.class"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
+	<!-- JUnit Testing -->
+	    <target name="junit" depends="junit_tests, junit_clean" description="--> execute all junit tests" />
+	    
+	    <target name="init_junit" depends="init_general">
+	        <mkdir dir="${junit.report}" />
+	    </target>
+	    
+	    <target name="junit_clean">
+	        <delete dir="${tmp.junit}" />
+	    </target>
+	    
+	    <target name="junit_tests" depends="init_junit, compile_all">
+	        <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="yes">
+	            <classpath>
+	                <pathelement path="${tmp.classes}" />
+	                <pathelement path="${tmp.junit}" />
+	                <pathelement path="${lib.junit}" />
+	                <path refid="libraries"/>
+	            </classpath>
+	            <formatter type="plain" />
+	            <batchtest fork="yes" todir="${junit.report}">
+	                <fileset dir="${tmp.junit}">
+	                    <include name="**/*Test.class"/>
+	                </fileset>
+	            </batchtest>
+	        </junit>
+	    </target>
 	
 	<target name="data_fill" depends="init_junit, compile_all">
         <junit fork="yes" haltonerror="yes" haltonfailure="yes" printsummary="yes" dir=".">
