@@ -166,8 +166,12 @@ public class SurveyServiceTest {
 	@AfterClass
 	public static void shutDownServer() throws Exception {
 
-		connector.stop();
-		node.shutDown();
+		if (connector != null) {
+			connector.stop();
+		}
+		if (node != null) {
+			node.shutDown();
+		}
 
 		connector = null;
 		node = null;
@@ -177,7 +181,9 @@ public class SurveyServiceTest {
 		System.out.println("Connector-Log:");
 		System.out.println("--------------");
 
-		System.out.println(logStream.toString());
+		if (logStream != null) {
+			System.out.println(logStream.toString());
+		}
 
 	}
 
