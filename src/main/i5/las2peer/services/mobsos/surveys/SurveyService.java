@@ -5004,7 +5004,7 @@ public class SurveyService extends RESTService {
 	 * English. Input string t is expected to contain placeholders ${k}, where k is a key defined in the ResourceBundle.
 	 * 
 	 * @param t a String to be localized
-	 * @param l a Locale
+	 * @param lang a Locale
 	 * @return
 	 */
 	private String i18n(String t, String lang) {
