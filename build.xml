@@ -28,12 +28,12 @@
 	
     <property name="tmp.classes" location="${tmp}/classes" />
     <property name="tmp.junit" location="${tmp}/test" />
-	<property name="junit.report" location="${export}/test_reports" />
 	
 	
     <property name="export" location="export" />
     <property name="export.doc" location="${export}/doc" />
     <property name="export.jars" location="${export}/jar" />
+	<property name="junit.report" location="${export}/test_reports" />
 
     <property name="lib" location="lib" />
 	
