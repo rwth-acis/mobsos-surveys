@@ -410,7 +410,7 @@ public class SurveyService extends RESTService {
 		@SuppressWarnings("unchecked")
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
-		@Produces(MediaType.APPLICATION_JSON)
+		@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 		@Path("questionnaires")
 		@ApiOperation(
 				value = "createQuestionnaire",
@@ -446,7 +446,7 @@ public class SurveyService extends RESTService {
 				} catch (IllegalArgumentException e) {
 					// if passed data is invalid, respond error to user
 					return Response.status(Status.BAD_REQUEST).entity("Invalid questionnaire " + e.getMessage())
-							.build();
+							.type(MediaType.TEXT_PLAIN).build();
 				}
 
 				// store valid questionnaire to database
@@ -457,10 +457,12 @@ public class SurveyService extends RESTService {
 					JSONObject r = new JSONObject();
 					r.put("id", qid);
 					r.put("url", service.epUrl + "questionnaires/" + qid);
-					return Response.status(Status.CREATED).entity(r.toJSONString()).build();
+					return Response.status(Status.CREATED).entity(r.toJSONString()).type(MediaType.APPLICATION_JSON)
+							.build();
 				} catch (SQLException e) {
 					if (0 <= e.getMessage().indexOf("Duplicate")) {
-						return Response.status(Status.CONFLICT).entity("Questionnaire already exists").build();
+						return Response.status(Status.CONFLICT).entity("Questionnaire already exists")
+								.type(MediaType.TEXT_PLAIN).build();
 					} else {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -4707,7 +4709,7 @@ public class SurveyService extends RESTService {
 		 */
 		private Response internalError(String onAction) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Internal error while " + onAction + "!")
-					.build();
+					.type(MediaType.TEXT_PLAIN).build();
 		}
 
 		/**
