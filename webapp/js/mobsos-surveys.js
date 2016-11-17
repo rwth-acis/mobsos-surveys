@@ -92,7 +92,7 @@ MobSOSSurveysClient.prototype.createQuestionnaire = function(metadata, form, cal
 		"questionnaires",
 		metadata,
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		function(data, type){
 			// if creating new questionnaire worked, 
 			// send another request uploading questionnaire form
@@ -138,7 +138,7 @@ MobSOSSurveysClient.prototype.getQuestionnaires = function(query, full, callback
 		"questionnaires?" + qpart,
 		"",
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback);
 	
@@ -183,7 +183,7 @@ MobSOSSurveysClient.prototype.createSurvey = function(metadata, callback, errorC
 		"surveys",
 		metadata,
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback
 	);
@@ -217,7 +217,7 @@ MobSOSSurveysClient.prototype.getSurveys = function(query, full, callback, error
 		"surveys?" + qpart,
 		"",
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback);
 	
@@ -252,7 +252,7 @@ MobSOSSurveysClient.prototype.setSurveyQuestionnaire = function(id, data, callba
 		"surveys/" +id + "/questionnaire",
 		data,
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback);
 	
@@ -263,22 +263,58 @@ MobSOSSurveysClient.prototype.submitSurveyResponse = function(id, data, callback
 		"surveys/" +id + "/responses",
 		data,
 		"application/json",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback);
 	
 };
 
-MobSOSSurveysClient.prototype.getResourceMeta = function(uri, callback, errorCallback){
+MobSOSSurveysClient.prototype.getResourceMeta = function(id, callback, errorCallback){
+	this.getResourcesMeta(function(data,type){
+		console.log("Resources:" + data.length);	
+		for(var i=0;i<data.length;i++){
+			if(data[i].id === id){
+				callback(data[i],type);	
+			}	
+		}
+		errorCallback("No client found.");
+	},errorCallback);
 	
-	this.sendRequest("POST",
-		"resource-meta",
-		uri,
-		"text/plain",
-		{},
-		callback,
-		errorCallback);
+}
+
+MobSOSSurveysClient.prototype.getResourcesMeta = function(callback, errorCallback){
 	
+	//this.sendRequest("POST",
+	//	"resource-meta",
+	//	uri,
+	//	"text/plain",
+	//	{},
+	//	callback,
+	//	errorCallback);
+	
+	this.getUserInfo(function(data){console.log(data);},function(error){console.log(error);});	
+	this.sendRequestExt("https://api.learning-layers.eu/o/oauth2",
+		"GET",
+		"api/clients",
+		"",	
+		"application/json",
+		{"Accept":"application/json"},
+		function(data,type) {
+			//console.log(data);
+			var pdata = [];
+ 
+			for(var i=0;i<data.length;i++){
+				//console.log("data id: "+ data[i].id);
+				if(data[i].logoUri !== null){
+					pdata.push({"id":data[i].clientId,"name":data[i].clientName,"logo":data[i].logoUri,"uri":data[i].logoUri});	
+				} 	
+			}
+			console.log(pdata);	
+			callback(pdata,type);
+		},
+			
+		function(error) {console.log(error);console.log("Error!"); errorCallback(error);}	
+	);
 };
 
 MobSOSSurveysClient.prototype.getUserInfo = function(callback, errorCallback){
@@ -287,11 +323,54 @@ MobSOSSurveysClient.prototype.getUserInfo = function(callback, errorCallback){
 		"userinfo",
 		"",
 		"",
-		{},
+		{"Accept":"application/json"},
 		callback,
 		errorCallback);
 	
 };
+
+MobSOSSurveysClient.prototype.sendRequestExt = function (ext_ep, method, relativePath, content, mime, customHeaders, callback, errorCallback) {
+	var mtype = "text/plain; charset=UTF-8";
+	if(mime !== 'undefined') {
+		mtype = mime;	
+	}
+	var rurl = ext_ep + "/" + relativePath;
+	
+	if(!this.isAnonymous()){
+		if(rurl.indexOf("\?") > 0){
+			rurl += "&access_token=" + window.localStorage["access_token"];	
+		} else {
+			rurl += "?access_token=" + window.localStorage["access_token"];	
+		}
+	} else {
+		console.log("Anonymous request.... " + rurl);	
+	}
+	
+	var ajaxObj = {
+		url: rurl,
+		type: method.toUpperCase(),
+		data: content,	
+		contentType: mtype,
+		crossDomain: true,
+		headers: {},
+		error: function (xhr, errorType, error) {
+			//console.log("Error in sendRequestExt");	
+			//console.log(error);
+			errorCallback(error);	
+		},
+		success: function(data, status, xhr){
+			//console.log("Success in sendRequestExt");	
+			var type = xhr.getResponseHeader("Content-Type");
+			callback(data,type);		
+		}	
+	};
+	
+	if (customHeaders !== undefined && customHeaders !== null) {
+		$.extend(ajaxObj.headers, customHeaders);
+	} 
+	
+	$.ajax(ajaxObj);
+}
 
 MobSOSSurveysClient.prototype.sendRequest = function(method, relativePath, content, mime, customHeaders, callback, errorCallback) {
 	
