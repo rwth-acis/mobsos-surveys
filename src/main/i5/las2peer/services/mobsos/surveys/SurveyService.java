@@ -143,24 +143,6 @@ import io.swagger.annotations.SwaggerDefinition;
  *
  */
 @ServicePath("mobsos-surveys")
-@Api
-@SwaggerDefinition(
-		info = @Info(
-				title = "MobSOS Surveys",
-				version = "0.2",
-				description = "<p>A simple RESTful service for online survey management.</p><p>MobSOS Surveys is part of the MobSOS "
-						+ "Tool Set dedicated to exploring, modeling, and measuring Community Information System (CIS) "
-						+ "Success as a complex construct established by multiple dimensions and factors. As part of "
-						+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
-						+ "measurements of CIS Success.</p>",
-				termsOfService = "",
-				contact = @Contact(
-						name = "Dominik Renzel",
-						url = "",
-						email = "renzel@dbis.rwth-aachen.de"),
-				license = @License(
-						name = "MIT",
-						url = "https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE")))
 public class SurveyService extends RESTService {
 
 	public final static String MOBSOS_QUESTIONNAIRE_NS = "http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd";
@@ -258,6 +240,24 @@ public class SurveyService extends RESTService {
 	// Service methods.
 	// //////////////////////////////////////////////////////////////////////////////////////
 	@Path("/") // this is the root resource
+	@Api
+	@SwaggerDefinition(
+			info = @Info(
+					title = "MobSOS Surveys",
+					version = "0.2",
+					description = "<p>A simple RESTful service for online survey management.</p><p>MobSOS Surveys is part of the MobSOS "
+							+ "Tool Set dedicated to exploring, modeling, and measuring Community Information System (CIS) "
+							+ "Success as a complex construct established by multiple dimensions and factors. As part of "
+							+ "MobSOS, this service enables to collect subjective data enabling qualitative and quantitative "
+							+ "measurements of CIS Success.</p>",
+					termsOfService = "",
+					contact = @Contact(
+							name = "Dominik Renzel",
+							url = "",
+							email = "renzel@dbis.rwth-aachen.de"),
+					license = @License(
+							name = "MIT",
+							url = "https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE")))
 	public static class Resource {
 		private SurveyService service = (SurveyService) Context.getCurrent().getService();
 
