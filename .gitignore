@@ -9,3 +9,4 @@ etc/ivy/ivy.jar
 service/
 etc/startup/
 form.html
+*.DS_Store
