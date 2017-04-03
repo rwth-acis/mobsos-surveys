@@ -2035,6 +2035,25 @@ public class SurveyService extends RESTService {
 								qpage += "\t\t\t</div>\n";
 								// --- end UI range slider style
 
+							} else if ("qu:DichotomousQuestionPageType".equals(qtype)) {
+
+								// TODO: do something with default value, if set.
+								// int defval = Integer.parseInt(e.getAttribute("defval"));
+								String minlabel = e.getAttribute("minlabel");
+								String maxlabel = e.getAttribute("maxlabel");
+
+								qpage += "\t\t\t<div class=\"btn-group\" data-toggle=\"buttons\">\n";
+								qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
+								qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"0\">" + minlabel
+										+ "\n";
+								qpage += "\t\t\t\t</label>\n";
+								qpage += "\t\t\t\t<label class=\"btn btn-primary\">\n";
+								qpage += "\t\t\t\t\t<input name=\"" + quid + "\" type=\"radio\" value=\"1\">" + maxlabel
+										+ "\n";
+								qpage += "\t\t\t\t</label>\n";
+								qpage += "\t\t\t\t<input type=\"hidden\" class='response' name=\"" + quid + "\">\n";
+								qpage += "\t\t\t</div>\n";
+
 							} else if ("qu:FreeTextQuestionPageType".equals(qtype)) {
 								qpage += "\t\t\t<textarea name=\"" + quid
 										+ "\" class=\"form-control response freetext-response\" rows=\"3\"></textarea>\n";
