@@ -43,12 +43,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  <script src="${SC_URL}js/respond.min.js"></script>
 	<![endif]-->
 	
-	<link href="${SC_URL}bootstrap-3.0.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<!--<link href="${SC_URL}bootstrap-3.0.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	
-	<link href="${SC_URL}css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-	<link href="${SC_URL}css/flags.css" rel="stylesheet" />
+	<!--<link href="${SC_URL}css/bootstrap-datetimepicker.min.css" rel="stylesheet">-->
+	<link href="https://las2peer.org/wp-content/uploads/2016/09/bootstrap-datetimepicker.min_.css" rel="stylesheet">
+	
 	
 	<style type="text/css">
+		.flag {
+	width: 16px;
+	height: 11px;
+	background:url(https://raw.githubusercontent.com/rwth-acis/mobsos-surveys/master/webapp/css/flags.png) no-repeat
+}
+
+.flag.flag-de {background-position: -16px 0}
+.flag.flag-es {background-position: -32px 0}
+.flag.flag-fr {background-position: 0 -11px}
+.flag.flag-en {background-position: -16px -11px}
+
 		.tt-dropdown-menu {
 		  background-color: #fff;
 		  margin: 10px 10px;
@@ -205,17 +218,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	
 	
 	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="${SC_URL}js/jquery-1.11.1.min.js"></script>
+	<!--<script type="text/javascript" src="${SC_URL}js/jquery-1.11.1.min.js"></script>-->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	
 	<!-- import Bootstrap for responsive UI (must) -->
-	<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>
+	<!--<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
+	<!--<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>-->
+	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>
 	
 	<!-- import datetimepicker + deps -->
-	<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>
-	<script type="text/javascript" src="${SC_URL}js/bootstrap-datetimepicker.js"></script>
+	<!--<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>-->
+	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/moment.min_.js"></script>
+	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/bootstrap-datetimepicker.js"></script>
+	<!--<script type="text/javascript" src="${SC_URL}js/bootstrap-datetimepicker.js"></script>-->
 		
 	<script type="text/javascript">
 		
@@ -287,19 +305,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#surv").removeClass("hidden");
 				});
 				
-				updateSurveys("");
 				
-			} else {
-				updateSurveys("");
-				
-			}
+			} 
+			updateSurveys("");
 		}
 		
 		function updateSurveys(search){
 		
 			client.getSurveys(search,1,
 				function(data,type){
-					
+				
 					qs = data.surveys;
 					
 					$('#surveys').html("");
@@ -388,7 +403,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = '${SC_URL}js/oidc-button.js';
+       //po.src = '${SC_URL}js/oidc-button.js';
+       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>
