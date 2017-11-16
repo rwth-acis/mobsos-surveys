@@ -433,7 +433,7 @@ public class SurveyServiceTest {
 			fail("Could not parse service response to JSON Object!");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			fail("Detected invalid questionnaire URL! " + e.getMessage());
+			fail("Detected invalid questionnaire URL! " + e.toString());
 		}
 	}
 
@@ -475,7 +475,7 @@ public class SurveyServiceTest {
 			try {
 				questionnaire = (JSONObject) JSONValue.parseWithException(result.getResponse());
 			} catch (ParseException e) {
-				fail(e.getMessage());
+				fail(e.toString());
 			}
 
 			// System.out.println(questionnaire.toJSONString());
@@ -516,7 +516,7 @@ public class SurveyServiceTest {
 
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Service returned malformed URL!");
@@ -574,7 +574,7 @@ public class SurveyServiceTest {
 			fail("Could not parse service response to JSON Object!");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			fail("Detected invalid questionnaire URL! " + e.getMessage());
+			fail("Detected invalid questionnaire URL! " + e.toString());
 		}
 	}
 
@@ -629,10 +629,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: " + e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: " + e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		}
 	}
 
@@ -914,7 +914,7 @@ public class SurveyServiceTest {
 			fail("Could not parse service response to JSON Object!");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			fail("Detected invalid survey URL! " + e.getMessage());
+			fail("Detected invalid survey URL! " + e.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -956,7 +956,7 @@ public class SurveyServiceTest {
 			try {
 				survey = (JSONObject) JSONValue.parseWithException(result.getResponse());
 			} catch (ParseException e) {
-				fail(e.getMessage());
+				fail(e.toString());
 			}
 
 			// change some fields in survey
@@ -994,7 +994,7 @@ public class SurveyServiceTest {
 
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			fail("Service returned malformed URL!");
@@ -1049,7 +1049,7 @@ public class SurveyServiceTest {
 			fail("Could not parse service response to JSON Object!");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-			fail("Detected invalid survey URL! " + e.getMessage());
+			fail("Detected invalid survey URL! " + e.toString());
 		}
 	}
 
@@ -1134,10 +1134,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: " + e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: " + e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		}
 	}
 
@@ -1236,10 +1236,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: " + e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: " + e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		}
 	}
 
@@ -1345,10 +1345,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: " + e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: " + e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		}
 	}
 
@@ -1405,10 +1405,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: " + e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: " + e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		}
 	}
 
@@ -1476,10 +1476,10 @@ public class SurveyServiceTest {
 	// fail("Service returned malformed URL!");
 	// } catch (IOException e) {
 	// e.printStackTrace();
-	// fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+	// fail("An unexpected exception occurred on loading test form data: "+e.toString());
 	// } catch (ParseException e) {
 	// e.printStackTrace();
-	// fail("Service returned invalid JSON! " + e.getMessage());
+	// fail("Service returned invalid JSON! " + e.toString());
 	// }
 	// }
 
@@ -1531,10 +1531,10 @@ public class SurveyServiceTest {
 			fail("Service returned malformed URL!");
 		} catch (IOException e) {
 			e.printStackTrace();
-			fail("An unexpected exception occurred on loading test form data: "+e.getMessage());
+			fail("An unexpected exception occurred on loading test form data: "+e.toString());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			fail("Service returned invalid JSON! " + e.getMessage());
+			fail("Service returned invalid JSON! " + e.toString());
 		} 
 	}
 	 */
