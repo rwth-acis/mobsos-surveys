@@ -47,7 +47,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-//import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -102,10 +101,12 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import i5.las2peer.api.Context;
+import i5.las2peer.api.ManualDeployment;
+import i5.las2peer.api.security.AnonymousAgent;
+import i5.las2peer.api.security.GroupAgent;
+import i5.las2peer.api.security.UserAgent;
 import i5.las2peer.restMapper.RESTService;
 import i5.las2peer.restMapper.annotations.ServicePath;
-import i5.las2peer.security.GroupAgent;
-import i5.las2peer.security.UserAgent;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -142,6 +143,7 @@ import io.swagger.annotations.SwaggerDefinition;
  * @author Dominik Renzel
  *
  */
+@ManualDeployment
 @ServicePath("mobsos-surveys")
 public class SurveyService extends RESTService {
 
@@ -368,22 +370,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -430,8 +435,7 @@ public class SurveyService extends RESTService {
 								message = "Questionnaire already exists.") })
 		public Response createQuestionnaire(String content) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to create questionnaires!")
 						.build();
 			}
@@ -485,8 +489,7 @@ public class SurveyService extends RESTService {
 		@Path("/questionnaires")
 		public Response deleteQuestionnaires() {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please autheticate to delete questionnaires!")
 						.build();
 			}
@@ -508,22 +511,25 @@ public class SurveyService extends RESTService {
 				return internalError(onAction);
 			} finally {
 				try {
-					if (rset != null)
+					if (rset != null) {
 						rset.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					return internalError(onAction);
 				}
 				try {
-					if (stmt != null)
+					if (stmt != null) {
 						stmt.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					return internalError(onAction);
 				}
 				try {
-					if (conn != null)
+					if (conn != null) {
 						conn.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 					return internalError(onAction);
@@ -597,22 +603,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -703,8 +712,7 @@ public class SurveyService extends RESTService {
 								message = "Questionnaire does not exist.") })
 		public Response updateQuestionnaire(@PathParam("id") int id, String content) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to update questionnaire!")
 						.build();
 			}
@@ -766,22 +774,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -820,8 +831,7 @@ public class SurveyService extends RESTService {
 								message = "Questionnaire does not exist.") })
 		public Response deleteQuestionnaire(@PathParam("id") int id) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to delete questionnaire!")
 						.build();
 			}
@@ -863,22 +873,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -967,22 +980,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1022,8 +1038,7 @@ public class SurveyService extends RESTService {
 								message = "Questionnaire does not exist.") })
 		public Response uploadQuestionnaireForm(@PathParam("id") int id, String formXml) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to upload questionnaire!")
 						.build();
 			}
@@ -1090,22 +1105,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1227,22 +1245,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1286,8 +1307,7 @@ public class SurveyService extends RESTService {
 								code = 409,
 								message = "Survey already exists.") })
 		public Response createSurvey(String data) {
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to create surveys!").build();
 			}
 
@@ -1339,8 +1359,7 @@ public class SurveyService extends RESTService {
 		@Path("surveys")
 		public Response deleteSurveys() {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to delete surveys!").build();
 			}
 
@@ -1364,22 +1383,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1469,22 +1491,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1566,8 +1591,7 @@ public class SurveyService extends RESTService {
 								message = "Survey does not exist.") })
 		public Response updateSurvey(@PathParam("id") int id, String content) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to update survey!").build();
 			}
 
@@ -1631,22 +1655,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1684,8 +1711,7 @@ public class SurveyService extends RESTService {
 								message = "Survey does not exist.") })
 		public Response deleteSurvey(@PathParam("id") int id) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED).entity("Please authenticate to delete survey!").build();
 			}
 
@@ -1729,22 +1755,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1842,22 +1871,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -1906,8 +1938,8 @@ public class SurveyService extends RESTService {
 				// String adaptText = text;
 
 				// add HTML elements for all questionnaire items accordingly
-				Vector<String> qpages = new Vector<String>();
-				Vector<String> navpills = new Vector<String>();
+				Vector<String> qpages = new Vector<>();
+				Vector<String> navpills = new Vector<>();
 
 				NodeList nodeList = form.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
 
@@ -2122,8 +2154,7 @@ public class SurveyService extends RESTService {
 								message = "Survey or questionnaire to be set does not exist.") })
 		public Response setSurveyQuestionnaire(@PathParam("id") int id, String content) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED)
 						.entity("Please authenticate to set questionnaire for survey!").build();
 			}
@@ -2216,22 +2247,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2375,22 +2409,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2498,8 +2535,7 @@ public class SurveyService extends RESTService {
 
 				String sub = (String) getActiveUserInfo().get("sub");
 
-				if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-						.getId()) {
+				if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 					sub += now.getTime();
 				}
 
@@ -2539,22 +2575,25 @@ public class SurveyService extends RESTService {
 					}
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2612,8 +2651,7 @@ public class SurveyService extends RESTService {
 								message = "Survey does not exist."), })
 		public Response deleteSurveyResponses(@PathParam("id") int id) {
 
-			if (Context.getCurrent().getMainAgent().getId() == Context.getCurrent().getLocalNode().getAnonymous()
-					.getId()) {
+			if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 				return Response.status(Status.UNAUTHORIZED)
 						.entity("Please authenticate to delete responses for survey!").build();
 			}
@@ -2655,22 +2693,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2714,7 +2755,6 @@ public class SurveyService extends RESTService {
 
 		@GET
 		@Produces(MediaType.TEXT_HTML)
-		@Path("/")
 		public Response serveIndexPage(@HeaderParam("accept-language") String lang) {
 			String onAction = "serving index page";
 			String html = "";
@@ -2853,22 +2893,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2922,22 +2965,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction + e.getMessage());
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -2994,22 +3040,25 @@ public class SurveyService extends RESTService {
 					return internalError(onAction);
 				} finally {
 					try {
-						if (rset != null)
+						if (rset != null) {
 							rset.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (stmt != null)
+						if (stmt != null) {
 							stmt.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
 					}
 					try {
-						if (conn != null)
+						if (conn != null) {
 							conn.close();
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
 						return internalError(onAction);
@@ -3044,7 +3093,7 @@ public class SurveyService extends RESTService {
 
 			try {
 				// authentication required for submitting response
-				if (Context.getCurrent().getMainAgent() != Context.getCurrent().getLocalNode().getAnonymous()) {
+				if (!(Context.get().getMainAgent() instanceof AnonymousAgent)) {
 					return Response.status(Status.UNAUTHORIZED)
 							.entity("Client feedback retrieval requires authentication.").build();
 				} else {
@@ -3077,22 +3126,25 @@ public class SurveyService extends RESTService {
 						return internalError(onAction);
 					} finally {
 						try {
-							if (rs != null)
+							if (rs != null) {
 								rs.close();
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							return internalError(onAction);
 						}
 						try {
-							if (s != null)
+							if (s != null) {
 								s.close();
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							return internalError(onAction);
 						}
 						try {
-							if (c != null)
+							if (c != null) {
 								c.close();
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							return internalError(onAction);
@@ -3124,7 +3176,6 @@ public class SurveyService extends RESTService {
 				value = "client_id") String cid, String data) {
 
 			UserAgent me = (UserAgent) Context.getCurrent().getMainAgent();
-			JSONObject mej = (JSONObject) JSONValue.parse(me.getUserData().toString());
 
 			JSONObject fb;
 
@@ -3159,7 +3210,7 @@ public class SurveyService extends RESTService {
 				comment = fb.get("comment").toString();
 			}
 
-			System.out.println("Feedback received from " + mej.get("sub"));
+			System.out.println("Feedback received from " + me.getEmail());
 			System.out.println(" - Rating: " + rating);
 			System.out.println(" - Comment: " + comment);
 
@@ -3235,7 +3286,7 @@ public class SurveyService extends RESTService {
 		
 				int surveyId = id;
 				long communityId = cid;
-				long userId = this.Context.getCurrent().getMainAgent().getId();
+				long userId = this.Context.get().getMainAgent().getIdentifier();
 		
 				Iterator<String> it = answerFieldTable.keySet().iterator();
 				while(it.hasNext()){
@@ -3727,14 +3778,14 @@ public class SurveyService extends RESTService {
 			String adaptedform = new String(originalFormXml);
 
 			// replace any occurring author tags within questionnaire form
-			Vector<String> foundTags = new Vector<String>();
+			Vector<String> foundTags = new Vector<>();
 			while (m.find()) {
 				String tag = m.group().substring(2, m.group().length() - 1);
 				String value = null;
 				if (!foundTags.contains(tag)) {
 					if (tag.startsWith("USER")) {
 						if (tag.endsWith("ID")) {
-							value = "" + user.getId();
+							value = "" + user.getIdentifier();
 						} else if (tag.endsWith("NAME")) {
 							value = user.getLoginName();
 						} else if (tag.endsWith("MAIL")) {
@@ -3743,14 +3794,14 @@ public class SurveyService extends RESTService {
 					} else if (tag.startsWith("COMMUNITY")) {
 						if (tag.endsWith("ID")) {
 							if (community != null) {
-								value = "" + community.getId();
+								value = "" + community.getIdentifier();
 							} else {
 								value = "(no community context)";
 							}
 						}
 					} else if (tag.startsWith("SURVEY.")) {
 						if (tag.endsWith("ID")) {
-							value = (String) (survey.get("id") + "");
+							value = survey.get("id") + "";
 						} else if (tag.endsWith("NAME")) {
 							value = (String) survey.get("name");
 						} else if (tag.endsWith("DESCRIPTION")) {
@@ -3863,20 +3914,23 @@ public class SurveyService extends RESTService {
 					throw e;
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
@@ -3906,8 +3960,9 @@ public class SurveyService extends RESTService {
 			for (int i = 1; i <= cols; i++) {
 				headline += rs.getMetaData().getColumnName(i);
 				rs.getMetaData().getColumnTypeName(i);
-				if (i < cols)
+				if (i < cols) {
 					headline += sep;
+				}
 			}
 			res += headline + "\r\n";
 
@@ -3933,8 +3988,9 @@ public class SurveyService extends RESTService {
 							data += o.toString();
 						}
 					}
-					if (i < cols)
+					if (i < cols) {
 						data += sep;
+					}
 				}
 				data += "\r\n";
 			}
@@ -4083,20 +4139,23 @@ public class SurveyService extends RESTService {
 				throw e;
 			} finally {
 				try {
-					if (rs != null)
+					if (rs != null) {
 						rs.close();
+					}
 				} catch (Exception e) {
 					throw e;
 				}
 				try {
-					if (stmt != null)
+					if (stmt != null) {
 						stmt.close();
+					}
 				} catch (Exception e) {
 					throw e;
 				}
 				try {
-					if (conn != null)
+					if (conn != null) {
 						conn.close();
+					}
 				} catch (Exception e) {
 					throw e;
 				}
@@ -4358,20 +4417,23 @@ public class SurveyService extends RESTService {
 				e.printStackTrace();
 			} finally {
 				try {
-					if (rset != null)
+					if (rset != null) {
 						rset.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				try {
-					if (stmt != null)
+					if (stmt != null) {
 						stmt.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				try {
-					if (conn != null)
+					if (conn != null) {
 						conn.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -4423,20 +4485,23 @@ public class SurveyService extends RESTService {
 				e.printStackTrace();
 			} finally {
 				try {
-					if (rset != null)
+					if (rset != null) {
 						rset.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				try {
-					if (stmt != null)
+					if (stmt != null) {
 						stmt.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				try {
-					if (conn != null)
+					if (conn != null) {
 						conn.close();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -4564,7 +4629,7 @@ public class SurveyService extends RESTService {
 
 			Iterator<String> remainingqids = questions.keySet().iterator();
 			while (remainingqids.hasNext()) {
-				String qid = (String) remainingqids.next();
+				String qid = remainingqids.next();
 				int requireds = (int) ((JSONObject) questions.get(qid)).get("required");
 				if (requireds == 1) {
 					throw new IllegalArgumentException(
@@ -4782,20 +4847,23 @@ public class SurveyService extends RESTService {
 					throw e;
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
@@ -4871,20 +4939,23 @@ public class SurveyService extends RESTService {
 					throw e;
 				} finally {
 					try {
-						if (rs != null)
+						if (rs != null) {
 							rs.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (s != null)
+						if (s != null) {
 							s.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
 					try {
-						if (c != null)
+						if (c != null) {
 							c.close();
+						}
 					} catch (Exception e) {
 						throw e;
 					}
@@ -4938,25 +5009,15 @@ public class SurveyService extends RESTService {
 		private JSONObject getActiveUserInfo() throws ParseException {
 			if (Context.getCurrent().getMainAgent() instanceof UserAgent) {
 				UserAgent me = (UserAgent) Context.getCurrent().getMainAgent();
-				JSONObject o;
-
-				if (me.getUserData() != null) {
-					System.err.println(me.getUserData());
-					o = (JSONObject) JSONValue.parseWithException((String) me.getUserData());
+				JSONObject o = new JSONObject();
+				if (Context.get().getMainAgent() instanceof AnonymousAgent) {
+					o.put("sub", "anonymous");
 				} else {
-					o = new JSONObject();
 
-					if (Context.getCurrent().getLocalNode().getAnonymous().getId() == Context.getCurrent()
-							.getMainAgent().getId()) {
-						o.put("sub", "anonymous");
-					} else {
-
-						String md5ide = new String("" + me.getId());
-						o.put("sub", md5ide);
-					}
+					String md5ide = new String("" + me.getIdentifier());
+					o.put("sub", md5ide);
 				}
 				return o;
-
 			} else {
 				return new JSONObject();
 			}

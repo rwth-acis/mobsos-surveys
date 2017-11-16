@@ -50,15 +50,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import i5.las2peer.api.p2p.ServiceNameVersion;
+import i5.las2peer.connectors.webConnector.WebConnector;
+import i5.las2peer.connectors.webConnector.client.ClientResponse;
+import i5.las2peer.connectors.webConnector.client.MiniClient;
 import i5.las2peer.p2p.LocalNode;
-import i5.las2peer.p2p.ServiceNameVersion;
-import i5.las2peer.security.ServiceAgent;
-import i5.las2peer.security.UserAgent;
+import i5.las2peer.p2p.LocalNodeManager;
+import i5.las2peer.security.ServiceAgentImpl;
+import i5.las2peer.security.UserAgentImpl;
 import i5.las2peer.services.mobsos.surveys.SurveyService;
 import i5.las2peer.testing.MockAgentFactory;
-import i5.las2peer.webConnector.WebConnector;
-import i5.las2peer.webConnector.client.ClientResponse;
-import i5.las2peer.webConnector.client.MiniClient;
 
 /**
  * JUnit Test Class for MobSOS Survey Service
@@ -68,14 +69,11 @@ import i5.las2peer.webConnector.client.MiniClient;
  */
 public class SurveyDataFill {
 
-	private static final String HTTP_ADDRESS = "http://127.0.0.1";
-	private static final int HTTP_PORT = WebConnector.DEFAULT_HTTP_PORT;
-
 	private static LocalNode node;
 	private static WebConnector connector;
 	private static MiniClient c1;
 	private static ByteArrayOutputStream logStream;
-	private static UserAgent user;
+	private static UserAgentImpl user;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
 			SurveyService.class.getCanonicalName(), "0.2");
@@ -91,7 +89,7 @@ public class SurveyDataFill {
 	public static void startServer() throws Exception {
 
 		// start node
-		node = LocalNode.newNode();
+		node = new LocalNodeManager().newNode();
 
 		user = MockAgentFactory.getAdam();
 
@@ -99,8 +97,8 @@ public class SurveyDataFill {
 
 		node.launch();
 
-		ServiceAgent testService = ServiceAgent.createServiceAgent(testServiceClass, "a pass");
-		testService.unlockPrivateKey("a pass");
+		ServiceAgentImpl testService = ServiceAgentImpl.createServiceAgent(testServiceClass, "a pass");
+		testService.unlock("a pass");
 
 		node.registerReceiver(testService);
 
@@ -108,7 +106,7 @@ public class SurveyDataFill {
 		logStream = new ByteArrayOutputStream();
 
 		// connector = new WebConnector(true,HTTP_PORT,false,1000,"./etc/xmlc");
-		connector = new WebConnector(true, HTTP_PORT, false, 1000);
+		connector = new WebConnector(true, 0, false, 0);
 
 		connector.setLogStream(new PrintStream(logStream));
 
@@ -116,8 +114,8 @@ public class SurveyDataFill {
 		Thread.sleep(1000); // wait a second for the connector to become ready
 
 		c1 = new MiniClient();
-		c1.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c1.setLogin(Long.toString(user.getId()), "adamspass");
+		c1.setConnectorEndpoint(connector.getHttpEndpoint());
+		c1.setLogin(user.getIdentifier(), "adamspass");
 
 		// String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
 		// System.out.println(xml);
@@ -141,13 +139,10 @@ public class SurveyDataFill {
 		connector = null;
 		node = null;
 
-		LocalNode.reset();
-
 		System.out.println("Connector-Log:");
 		System.out.println("--------------");
 
 		System.out.println(logStream.toString());
-
 	}
 
 	@SuppressWarnings("unchecked")

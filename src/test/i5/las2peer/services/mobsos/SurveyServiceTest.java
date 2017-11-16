@@ -55,17 +55,18 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import i5.las2peer.api.p2p.ServiceNameVersion;
+import i5.las2peer.api.security.Agent;
+import i5.las2peer.connectors.webConnector.WebConnector;
+import i5.las2peer.connectors.webConnector.client.ClientResponse;
+import i5.las2peer.connectors.webConnector.client.MiniClient;
 import i5.las2peer.p2p.LocalNode;
-import i5.las2peer.p2p.ServiceNameVersion;
-import i5.las2peer.security.Agent;
-import i5.las2peer.security.GroupAgent;
-import i5.las2peer.security.ServiceAgent;
-import i5.las2peer.security.UserAgent;
+import i5.las2peer.p2p.LocalNodeManager;
+import i5.las2peer.security.GroupAgentImpl;
+import i5.las2peer.security.ServiceAgentImpl;
+import i5.las2peer.security.UserAgentImpl;
 import i5.las2peer.services.mobsos.surveys.SurveyService;
 import i5.las2peer.testing.MockAgentFactory;
-import i5.las2peer.webConnector.WebConnector;
-import i5.las2peer.webConnector.client.ClientResponse;
-import i5.las2peer.webConnector.client.MiniClient;
 
 /**
  * JUnit Test Class for MobSOS Survey Service
@@ -75,16 +76,13 @@ import i5.las2peer.webConnector.client.MiniClient;
  */
 public class SurveyServiceTest {
 
-	private static final String HTTP_ADDRESS = "http://127.0.0.1";
-	private static final int HTTP_PORT = WebConnector.DEFAULT_HTTP_PORT;
-
 	private static LocalNode node;
 	private static WebConnector connector;
 	private static MiniClient c1, c2, c3;
 	private static ByteArrayOutputStream logStream;
 
-	private static UserAgent user1, user2, user3;
-	private static GroupAgent group1, group2;
+	private static UserAgentImpl user1, user2, user3;
+	private static GroupAgentImpl group1, group2;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
 			SurveyService.class.getCanonicalName(), "0.2");
@@ -100,25 +98,22 @@ public class SurveyServiceTest {
 	public static void startServer() throws Exception {
 
 		// start node
-		node = LocalNode.newNode();
+		node = new LocalNodeManager().newNode();
 
 		user1 = MockAgentFactory.getAdam();
 		user2 = MockAgentFactory.getAbel();
 		user3 = MockAgentFactory.getEve();
-		user1.unlockPrivateKey("adamspass");
-		user2.unlockPrivateKey("abelspass");
-		user3.unlockPrivateKey("evespass");
+		user1.unlock("adamspass");
+		user2.unlock("abelspass");
+		user3.unlock("evespass");
 
 		Agent[] as;
 		as = new Agent[] { user1, user2 };
-		try {
-			group1 = GroupAgent.createGroupAgent(as);
-
-			as = new Agent[] { user2, user3 };
-			group2 = GroupAgent.createGroupAgent(as);
-		} catch (Exception e) {
-			System.out.println(e);
-		}
+		group1 = GroupAgentImpl.createGroupAgent(as);
+		group1.unlock(user1);
+		as = new Agent[] { user2, user3 };
+		group2 = GroupAgentImpl.createGroupAgent(as);
+		group2.unlock(user2);
 
 		node.storeAgent(user1);
 		node.storeAgent(user2);
@@ -129,29 +124,29 @@ public class SurveyServiceTest {
 
 		node.launch();
 
-		ServiceAgent testService = ServiceAgent.createServiceAgent(testServiceClass, "a pass");
-		testService.unlockPrivateKey("a pass");
+		ServiceAgentImpl testService = ServiceAgentImpl.createServiceAgent(testServiceClass, "a pass");
+		testService.unlock("a pass");
 		node.registerReceiver(testService);
 
 		// start connector
 		logStream = new ByteArrayOutputStream();
 
-		connector = new WebConnector(true, HTTP_PORT, false, 1000);
+		connector = new WebConnector(true, 0, false, 0);
 		connector.setLogStream(new PrintStream(logStream));
 		connector.start(node);
 		Thread.sleep(1000); // wait a second for the connector to become ready
 
 		c1 = new MiniClient();
-		c1.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c1.setLogin(Long.toString(user1.getId()), "adamspass");
+		c1.setConnectorEndpoint(connector.getHttpEndpoint());
+		c1.setLogin(user1.getIdentifier(), "adamspass");
 
 		c2 = new MiniClient();
-		c2.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c2.setLogin(Long.toString(user2.getId()), "abelspass");
+		c2.setConnectorEndpoint(connector.getHttpEndpoint());
+		c2.setLogin(user2.getIdentifier(), "abelspass");
 
 		c3 = new MiniClient();
-		c3.setAddressPort(HTTP_ADDRESS, HTTP_PORT);
-		c3.setLogin(Long.toString(user3.getId()), "evespass");
+		c3.setConnectorEndpoint(connector.getHttpEndpoint());
+		c3.setLogin(user3.getIdentifier(), "evespass");
 
 	}
 
@@ -162,7 +157,6 @@ public class SurveyServiceTest {
 	 */
 	@AfterClass
 	public static void shutDownServer() throws Exception {
-
 		if (connector != null) {
 			connector.stop();
 		}
@@ -173,15 +167,12 @@ public class SurveyServiceTest {
 		connector = null;
 		node = null;
 
-		LocalNode.reset();
-
 		System.out.println("Connector-Log:");
 		System.out.println("--------------");
 
 		if (logStream != null) {
 			System.out.println(logStream.toString());
 		}
-
 	}
 
 	/**
