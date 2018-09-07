@@ -126,7 +126,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			client.getQuestionnaire(${ID},
 				function(d){
-					
 					$("#qname").text(decodeURIComponent(d.name))
 					$("#qorg").html("<img src='" + d.logo + "' height='20'><div id='org'></div> ");
 					$("#org").text(decodeURIComponent(d.organization));
@@ -143,19 +142,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 						function(data,type){
 							
-							var pages = data.getElementsByTagName("Page");
+							var pages = data.getElementsByTagName("qu:Page");
 							var ipages = 0;
 							var qpages = 0;
-							
+
 							for(i=0;i<pages.length;i++){
-							
+								
 								var page = pages[i];
 								var p_name = page.getAttribute("name");
 								var p_type = page.getAttribute("xsi:type");
 								
 								if(p_type == "qu:InformationPageType"){
-								
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									
 									$('#qitems').append("<li class='list-group-item'><span class='glyphicon glyphicon-info-sign'/> <span class='list-group-item-heading h4'>" + p_name + "</span><p class='list-group-item-text'/>" + p_info + "</li>");
 									
@@ -176,7 +174,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										p_style = "style='color:darkred;' ";
 									}
 									
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									
 									$('#qitems').append("<li class='list-group-item'><span " + p_style + " class='glyphicon glyphicon-question-sign'/> <span class='list-group-item-heading h4'>" + p_qid + " - " + p_name + "</span><p class='list-group-item-text'/>" + p_info + " (" + p_minval + ": " + p_minlab + " - " + p_maxval + ": " + p_maxlab + ")</p></li>");
 									
@@ -185,7 +183,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 								} else if (p_type == "qu:FreeTextQuestionPageType") {
 									
 									var p_qid = page.getAttribute("qid");
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									var p_req = page.getAttribute("required");
 									var p_style = "style='color:darkgreen;' ";
 									
