@@ -30,8 +30,8 @@ Start
 
 To start MobSOS Surveys, use one of the available start scripts:
   
-  * `bin/startNetwork.bat (Win)`
-  * `bin/startNetwork.sh (Unix, Mac)`
+  * `bin/start_network.bat (Win)`
+  * `bin/start_network.sh (Unix, Mac)`
 
 After successful start, MobSOS Surveys is available under
 
