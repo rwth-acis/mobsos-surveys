@@ -155,7 +155,7 @@ public class SurveyService extends RESTService {
 	private Validator validator;
 
 	// fields read from service configuration file
-	private String epUrl, questionnaireSchemaPath;
+	private String epUrl, las2peerUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName, jdbcUrl, jdbcSchema, jdbcLogin, jdbcPass;
 	private String oidcSchema, oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
 
@@ -165,10 +165,11 @@ public class SurveyService extends RESTService {
 		// set values from configuration file
 		this.setFieldValues();
 
-		// make sure epUrl and staticContentUrl have trailing slash
-		if (!epUrl.endsWith("/")) {
-			epUrl += "/";
+		// make sure las2peerUrl and staticContentUrl have trailing slash
+		if (!las2peerUrl.endsWith("/")) {
+			las2peerUrl += "/";
 		}
+		this.epUrl = las2peerUrl + "mobsos-surveys/";
 
 		if (staticContentUrl == null || staticContentUrl.isEmpty()) {
 			staticContentUrl = epUrl;
@@ -177,6 +178,8 @@ public class SurveyService extends RESTService {
 				staticContentUrl += "/";
 			}
 		}
+
+
 
 		// include this service into las2peer monitoring
 		// this.monitor = true;
@@ -281,6 +284,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
@@ -669,6 +673,7 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1156,6 +1161,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1550,6 +1556,7 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with concrete values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1924,6 +1931,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2306,6 +2314,7 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with concrete values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2744,6 +2753,7 @@ public class SurveyService extends RESTService {
 			html = i18n(html, lang);
 
 			html = fillPlaceHolder(html, "EP_URL", service.staticContentUrl);
+			html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 			html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 			html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 			html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2772,6 +2782,7 @@ public class SurveyService extends RESTService {
 
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+			html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 			html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 
 			html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);

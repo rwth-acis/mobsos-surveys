@@ -149,7 +149,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
 		
 		var endpoint_url = "${EP_URL}";
-		var client = new MobSOSSurveysClient(endpoint_url);
+		var las2peer_url = "${L2P_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
