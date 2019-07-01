@@ -370,7 +370,7 @@ MobSOSSurveysClient.prototype.sendRequestExt = function (ext_ep, method, relativ
 	} 
 	
 	$.ajax(ajaxObj);
-}
+};
 
 MobSOSSurveysClient.prototype.sendRequest = function(method, relativePath, content, mime, customHeaders, callback, errorCallback) {
 	
