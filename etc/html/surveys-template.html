@@ -96,6 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					data-logo="${OIDC_PROV_LOGO}"
 					data-server="${OIDC_PROV_URL}"
 					data-clientid="${OIDC_CLNT_ID}"
+					data-redirect="${EP_URL}surveys"
 					data-scope="openid phone email address profile">
               </span>
 			
@@ -403,8 +404,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       //po.src = '${SC_URL}js/oidc-button.js';
-       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
+       // po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>
