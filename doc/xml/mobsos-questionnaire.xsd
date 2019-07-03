@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" elementFormDefault="qualified">
+<xsd:schema xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" elementFormDefault="qualified">
 
 	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2009/01/xml.xsd"/>
-					  
+
 	<xsd:simpleType name="zeroOrOneType">
 		<xsd:restriction base="xsd:integer">
 			<xsd:minInclusive value="0"/>
 			<xsd:maxInclusive value="1"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	
+
 	<xsd:simpleType name="questionIdType">
 		<xsd:restriction base="xsd:string">
 			<xsd:pattern value="[A-Z0-9]*(\.[A-Z0-9]*)*"/>
@@ -26,9 +27,9 @@
 			<xsd:enumeration value="Community Impact"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	
+
 	<!-- ############# Questionnaires ############## -->
-	
+
 	<!-- Definition of possible document element Questionnaire -->
 	<xsd:element name="Questionnaire" type="qu:QuestionnaireType">
 		<xsd:key name="unique_qids">
@@ -42,29 +43,30 @@
 		<xsd:attribute name="dimension" type="qu:successDimensionType" use="required"/>
 		<xsd:attribute name="factor" type="xsd:string" use="required"/>
 	</xsd:complexType>
-	
+
 	<!-- Definition of "QuestionnaireType" -->
 	<xsd:complexType name="QuestionnaireType">
 		<xsd:annotation>
 			<xsd:documentation>
 				This type models a questionnaire. A questionnaire consists of a sequence of pages, which can be either
-				information or question pages. In this prototype version of the MobSOS questionnaire schema three types 
-				of question pages are available. These are in particular DichotomousQuestionPageType, OrdinalScaleQuestionPageType 
-				and FreeTextQuestionPageType. 
+				information or question pages. In this prototype version of the MobSOS questionnaire schema three types
+				of question pages are available. These are in particular DichotomousQuestionPageType,
+				OrdinalScaleQuestionPageType
+				and FreeTextQuestionPageType.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Page" type="qu:PageType" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="url" type="xsd:anyURI" use="optional"/>
-		<xsd:attribute ref="xml:lang" />
+		<xsd:attribute ref="xml:lang"/>
 	</xsd:complexType>
 	<!-- Pages -->
 	<!-- Definition of "PageType" -->
-	<xsd:complexType name="PageType" abstract="true">
+	<xsd:complexType name="PageType" abstract="true" mixed="true">
 		<xsd:annotation>
 			<xsd:documentation>
-				This abstract type models the base properties of a page in a questionnaire. 
+				This abstract type models the base properties of a page in a questionnaire.
 				A page must define an attribute name and exactly one instruction element.
 			</xsd:documentation>
 		</xsd:annotation>
@@ -87,36 +89,39 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- Definition of "QuestionPageType" -->
-	<xsd:complexType name="QuestionPageType" abstract="true">
+	<xsd:complexType name="QuestionPageType" abstract="true" mixed="true">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models the base properties of a question page in a questionnaire. 
-				In addition to basic page properties a question page defines an additional required 
+				This type models the base properties of a question page in a questionnaire.
+				In addition to basic page properties a question page defines an additional required
 				attribute qid representing the ID of the corresponding question. Another optional attribute
 				required defines, if the answer to the question on this page is optional or mandatory by
 				providing a boolean. If the required attribute is omitted, the default value false is
 				assumed, i.e. the answer is optional.
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="qu:PageType">
-				<xsd:attribute name="qid" type="qu:questionIdType" use="required"/>
-				<xsd:attribute name="required" type="xsd:boolean" use="optional" default="false"/>
-				<xsd:sequence>
-					<xsd:element name="SuccessModelRecommendation" type="qu:SuccessModelRecommendationType" minOccurs="0"/>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
+		<xsd:sequence>
+			<xsd:element name="Instructions" type="xsd:string"/>
+			<xsd:element name="SuccessModelRecommendation" type="qu:SuccessModelRecommendationType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="qid" type="qu:questionIdType" use="required"/>
+		<xsd:attribute name="required" type="xsd:boolean" use="optional" default="false"/>
 	</xsd:complexType>
 	<!-- Definition of "DichotomousQuestionPageType" -->
 	<xsd:complexType name="DichotomousQuestionPageType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models a dichotomous question page in a questionnaire. For a dichotomous question there exist exactly
-				two answers that somehow reflect a boolean true or false represented by the numbers 0 and 1. Attribute defval can be
-				used to define a default value of either 0 or 1. In addition to question page properties a dichotomous question page 
-				defines two additional required attributes tlabel and flabel defining labels for true or false respectively. 
-				A prominent example would be a yes/no question, where labels would be set to "yes" and "no" respectively.
+				This type models a dichotomous question page in a questionnaire. For a dichotomous question there exist
+				exactly
+				two answers that somehow reflect a boolean true or false represented by the numbers 0 and 1. Attribute
+				defval can be
+				used to define a default value of either 0 or 1. In addition to question page properties a dichotomous
+				question page
+				defines two additional required attributes tlabel and flabel defining labels for true or false
+				respectively.
+				A prominent example would be a yes/no question, where labels would be set to "yes" and "no"
+				respectively.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
@@ -131,19 +136,27 @@
 	<xsd:complexType name="OrdinalScaleQuestionPageType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models an ordinal scale question page in a questionnaire. An ordinal scale question intends to ask 
-				for a rating on an ordinal scale characterized by minimum and a maximum values represented by fully ordered discrete 
-				equidistant numerical values. In the prototype version of this schema these characteristic properties are defined in the 
-				integer attributes minval and maxval. With defval a default value can be defined. In analogy to labels for true and false
-				values in dichotomous question pages the two additional attributes minlabel and maxlabel define semantic meaning for 
-				both ends of the scale. A prominent example would be the following question: 
-				
-					Please rate the overall service quality on a scale from 0 (extremely bad) to 10 (brilliant)
-					
-				It should be noted that if the difference between minimum and maximum is odd it is possible to choose a neutral answer,
-				while an even difference requires a decision towards one tendency. Some common examples would be scales 
-				from 0 to n or from -n to +n. Although their definition is possible with this schema, scales from n to m are not 
-				recommendable. It should be noted that defval must be equal or greater than minval and equal or smaller than maxval. 
+				This type models an ordinal scale question page in a questionnaire. An ordinal scale question intends to
+				ask
+				for a rating on an ordinal scale characterized by minimum and a maximum values represented by fully
+				ordered discrete
+				equidistant numerical values. In the prototype version of this schema these characteristic properties
+				are defined in the
+				integer attributes minval and maxval. With defval a default value can be defined. In analogy to labels
+				for true and false
+				values in dichotomous question pages the two additional attributes minlabel and maxlabel define semantic
+				meaning for
+				both ends of the scale. A prominent example would be the following question:
+
+				Please rate the overall service quality on a scale from 0 (extremely bad) to 10 (brilliant)
+
+				It should be noted that if the difference between minimum and maximum is odd it is possible to choose a
+				neutral answer,
+				while an even difference requires a decision towards one tendency. Some common examples would be scales
+				from 0 to n or from -n to +n. Although their definition is possible with this schema, scales from n to m
+				are not
+				recommendable. It should be noted that defval must be equal or greater than minval and equal or smaller
+				than maxval.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
@@ -160,28 +173,31 @@
 	<xsd:complexType name="FreeTextQuestionPageType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models an open question providing survey planners with a tool for the acquisition of informal freetext 
-				information submitted by evaluators. However, this data is not well-suited for traditional statistical analysis. 
+				This type models an open question providing survey planners with a tool for the acquisition of informal
+				freetext
+				information submitted by evaluators. However, this data is not well-suited for traditional statistical
+				analysis.
 				An example would be the following question:
-				
-					Please write down additional service features that could be interesting for your community.
-					
+
+				Please write down additional service features that could be interesting for your community.
+
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="qu:QuestionPageType"/>
 		</xsd:complexContent>
 	</xsd:complexType>
-	
+
 	<!-- ############# Questionnaire Answers ############## -->
-	
+
 	<!-- Definition of document element QuestionnaireAnswer -->
 	<xsd:element name="QuestionnaireAnswer" type="qu:QuestionnaireAnswerType"/>
 	<!-- Definition of "QuestionnaireAnswerType" -->
 	<xsd:complexType name="QuestionnaireAnswerType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models an answer to a questionnaire. A questionnaire answer consists of a sequence of answers to
+				This type models an answer to a questionnaire. A questionnaire answer consists of a sequence of answers
+				to
 				individual questions presented in questionnaires on question pages.
 			</xsd:documentation>
 		</xsd:annotation>
@@ -193,9 +209,10 @@
 	<xsd:complexType name="QuestionAnswerType">
 		<xsd:annotation>
 			<xsd:documentation>
-				This type models an answer to a questionnaire. A questionnaire answer consists of a sequence of answers to
-				individual questions presented in questionnaires on question pages. In order to keep questionnaire and 
-				answer data consistent it must be guaranteed, that each question identifier given as value of the qid 
+				This type models an answer to a questionnaire. A questionnaire answer consists of a sequence of answers
+				to
+				individual questions presented in questionnaires on question pages. In order to keep questionnaire and
+				answer data consistent it must be guaranteed, that each question identifier given as value of the qid
 				attribute must refer to an identifier of a question page in the corresponding questionnaire.
 			</xsd:documentation>
 		</xsd:annotation>
