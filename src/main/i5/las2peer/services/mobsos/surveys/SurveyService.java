@@ -4309,7 +4309,7 @@ public class SurveyService extends RESTService {
 					|| o.get("description") == null || o.get("resource") == null || o.get("resource-label") == null
 					|| o.get("start") == null || o.get("end") == null || o.get("lang") == null) {
 				throw new IllegalArgumentException(
-						"Survey data incomplete! All fields name, organization, logo, description, resource, start, end, and lang must be defined!");
+						"Survey data incomplete! All fields name, organization, logo, description, resource, resource-label, start, end, and lang must be defined!");
 			}
 
 			// finally check time integrity constraint: start must be before end (possibly not enforced by database;

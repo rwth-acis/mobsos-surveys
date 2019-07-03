@@ -76,7 +76,7 @@ public class SurveyDataFill {
 	private static UserAgentImpl user;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
-			SurveyService.class.getCanonicalName(), "0.2");
+			SurveyService.class.getCanonicalName(), "0.3");
 
 	/**
 	 * Called before the tests start.

@@ -100,13 +100,15 @@
 				assumed, i.e. the answer is optional.
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:sequence>
-			<xsd:element name="Instructions" type="xsd:string"/>
-			<xsd:element name="SuccessModelRecommendation" type="qu:SuccessModelRecommendationType" minOccurs="0"/>
-		</xsd:sequence>
-		<xsd:attribute name="name" type="xsd:string" use="required"/>
-		<xsd:attribute name="qid" type="qu:questionIdType" use="required"/>
-		<xsd:attribute name="required" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:complexContent>
+            <xsd:extension base="qu:PageType">
+                <xsd:sequence>
+                    <xsd:element name="SuccessModelRecommendation" type="qu:SuccessModelRecommendationType" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="qid" type="qu:questionIdType" use="required"/>
+                <xsd:attribute name="required" type="xsd:boolean" use="optional" default="false"/>
+            </xsd:extension>
+        </xsd:complexContent>
 	</xsd:complexType>
 	<!-- Definition of "DichotomousQuestionPageType" -->
 	<xsd:complexType name="DichotomousQuestionPageType">
