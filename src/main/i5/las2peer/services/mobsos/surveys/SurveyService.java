@@ -87,6 +87,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import i5.las2peer.api.logging.MonitoringEvent;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -2552,6 +2553,8 @@ public class SurveyService extends RESTService {
 				PreparedStatement stmt = null;
 				ResultSet rset = null;
 
+				this.logAnswersToMobSOS(surveyId, form, answerFieldTable);
+
 				try {
 					conn = dataSource.getConnection();
 					stmt = conn.prepareStatement("insert into " + service.jdbcSchema
@@ -2611,6 +2614,27 @@ public class SurveyService extends RESTService {
 			} catch (Exception e) {
 				e.printStackTrace();
 				return internalError(onAction);
+			}
+		}
+
+		private void logAnswersToMobSOS(int surveyId, Document form, JSONObject answerFieldTable) {
+			JSONObject questions = extractQuestionInformation(form);
+			Iterator<String> it = answerFieldTable.keySet().iterator();
+			while (it.hasNext()) {
+				String qkey = it.next();
+				String qval = "" + answerFieldTable.get(qkey);
+				if(qval.equals("NaN")){
+					// comment fields may return NaN if empty and must be disregarded
+					continue;
+				}
+				JSONObject question = (JSONObject) questions.get(qkey);
+
+				JSONObject message = new JSONObject();
+				message.put("sid", surveyId);
+				message.put("qkey", qkey);
+				message.put("qval", qval);
+				message.put("instructions", question.get("instructions"));
+				Context.get().monitorEvent(MonitoringEvent.SERVICE_CUSTOM_MESSAGE_1, message.toJSONString() );
 			}
 		}
 
@@ -3104,7 +3128,7 @@ public class SurveyService extends RESTService {
 
 			try {
 				// authentication required for submitting response
-				if (!(Context.get().getMainAgent() instanceof AnonymousAgent)) {
+				if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 					return Response.status(Status.UNAUTHORIZED)
 							.entity("Client feedback retrieval requires authentication.").build();
 				} else {
@@ -3818,7 +3842,7 @@ public class SurveyService extends RESTService {
 						} else if (tag.endsWith("DESCRIPTION")) {
 							value = (String) survey.get("description");
 						} else if (tag.endsWith("RESOURCE")) {
-							String id = (String) survey.get("resource");
+							String id = (String) survey.get("resource-label");
 							Response r = getClientMetadata(id);
 							if (r.getStatus() == 200) {
 								JSONObject meta = (JSONObject) JSONValue.parse((String) r.getEntity());
@@ -4072,6 +4096,7 @@ public class SurveyService extends RESTService {
 			o.put("organization", rs.getString("organization"));
 			o.put("logo", rs.getString("logo"));
 			o.put("resource", rs.getString("resource"));
+			o.put("resource-label", rs.getString("resource_label"));
 			o.put("qid", rs.getInt("qid"));
 
 			long ts_start = rs.getTimestamp("start").getTime();
@@ -4186,8 +4211,8 @@ public class SurveyService extends RESTService {
 				throw new IllegalArgumentException("Survey data *" + content + "* is not valid JSON!");
 			}
 			// check result for unknown illegal fields. If so, parsing fails.
-			String[] fields = { "id", "owner", "organization", "logo", "name", "description", "resource", "start",
-					"end", "lang", "qid" };
+			String[] fields = { "id", "owner", "organization", "logo", "name", "description", "resource",
+					"resource-label", "start", "end", "lang", "qid" };
 			for (Object key : o.keySet()) {
 				if (!Arrays.asList(fields).contains(key)) {
 
@@ -4239,7 +4264,10 @@ public class SurveyService extends RESTService {
 						} catch (IOException e) {
 							throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
 						}*/
-					} else if (key.equals("start")) {
+					} else if (key.equals("resource-label") && !(o.get(key) instanceof String)) {
+						throw new IllegalArgumentException(
+								"Illegal value for survey field 'resource-label'. Should be a string.");
+					}else if (key.equals("start")) {
 						try {
 							DatatypeConverter.parseDateTime((String) o.get("start"));
 						} catch (IllegalArgumentException e) {
@@ -4278,8 +4306,8 @@ public class SurveyService extends RESTService {
 
 			// check if all necessary fields are specified.
 			if (o.get("name") == null || o.get("organization") == null || o.get("logo") == null
-					|| o.get("description") == null || o.get("resource") == null || o.get("start") == null
-					|| o.get("end") == null || o.get("lang") == null) {
+					|| o.get("description") == null || o.get("resource") == null || o.get("resource-label") == null
+					|| o.get("start") == null || o.get("end") == null || o.get("lang") == null) {
 				throw new IllegalArgumentException(
 						"Survey data incomplete! All fields name, organization, logo, description, resource, start, end, and lang must be defined!");
 			}
@@ -4399,7 +4427,7 @@ public class SurveyService extends RESTService {
 				conn = dataSource.getConnection();
 				stmt = conn.prepareStatement(
 						"insert into " + service.jdbcSchema
-								+ ".survey(owner, organization, logo, name, description, resource, start, end, lang ) values (?,?,?,?,?,?,?,?,?)",
+								+ ".survey(owner, organization, logo, name, description, resource, resource_label, start, end, lang ) values (?,?,?,?,?,?,?,?,?,?)",
 						Statement.RETURN_GENERATED_KEYS);
 
 				stmt.clearParameters();
@@ -4409,11 +4437,12 @@ public class SurveyService extends RESTService {
 				stmt.setString(4, (String) survey.get("name"));
 				stmt.setString(5, (String) survey.get("description"));
 				stmt.setString(6, (String) survey.get("resource"));
-				stmt.setTimestamp(7,
-						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("start")).getTimeInMillis()));
+				stmt.setString(7, (String) survey.get("resource-label"));
 				stmt.setTimestamp(8,
+						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("start")).getTimeInMillis()));
+				stmt.setTimestamp(9,
 						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("end")).getTimeInMillis()));
-				stmt.setString(9, (String) survey.get("lang"));
+				stmt.setString(10, (String) survey.get("lang"));
 
 				stmt.executeUpdate();
 				ResultSet rs = stmt.getGeneratedKeys();
@@ -4789,6 +4818,9 @@ public class SurveyService extends RESTService {
 								question.put("maxval", Integer.parseInt(e.getAttribute("maxval")));
 							}
 						}
+						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
+						question.put("instructions",instructionNode.getTextContent());
+
 						questions.put(e.getAttribute("qid"), question);
 					}
 				}

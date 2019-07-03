@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	  <script src="${SC_URL}js/html5shiv.js"></script>
 	  <script src="${SC_URL}js/respond.min.js"></script>
 	<![endif]-->
-	
+
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body>
@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			  <ul class="nav navbar-nav">
                <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
 			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
-             </ul>   
+             </ul>
               <span class="oidc-signin navbar-btn navbar-right btn-default"
 					data-callback="signinCallback"
 					data-name="${OIDC_PROV_NAME}"
@@ -71,14 +71,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					data-logo="${OIDC_PROV_LOGO}"
 					data-server="${OIDC_PROV_URL}"
 					data-clientid="${OIDC_CLNT_ID}"
-					data-redirect="${EP_URL}surveys"
+					data-redirect="${EP_URL}surveys/${ID}"
 					data-scope="openid phone email address profile">
               </span>
-			
+
           </div><!--/.nav-collapse -->
         </div>
       </div>
-	
+
 	<!-- Container for operations on questionnaires -->
 	<div id="survey" class="container ">
 		<div class="row" style="margin:30px 0px 0px 0px;">
@@ -93,106 +93,109 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			</table>
 			<p id="submit-msg" class="alert alert-info hidden"></p>
 			<p>
-				<button id="i_survey_part" class="btn btn-lg btn-success hidden">${participate}</button>
-				<button id="i_survey_resp" class="btn btn-lg btn-success">${responses}</button>
+				<button id="i_survey_part" class="btn btn-lg btn-success hidden" data-toggle="modal" data-target="#survey-form-modal">${participate}</button>
+				<button id="i_survey_resp" class="btn btn-lg btn-success" data-toggle="modal" data-target="#survey-results-modal">${responses}</button>
 			</p>
 		</div>
 	</div>
-	
+
+	<div class="modal fade" id="survey-form-modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">${participate}</h4>
+				</div>
+				<div class="modal-body">
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <div class="modal fade" id="survey-results-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">${responses}</h4>
+                </div>
+                <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+
 	<!-- import jQuery for AJAX calls (must) -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-	
+
 	<!-- import Bootstrap for responsive UI (must) -->
 	<!--<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>-->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-	
+
 	<!-- import MobSOS Surveys lib -->
 	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
 	<!--<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>-->
-	
+
 	<!-- import moment.js for displaying times and dates -->
 	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/moment.min_.js"></script>
-	
+
 	<script type="text/javascript">
-		
+
 		var endpoint_url = "${EP_URL}";
 		var las2peer_url = "${L2P_URL}";
 		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
-		
+
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
 			if(result === "success"){
 				$("#i_survey_edit").removeClass("hidden");
-			} 
-			
-			$("#i_survey_part").click(function(){
-					client.navigateTo("questionnaire");
-					//window.location.href = window.location.href + "/questionnaire?access_token=" + window.localStorage["access_token"];
+			}
+
+			$('#survey-form-modal').on('show.bs.modal', function (e) {
+				client.getSurveyQuestionnaire(${ID}, function (data) {
+					$('#survey-form-modal').find('.modal-body').html(data);
+				},console.error)
 			});
-			
-			$("#i_survey_resp").click(function(){
-				client.navigateTo("responses");
-				//window.location.href = window.location.href + "/responses?access_token=" + window.localStorage["access_token"];
+
+			$("#survey-results-modal").on('show.bs.modal', function (e) {
+                client.getSurveyResponsesAsHtml(${ID}, function (data) {
+                    $('#survey-results-modal').find('.modal-body').html(data);
+                },console.error)
 			});
-			
+
 			updateSurvey();
 		}
-		
+
 		function updateSurvey(){
-			
+
 			client.getSurvey(${ID},
 				function(data,type){
-					
-					client.getResourceMeta(data.resource, 
-						function(meta){
-							console.log("Meta: ");
-							console.log(meta);
-							if(meta.uri && meta.logo){
-								$("#s_resource").html("<img src='" + meta.logo + "' height='48px'/>  <a href='" + meta.uri + "'>" + meta.name + "</a>");
-							} else if(meta.uri){
-								$("#s_resource").html("<a href='" + meta.uri + "'>" + meta.name + "</a>");
-							}
-							else{
-								$("#s_resource").html(meta.name);
-							}
-						}, 
-						function(err){
-						}
-					);
-					
 					$("#s_name").text(decodeURIComponent(data.name))
 					$("#s_org").html("<img src='" + data.logo + "' height='20'><div id='org' style='display:inline;margin:5px'></div>");
 					$("#org").text(decodeURIComponent(data.organization));
 					$("#s_desc").text(""+decodeURIComponent(data.description));
-					$("#s_resource").html(data.resource);
-					
+					$("#s_resource").html(data['resource-label']);
+
 					$("#s_start").html(moment.utc(data.start).format("llll"));
 					$("#s_end").html(moment.utc(data.end).format("llll"));
-					
+
 					//TODO: add result field qurl in service!
 					$("#s_questionnaire").html("<a href='${EP_URL}questionnaires/" + data.qid + "'>Questionnaire</a>");
 					console.log(data);
-					
+
 					// only show participation button, if survey is active (i.e. started, and did not end, yet)
 					var now = moment();
 					var s_e = moment.utc(data.end);
 					var s_s = moment.utc(data.start);
-					
+
 					if(now > s_e){
 						console.log("Warning: survey over!");
 					} else if(now < s_s){
 						console.log("Warning: survey did not yet begin!");
 					} else {
 						console.log("Participation possible timewise");
-						
-						if(!oidc_userinfo){
-							console.log("User anonymous. Check ");
-							if(client.hasSubmission(data.id)){
-								$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
-							} else {
-								$("#i_survey_part").removeClass("hidden");
-							}
-						} else {
+
+						if(oidc_userinfo){
 							// check responses, if user already participated.
 							client.getSurveyResponses(${ID},
 								function(d,type){
@@ -210,21 +213,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 									console.log(e);
 								}
 							);
-							
+
 						}
-						
-						
+
+
 					}
-					
+
 				},
 				function(error){
 					console.log(error);
 				}
 			);
 		}
-	
+
 	</script>
-	  
+
 	<!-- add this script element right before closing tag </body> -->
 	<script type="text/javascript">
       (function() {

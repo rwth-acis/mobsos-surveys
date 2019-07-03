@@ -138,13 +138,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</div>
 					
 					<div class="form-group">
-						<label for="i_survey_resource">${resource}</label>
+						<label for="i_survey_clientpick">${resource}</label>
 						<div>
 							<select id="i_survey_clientpick" class="form-control">
 								<!-- client options inserted dynamically -->
 							</select>
 						</div>
 						<!-- <input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />-->
+					</div>
+
+					<div class="form-group">
+						<label for="i_survey_resource_label">${resource_label}</label>
+						<textarea class="form-control" id="i_survey_resource_label" placeholder="Resource Label" ></textarea>
 					</div>
 					
 					<div class="col-md-6 form-group">
@@ -353,6 +358,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				"start": $("#i_survey_starttime").val(),
 				"end": $("#i_survey_endtime").val(),
 				"resource": $("#i_survey_clientpick").find('option:selected').text(),
+				"resource-label": encodeURIComponent($('#i_survey_resource_label').val()),
 				//"resource": $("#i_survey_resource").val(),
 				"lang": $("#i_survey_lang").val()
 			};

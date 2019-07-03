@@ -254,6 +254,29 @@ MobSOSSurveysClient.prototype.getSurveyResponses = function (id, callback, error
 
 };
 
+MobSOSSurveysClient.prototype.getSurveyResponsesAsHtml = function (id, callback, errorCallback) {
+
+    this.sendRequestToService("GET",
+        "surveys/" + id + "/responses",
+        "",
+        "",
+        {"Accept": "text/html"},
+        callback,
+        errorCallback);
+
+};
+
+MobSOSSurveysClient.prototype.getSurveyQuestionnaire = function (id, callback, errorCallback) {
+    this.sendRequestToService("GET",
+        "surveys/" + id + "/questionnaire",
+        "",
+        "application/json",
+        {},
+        callback,
+        errorCallback);
+
+};
+
 MobSOSSurveysClient.prototype.setSurveyQuestionnaire = function (id, data, callback, errorCallback) {
     this.sendRequestToService("POST",
         "surveys/" + id + "/questionnaire",
