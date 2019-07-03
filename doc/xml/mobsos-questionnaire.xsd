@@ -15,6 +15,17 @@
 			<xsd:pattern value="[A-Z0-9]*(\.[A-Z0-9]*)*"/>
 		</xsd:restriction>
 	</xsd:simpleType>
+
+	<xsd:simpleType name="successDimensionType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="System Quality"/>
+			<xsd:enumeration value="Information Quality"/>
+			<xsd:enumeration value="Use"/>
+			<xsd:enumeration value="User Satisfaction"/>
+			<xsd:enumeration value="Individual Impact"/>
+			<xsd:enumeration value="Community Impact"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 	
 	<!-- ############# Questionnaires ############## -->
 	
@@ -25,6 +36,12 @@
 			<xsd:field xpath="@qid"/>
 		</xsd:key>
 	</xsd:element>
+
+	<!-- Definition of success model recommendations type -->
+	<xsd:complexType name="SuccessModelRecommendationType">
+		<xsd:attribute name="dimension" type="qu:successDimensionType" use="required"/>
+		<xsd:attribute name="factor" type="xsd:string" use="required"/>
+	</xsd:complexType>
 	
 	<!-- Definition of "QuestionnaireType" -->
 	<xsd:complexType name="QuestionnaireType">
@@ -85,6 +102,9 @@
 			<xsd:extension base="qu:PageType">
 				<xsd:attribute name="qid" type="qu:questionIdType" use="required"/>
 				<xsd:attribute name="required" type="xsd:boolean" use="optional" default="false"/>
+				<xsd:sequence>
+					<xsd:element name="SuccessModelRecommendation" type="qu:SuccessModelRecommendationType" minOccurs="0"/>
+				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

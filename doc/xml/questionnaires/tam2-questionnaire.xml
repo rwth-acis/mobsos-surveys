@@ -21,6 +21,7 @@
 		<qu:Instructions>
 			Assuming I have access to ${SURVEY.RESOURCE}, I intend to use it.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Use" factor="Intention to Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Intention to Use" 
@@ -34,6 +35,7 @@
 		<qu:Instructions>
 			Given that I have access to ${SURVEY.RESOURCE}, I predict that I would use it.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Use" factor="Intention to Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -47,6 +49,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} improves my performance in my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -60,7 +63,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} in my job increases my productivity.
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -74,6 +77,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} enhances my effectiveness in my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -87,6 +91,7 @@
 		<qu:Instructions>
 			I find ${SURVEY.RESOURCE} to be useful in my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease of Use" 
@@ -100,6 +105,7 @@
 		<qu:Instructions>
 			My interaction with ${SURVEY.RESOURCE} is clear and understandable.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease of Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease of Use" 
@@ -113,6 +119,7 @@
 		<qu:Instructions>
 			Interacting with ${SURVEY.RESOURCE} does not require a lot of my mental effort.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease of Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease of Use" 
@@ -126,6 +133,7 @@
 		<qu:Instructions>
 			I find ${SURVEY.RESOURCE} to be easy to use.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease of Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease of Use" 
@@ -139,6 +147,7 @@
 		<qu:Instructions>
 			I find it easy to get ${SURVEY.RESOURCE} to do what I want it to do.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease of Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Subjective Norm" 
@@ -152,6 +161,7 @@
 		<qu:Instructions>
 			People who influence my behavior think that I should use ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Subjective Norm"/>
 	</qu:Page>
 	
 	<qu:Page name="Subjective Norm" 
@@ -165,6 +175,7 @@
 		<qu:Instructions>
 			People who are important to me think that I should use ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Subjective Norm"/>
 	</qu:Page>
 	
 	<qu:Page name="Voluntariness" 
@@ -178,6 +189,7 @@
 		<qu:Instructions>
 			My use of ${SURVEY.RESOURCE} is voluntary.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Use" factor="Voluntariness"/>
 	</qu:Page>
 	
 	<qu:Page name="Voluntariness" 
@@ -191,6 +203,7 @@
 		<qu:Instructions>
 			My supervisor does not require me to use ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Use" factor="Voluntariness"/>
 	</qu:Page>
 	
 	<qu:Page name="Voluntariness" 
@@ -204,6 +217,7 @@
 		<qu:Instructions>
 			Although it might be helpful, using ${SURVEY.RESOURCE} is certainly not compulsory in my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Use" factor="Voluntariness"/>
 	</qu:Page>
 	
 	<qu:Page name="Image" 
@@ -217,6 +231,7 @@
 		<qu:Instructions>
 			People in my organization who use ${SURVEY.RESOURCE} have more prestige than those who do not.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Image"/>
 	</qu:Page>
 	
 	<qu:Page name="Image" 
@@ -230,6 +245,7 @@
 		<qu:Instructions>
 			People in my organization who use ${SURVEY.RESOURCE} have a high profile.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Image"/>
 	</qu:Page>
 	
 	<qu:Page name="Image" 
@@ -243,6 +259,7 @@
 		<qu:Instructions>
 			Having ${SURVEY.RESOURCE} is a status symbol in my organization.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Image"/>
 	</qu:Page>
 	
 	<qu:Page name="Job Relevance" 
@@ -256,6 +273,7 @@
 		<qu:Instructions>
 			In my job, usage of ${SURVEY.RESOURCE} is important.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Job Relevance"/>
 	</qu:Page>
 	
 	<qu:Page name="Job Relevance" 
@@ -269,6 +287,7 @@
 		<qu:Instructions>
 			In my job, usage of ${SURVEY.RESOURCE} is relevant.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Job Relevance"/>
 	</qu:Page>
 	
 	<qu:Page name="Output Quality" 
@@ -282,6 +301,7 @@
 		<qu:Instructions>
 			The quality of output I get from ${SURVEY.RESOURCE} is high.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Output Quality"/>
 	</qu:Page>
 	
 	<qu:Page name="Output Quality" 
@@ -295,6 +315,7 @@
 		<qu:Instructions>
 			I have no problem with the quality of ${SURVEY.RESOURCE}'s output.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Output Quality"/>
 	</qu:Page>
 	
 	<qu:Page name="Result Demonstratability" 
@@ -308,6 +329,7 @@
 		<qu:Instructions>
 			I have no difficulty telling others about the results of using ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Result Demonstratability"/>
 	</qu:Page>
 	
 	<qu:Page name="Result Demonstratability" 
@@ -321,6 +343,7 @@
 		<qu:Instructions>
 			I believe I could communicate to others the consequences of using ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Result Demonstratability"/>
 	</qu:Page>
 	
 	<qu:Page name="Result Demonstratability" 
@@ -334,6 +357,7 @@
 		<qu:Instructions>
 			The results of using ${SURVEY.RESOURCE} are apparent to me.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Result Demonstratability"/>
 	</qu:Page>
 	
 	<qu:Page name="Result Demonstratability" 
@@ -347,6 +371,7 @@
 		<qu:Instructions>
 			I would have difficulty explaining why using ${SURVEY.RESOURCE} may or may not be beneficial.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Result Demonstratability"/>
 	</qu:Page>
 	
 </qu:Questionnaire>

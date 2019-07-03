@@ -13,6 +13,7 @@
 		<qu:Instructions>
 			Overall Quality of ${SURVEY.RESOURCE}
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Comments" 
@@ -22,6 +23,7 @@
 		<qu:Instructions>
 			Comments
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Overall"/>
 	</qu:Page>
 	
 </qu:Questionnaire>
