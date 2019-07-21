@@ -13,7 +13,7 @@
 
 	<xsd:simpleType name="questionIdType">
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value="[A-Z0-9]*(\.[A-Z0-9]*)*"/>
+			<xsd:pattern value="[A-Za-z0-9]*([\-.][A-Za-z0-9]*)*"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 
