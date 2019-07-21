@@ -31,63 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package i5.las2peer.services.mobsos.surveys;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.ResourceBundle;
-import java.util.Scanner;
-import java.util.TimeZone;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.XMLConstants;
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
+import i5.las2peer.api.Context;
+import i5.las2peer.api.ManualDeployment;
 import i5.las2peer.api.logging.MonitoringEvent;
+import i5.las2peer.api.security.AnonymousAgent;
+import i5.las2peer.api.security.GroupAgent;
+import i5.las2peer.api.security.UserAgent;
+import i5.las2peer.restMapper.RESTService;
+import i5.las2peer.restMapper.annotations.ServicePath;
+import io.swagger.annotations.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -101,21 +53,33 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
-import i5.las2peer.api.Context;
-import i5.las2peer.api.ManualDeployment;
-import i5.las2peer.api.security.AnonymousAgent;
-import i5.las2peer.api.security.GroupAgent;
-import i5.las2peer.api.security.UserAgent;
-import i5.las2peer.restMapper.RESTService;
-import i5.las2peer.restMapper.annotations.ServicePath;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Contact;
-import io.swagger.annotations.Info;
-import io.swagger.annotations.License;
-import io.swagger.annotations.SwaggerDefinition;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.XMLConstants;
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 /**
  * 
@@ -2331,6 +2295,40 @@ public class SurveyService extends RESTService {
 			}
 		}
 
+		@GET
+		@Produces(MediaType.TEXT_HTML)
+		@Path("xml-generator")
+		public Response getXmlGeneratorHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang) {
+
+			String onAction = "retrieving XML generator HTML";
+
+			// adapt template to specific survey
+			try {
+				Scanner scanner = new Scanner(new File("./etc/html/xml-generator.html"));
+				String html = scanner.useDelimiter("\\A").next();
+				scanner.close();
+
+				// localize template
+				html = i18n(html, lang);
+
+				// fill in placeholders with concrete values
+				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
+				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
+				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
+				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
+				html = fillPlaceHolder(html, "OIDC_PROV_URL", service.oidcProviderUrl);
+				html = fillPlaceHolder(html, "OIDC_CLNT_ID", service.oidcClientId);
+
+				// finally return resulting HTML
+				return Response.status(Status.OK).entity(html).header("Access-Control-Allow-Origin", "*")
+						.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+						.build();
+			} catch (FileNotFoundException e) {
+				return internalError(onAction);
+			}
+		}
+
 		/**
 		 * TODO: write documentation
 		 * 
@@ -2854,8 +2852,7 @@ public class SurveyService extends RESTService {
 		// should not be used with productive installations due to performance issues!
 
 		@GET
-		@Produces(MediaType.TEXT_PLAIN)
-		@Path("/js/{filename}")
+		@Path("/js/{filename:.+}")
 		public Response serveJS(@PathParam("filename") String filename) {
 
 			// String onAction = "serving JavaScript";
@@ -2864,7 +2861,11 @@ public class SurveyService extends RESTService {
 				Scanner scanner = new Scanner(new File("./etc/webapp/js/" + filename));
 				String js = scanner.useDelimiter("\\A").next();
 				scanner.close();
-				return Response.status(Status.OK).entity(js).build();
+				String responseType = MediaType.TEXT_PLAIN;
+				if (filename.contains(".html")) {
+					responseType = MediaType.TEXT_HTML;
+				}
+				return Response.ok(js, responseType).build();
 
 			} catch (FileNotFoundException e) {
 				return Response.status(Status.NOT_FOUND).entity(filename + " not found!").build();

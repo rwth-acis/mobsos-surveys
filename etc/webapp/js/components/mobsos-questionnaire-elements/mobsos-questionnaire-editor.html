@@ -1,0 +1,147 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../polymer-sortablejs/polymer-sortablejs.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="mobsos-question-editor.html">
+<link rel="import" href="mobsos-questionnaire-row.html">
+
+<!--
+`mobsos-questionnaire-editor`
+An editor for creating questionnaires for MobSOS. Its interface shows a list of question editors. New questions can be
+added via a button. Finally, the questionnaire can be exported as an XML in the MobSOS Surveys format.
+
+@demo demo/index.html
+-->
+
+<dom-module id="mobsos-questionnaire-editor">
+  <template>
+    <style>
+
+      :host {
+        display: block;
+      }
+
+      .container {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+
+      .buttonbar {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+        width: 100%;
+        max-width: 652px;
+        margin-bottom: 25px;
+      }
+
+      #questionnaire {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        width: 100%;
+      }
+
+      mobsos-questionnaire-row {
+        display: inline;
+        border: 1px solid lightgray;
+        padding: 5px 25px 25px 25px;
+        margin-bottom: 15px;
+      }
+
+    </style>
+
+    <div class="container">
+
+      <div class="buttonbar">
+        <paper-button on-tap="_handleXMLExport" raised><iron-icon icon="file-download"></iron-icon>Export XML</paper-button>
+      </div>
+
+      <sortable-js id="questionnaire" handle=".drag-handle">
+
+      </sortable-js>
+
+      <div class="buttonbar">
+        <paper-button on-tap="_handleAddQuestion" raised><iron-icon icon="add"></iron-icon>Add page</paper-button>
+      </div>
+
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'mobsos-questionnaire-editor',
+
+      properties: {},
+
+      /**
+       * Exports the questionnaire as MobSOS XML.
+       *
+       * @return {string} a MobSOS XML representation of the questionnaire.
+       */
+      exportXML: function() {
+        var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
+                '<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n\n';
+
+        // now add all the question's XML nodes
+        var questionNodes = this.$.questionnaire.querySelectorAll('mobsos-question-editor');
+
+        for (var i = 0; i < questionNodes.length; i++) {
+          var questionNode = questionNodes[i];
+          xml += questionNode.exportXML() + '\n\n';
+        }
+
+        xml += '</qu:Questionnaire>';
+
+        return xml;
+      },
+
+      _handleXMLExport: function() {
+        var xml = this.exportXML();
+
+        var filename = "questionnaire.xml";
+
+        var uri = 'data:application/xml;charset=utf-8,' + encodeURI(xml);
+
+        // now, let's create a fake <a> tag, and click it to trigger the download dialog.
+        // @see {@link https://gist.github.com/beders/467a7fccfccb1744607e}
+        var link = document.createElement("a");
+        link.href = uri;
+        // set the visibility hidden so it will not have any effect on the Web layout
+        link.style = "visibility:hidden;";
+        link.download = filename;
+        // this part will append the anchor tag and remove it after automatic click
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
+      _handleAddQuestion: function() {
+        var rowNode = document.createElement('mobsos-questionnaire-row');
+        rowNode.addEventListener('delete-question', this._handleDeleteQuestion.bind(this));
+        var dragHandleNode = document.createElement('iron-icon');
+        dragHandleNode.setAttribute('class', 'drag-handle');
+        dragHandleNode.setAttribute('icon', 'editor:drag-handle');
+        var questionNode = document.createElement('mobsos-question-editor');
+
+        // we need to use the Polymer method here, otherwise the question is not stamped within the local DOM...
+        Polymer.dom(rowNode).appendChild(dragHandleNode);
+        Polymer.dom(rowNode).appendChild(questionNode);
+
+        Polymer.dom(this.$.questionnaire).appendChild(rowNode);
+        rowNode.playAnimation('entry');
+      },
+
+      _handleDeleteQuestion: function(event) {
+        event.target.addEventListener('neon-animation-finish', function() {
+          Polymer.dom(this.$.questionnaire).removeChild(event.target);
+        }.bind(this));
+        event.target.playAnimation('exit');
+      }
+
+    });
+  </script>
+</dom-module>

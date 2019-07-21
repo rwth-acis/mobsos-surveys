@@ -1,0 +1,84 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+
+<!--
+`mobsos-questionnaire-row`
+A row for the MobSOS questionnaire editor. Mainly responsible for showing the delete button.
+
+@demo demo/index.html
+-->
+
+<dom-module id="mobsos-questionnaire-row">
+  <template>
+    <style>
+
+      :host {
+        /*display: inline;*/
+        width: 100%;
+        max-width: 600px;
+      }
+
+      .container {
+        @apply(--layout-vertical);
+      }
+
+      .drag-handle {
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        width: 100%;
+        cursor: move;
+        cursor: -webkit-grabbing;  /* overrides 'move' */
+      }
+
+      .actions {
+        @apply(--layout-horizontal);
+        @apply(--layout-end-justified);
+        margin-top: 10px;
+      }
+
+    </style>
+
+    <div class="container">
+      <div class="drag-handle" title="Drag me around to reorder questions!">
+        <content select="iron-icon"></content>
+      </div>
+
+      <content select="mobsos-question-editor"></content>
+
+      <div class="actions">
+        <paper-icon-button icon="delete" on-tap="_handleDeleteQuestion" alt="Delete" title="Delete"></paper-icon-button>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'mobsos-questionnaire-row',
+
+      behaviors: [
+        Polymer.NeonAnimationRunnerBehavior
+      ],
+
+      properties: {
+        entryAnimation: {
+          value: 'scale-up-animation'
+        },
+        exitAnimation: {
+          value: 'fade-out-animation'
+        }
+      },
+
+      _handleDeleteQuestion: function() {
+        this.fire('delete-question');
+      }
+
+    });
+  </script>
+
+</dom-module>
