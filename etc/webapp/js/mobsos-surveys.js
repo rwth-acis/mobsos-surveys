@@ -157,7 +157,7 @@ MobSOSSurveysClient.prototype.getQuestionnaire = function (id, callback, errorCa
         "questionnaires/" + id,
         "",
         "application/json",
-        {},
+        {"Accept": "application/json"},
         callback,
         errorCallback);
 
