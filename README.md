@@ -1,5 +1,6 @@
 MobSOS Surveys
 ==============
+[![Build Status](https://travis-ci.org/rwth-acis/mobsos-surveys.svg?branch=master)](https://travis-ci.org/rwth-acis/mobsos-surveys)
 
 A simple RESTful service for managing, conducting, and evaluating online surveys, including a template-based responsive Web frontend. The service is based on [las2peer](https://github.com/rwth-acis/LAS2peer).
 
