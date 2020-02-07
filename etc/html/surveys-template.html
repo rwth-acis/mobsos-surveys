@@ -96,6 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					data-logo="${OIDC_PROV_LOGO}"
 					data-server="${OIDC_PROV_URL}"
 					data-clientid="${OIDC_CLNT_ID}"
+					data-redirect="${EP_URL}surveys"
 					data-scope="openid phone email address profile">
               </span>
 			
@@ -137,13 +138,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					</div>
 					
 					<div class="form-group">
-						<label for="i_survey_resource">${resource}</label>
+						<label for="i_survey_clientpick">${resource}</label>
 						<div>
 							<select id="i_survey_clientpick" class="form-control">
 								<!-- client options inserted dynamically -->
 							</select>
 						</div>
 						<!-- <input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />-->
+					</div>
+
+					<div class="form-group">
+						<label for="i_survey_resource_label">${resource_label}</label>
+						<textarea class="form-control" id="i_survey_resource_label" placeholder="Resource Label" ></textarea>
 					</div>
 					
 					<div class="col-md-6 form-group">
@@ -226,8 +232,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<!--<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>-->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
+	<!--<script type="text/javascript" src="https://las2peer.dbis.rwth-aachen.de/mobsos-surveys/mobsos-surveys.js"></script>-->
 	
 	<!-- import datetimepicker + deps -->
 	<!--<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>-->
@@ -238,7 +244,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
 		
 		var endpoint_url = "${EP_URL}";
-		var client = new MobSOSSurveysClient(endpoint_url);
+		var las2peer_url = "${L2P_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
@@ -260,7 +267,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					}
 				);
 				
-				client.getResourcesMeta( 
+				client.getResourcesMeta(
 					function(d){
 						for (i in d){
 							var c = d[i];
@@ -350,7 +357,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				"logo": $('#i_survey_logo').val(),
 				"start": $("#i_survey_starttime").val(),
 				"end": $("#i_survey_endtime").val(),
-				"resource": $("#i_survey_clientpick").val(),
+				"resource": $("#i_survey_clientpick").find('option:selected').text(),
+				"resource-label": encodeURIComponent($('#i_survey_resource_label').val()),
 				//"resource": $("#i_survey_resource").val(),
 				"lang": $("#i_survey_lang").val()
 			};
@@ -403,8 +411,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       //po.src = '${SC_URL}js/oidc-button.js';
-       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
+       // po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

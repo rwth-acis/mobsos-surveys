@@ -20,6 +20,7 @@
 		<qu:Instructions>
 			Ich denke, dass ich ${SURVEY.RESOURCE} gerne häufig benutzen würde.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -33,6 +34,7 @@
 		<qu:Instructions>
 			Ich fand ${SURVEY.RESOURCE} unnötig komplex.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -46,6 +48,7 @@
 		<qu:Instructions>
 			Ich fand ${SURVEY.RESOURCE} einfach zu benutzen.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Erlernbarkeit" 
@@ -59,6 +62,7 @@
 		<qu:Instructions>
 			Ich glaube, ich würde die Hilfe einer technisch versierten Person benötigen, um ${SURVEY.RESOURCE} benutzen zu können.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -72,6 +76,7 @@
 		<qu:Instructions>
 			Ich fand, die verschiedenen Funktionen in ${SURVEY.RESOURCE} waren gut integriert.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -85,6 +90,7 @@
 		<qu:Instructions>
 			Ich denke, ${SURVEY.RESOURCE} enthielt zu viele Inkonsistenzen.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -98,6 +104,7 @@
 		<qu:Instructions>
 			Ich kann mir vorstellen, dass die meisten Menschen den Umgang mit ${SURVEY.RESOURCE} sehr schnell lernen.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -111,6 +118,7 @@
 		<qu:Instructions>
 			Ich fand ${SURVEY.RESOURCE} sehr umständlich zu nutzen.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Gebrauchstauglichkeit" 
@@ -124,6 +132,7 @@
 		<qu:Instructions>
 			Ich fühlte mich bei der Benutzung von ${SURVEY.RESOURCE} sehr sicher.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Erlernbarkeit" 
@@ -137,6 +146,7 @@
 		<qu:Instructions>
 			Ich musste eine Menge lernen, bevor ich anfangen konnte ${SURVEY.RESOURCE} zu verwenden.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Accessibility"/>
 	</qu:Page>
 	
 </qu:Questionnaire>

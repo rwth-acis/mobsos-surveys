@@ -36,6 +36,7 @@ create table survey (
     name varchar(128) not null,
     description varchar(2048) not null,
     resource varchar(200) not null,
+    resource_label varchar(200) not null,
     lang varchar(32) not null,
     start datetime not null,
     end datetime not null,

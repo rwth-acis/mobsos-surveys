@@ -57,6 +57,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	.flag.flag-es {background-position: -32px 0}
 	.flag.flag-fr {background-position: 0 -11px}
 	.flag.flag-en {background-position: -16px -11px}
+
+    @media (min-width: 768px) {
+        #generate-xml-modal .modal-dialog {
+            min-width: 760px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        #generate-xml-modal .modal-dialog {
+            min-width: 980px;
+        }
+    }
+
 	</style>
 </head>
 <body>
@@ -85,6 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					data-logo="${OIDC_PROV_LOGO}"
 					data-server="${OIDC_PROV_URL}"
 					data-clientid="${OIDC_CLNT_ID}"
+					data-redirect="${EP_URL}questionnaires"
 					data-scope="openid phone email address profile">
               </span>
 			
@@ -124,9 +138,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<label for="i_quest_desc">${desc}</label>
 					<textarea class="form-control" id="i_quest_desc" placeholder="${desc}"></textarea>
 				</div>
-				<div class="col-md3 form-group">
+				<div class="col-md3 form-group form-xml-file">
 					<label for="i_quest_file">${questionnaire} XML</label>
 					<input class="form-control" name="file" type="file" id="i_quest_file" />
+                    <button id="generate_xml" type="button" class="form-control btn btn-default" data-toggle="modal"
+                            data-target="#generate-xml-modal">
+						${generate_xml}
+                    </button>
 				</div>
 				<div id="file-error" class="col-md3 alert alert-danger hidden">
 					
@@ -139,7 +157,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					<input id="i_quest_cancel" class="form-control btn btn-default" type="button" value="${cancel}" />
 				</div>
 			</form>
-			</p>
+
+            <div class="modal fade" id="generate-xml-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">${generate_xml}</h4>
+                        </div>
+                        <div class="modal-body">
+							<iframe style="width: 100%; height: 80vh" src="${EP_URL}xml-generator"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </p>
 		</div>
 		<div id="msg" class="row alert alert-danger hidden">
 					
@@ -175,13 +209,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<!--<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>-->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
+	<!--<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>-->
 		
 	<script type="text/javascript">
 		
 		var endpoint_url = "${EP_URL}";
-		var client = new MobSOSSurveysClient(endpoint_url);
+		var las2peer_url = "${L2P_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 		var form = "";
 		
 		function alertSelectedFileError(msg){
@@ -376,8 +411,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       //po.src = '${SC_URL}js/oidc-button.js';
-       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
+       // po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

@@ -21,6 +21,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perspicuity" 
@@ -34,6 +35,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perspicuity"/>
 	</qu:Page>
 	
 	<qu:Page name="Novelty" 
@@ -47,6 +49,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Novelty"/>
 	</qu:Page>
 	
 	<qu:Page name="Perspicuity" 
@@ -60,6 +63,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perspicuity"/>
 	</qu:Page>
 	
 	<qu:Page name="Stimulation" 
@@ -73,6 +77,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Stimulation"/>
 	</qu:Page>
 	
 	<qu:Page name="Stimulation" 
@@ -86,7 +91,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Stimulation"/>
 	</qu:Page>
 	
 	<qu:Page name="Stimulation" 
@@ -100,7 +105,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Stimulation"/>
 	</qu:Page>
 	
 	<qu:Page name="Dependability" 
@@ -114,7 +119,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Dependability"/>
 	</qu:Page>
 	
 	<qu:Page name="Efficiency" 
@@ -128,7 +133,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Efficiency"/>
 	</qu:Page>
 	
 	<qu:Page name="Novelty" 
@@ -142,7 +147,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Novelty"/>
 	</qu:Page>
 	
 	<qu:Page name="Dependability" 
@@ -156,7 +161,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Dependability"/>
 	</qu:Page>
 	
 	<qu:Page name="Attractiveness" 
@@ -170,7 +175,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perspicuity" 
@@ -184,7 +189,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perspicuity"/>
 	</qu:Page>
 	
 	<qu:Page name="Attractiveness" 
@@ -198,7 +203,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Novelty" 
@@ -212,7 +217,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Novelty"/>
 	</qu:Page>
 	
 	<qu:Page name="Attractiveness" 
@@ -226,7 +231,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Dependability" 
@@ -240,7 +245,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Dependability"/>
 	</qu:Page>
 	
 	<qu:Page name="Stimulation" 
@@ -254,7 +259,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Stimulation"/>
 	</qu:Page>
 	
 	<qu:Page name="Dependability" 
@@ -268,7 +273,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE}... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Dependability"/>
 	</qu:Page>
 	
 	<qu:Page name="Efficiency" 
@@ -282,7 +287,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Efficiency"/>
 	</qu:Page>
 	
 	<qu:Page name="Perspicuity" 
@@ -296,7 +301,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perspicuity"/>
 	</qu:Page>
 	
 	<qu:Page name="Efficiency" 
@@ -310,7 +315,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Efficiency"/>
 	</qu:Page>
 	
 	<qu:Page name="Efficiency" 
@@ -324,7 +329,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Efficiency"/>
 	</qu:Page>
 	
 	<qu:Page name="Attractiveness" 
@@ -338,7 +343,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Attractiveness" 
@@ -352,7 +357,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Attractiveness"/>
 	</qu:Page>
 	
 	<qu:Page name="Novelty" 
@@ -366,7 +371,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is... 
 		</qu:Instructions>
-		
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Novelty"/>
 	</qu:Page>
 	
 </qu:Questionnaire>

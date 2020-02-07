@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					data-logo="${OIDC_PROV_LOGO}"
 					data-server="${OIDC_PROV_URL}"
 					data-clientid="${OIDC_CLNT_ID}"
+					data-redirect="${EP_URL}questionnaires"
 					data-scope="openid phone email address profile">
               </span>
 			
@@ -103,13 +104,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	
 	<!-- import MobSOS Surveys lib -->
-	<!--<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>-->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>
+	<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
+	<!--<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/11/mobsos-surveys.js"></script>-->
 		
 	<script type="text/javascript">
 		
 		var endpoint_url = "${EP_URL}";
-		var client = new MobSOSSurveysClient(endpoint_url);
+		var las2peer_url = "${L2P_URL}";
+		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 		
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
@@ -126,7 +128,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			
 			client.getQuestionnaire(${ID},
 				function(d){
-					
 					$("#qname").text(decodeURIComponent(d.name))
 					$("#qorg").html("<img src='" + d.logo + "' height='20'><div id='org'></div> ");
 					$("#org").text(decodeURIComponent(d.organization));
@@ -143,19 +144,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						
 						function(data,type){
 							
-							var pages = data.getElementsByTagName("Page");
+							var pages = data.getElementsByTagName("qu:Page");
 							var ipages = 0;
 							var qpages = 0;
-							
+
 							for(i=0;i<pages.length;i++){
-							
+								
 								var page = pages[i];
 								var p_name = page.getAttribute("name");
 								var p_type = page.getAttribute("xsi:type");
 								
 								if(p_type == "qu:InformationPageType"){
-								
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									
 									$('#qitems').append("<li class='list-group-item'><span class='glyphicon glyphicon-info-sign'/> <span class='list-group-item-heading h4'>" + p_name + "</span><p class='list-group-item-text'/>" + p_info + "</li>");
 									
@@ -176,7 +176,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 										p_style = "style='color:darkred;' ";
 									}
 									
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									
 									$('#qitems').append("<li class='list-group-item'><span " + p_style + " class='glyphicon glyphicon-question-sign'/> <span class='list-group-item-heading h4'>" + p_qid + " - " + p_name + "</span><p class='list-group-item-text'/>" + p_info + " (" + p_minval + ": " + p_minlab + " - " + p_maxval + ": " + p_maxlab + ")</p></li>");
 									
@@ -185,7 +185,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 								} else if (p_type == "qu:FreeTextQuestionPageType") {
 									
 									var p_qid = page.getAttribute("qid");
-									var p_info = page.getElementsByTagName("Instructions")[0].textContent;
+									var p_info = page.getElementsByTagName("qu:Instructions")[0].textContent;
 									var p_req = page.getAttribute("required");
 									var p_style = "style='color:darkgreen;' ";
 									
@@ -226,8 +226,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<script type="text/javascript">
       (function() {
        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       //po.src = '${SC_URL}js/oidc-button.js';
-       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
+       po.src = '${SC_URL}js/oidc-button.js';
+       // po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
      })();
     </script>

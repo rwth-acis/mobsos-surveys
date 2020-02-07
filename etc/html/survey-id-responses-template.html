@@ -1,496 +1,421 @@
-<!DOCTYPE html>
-<!--
-Copyright (c) 2014 Dominik Renzel, Advanced Community Information Systems (ACIS) Group, 
-Chair of Computer Science 5 (Databases & Information Systems), RWTH Aachen University, Germany
-All rights reserved.
+<style id="svg_css" type="text/css">
+    .box {
+        font: 10px sans-serif;
+    }
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+    .box line,
+    .box rect,
+    .box circle {
+        fill: steelblue;
+        stroke: #000;
+        stroke-width: 1px;
+    }
 
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
+    .box .center {
+        stroke-dasharray: 3, 3;
+    }
 
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
+    .box .outlier {
+        fill: none;
+        stroke: #000;
+    }
 
-* Neither the name of the ACIS Group nor the names of its
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
+    .axis {
+        font: 12px sans-serif;
+    }
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--->
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MobSOS Surveys - ${survey} ${ID} ${responses}</title>
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
 
-	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-	<!--[if lt IE 9]>
-	  <script src="${SC_URL}js/html5shiv.js"></script>
-	  <script src="${SC_URL}js/respond.min.js"></script>
-	<![endif]-->
-	
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	
-	<style id="svg_css" type="text/css">
-		.box {
-		  font: 10px sans-serif;
-		}
+    .x.axis path {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+    #graph{
+        width: 100%;
+    }
+    .page-header{
+        margin-top: 10px;
+    }
+</style>
 
-		.box line,
-		.box rect,
-		.box circle {
-		  fill: steelblue;
-		  stroke: #000;
-		  stroke-width: 1px;
-		}
+<!-- Container for operations on questionnaires -->
+<div id="responses" class="container-fluid">
 
-		.box .center {
-		  stroke-dasharray: 3,3;
-		}
+    <div id="vis" class="row">
+        <h2 class="page-header"><span id="s_name_reponses" class="h2"></span></h2>
+        <h4 id="s_org"></h4>
+        <p>
 
-		.box .outlier {
-		  fill: none;
-		  stroke: #000;
-		}
-		
-		.axis {
-		  font: 12px sans-serif;
-		}
-		 
-		.axis path,
-		.axis line {
-		  fill: none;
-		  stroke: #000;
-		  shape-rendering: crispEdges;
-		}
-		 
-		.x.axis path { 
-		  fill: none;
-		  stroke: #000;
-		  shape-rendering: crispEdges;
-		}
-	</style>
-</head>
-<body>
-
-	<!-- Fixed navbar -->
-      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
+            <button id="responses_download" class="btn btn-lg btn-success"><span
+                    class="glyphicon glyphicon-list-alt"></span> ${download_dataset}
             </button>
-            <a class="navbar-brand"><!-- <img src="" width="24" height="24" alt="Learning Layers"/>-->MobSOS Surveys</a>
-          </div>
-          <div class="navbar-collapse collapse">
-			  <ul class="nav navbar-nav">
-               <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
-			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
-             </ul>   
-              <span class="oidc-signin navbar-btn navbar-right btn-default"
-					data-callback="signinCallback"
-					data-name="${OIDC_PROV_NAME}"
-					data-size="sm"
-					data-logo="${OIDC_PROV_LOGO}"
-					data-server="${OIDC_PROV_URL}"
-					data-clientid="${OIDC_CLNT_ID}"
-					data-scope="openid phone email address profile">
-              </span>
-			
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-	
-	<!-- Container for operations on questionnaires -->
-	<div id="responses" class="container">
-		
-		<div id="vis" class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="s_name" class="h2"></span></h2>
-			<h4 id="s_org"></h4>
-			<p>
-				
-				<button id="responses_download" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-list-alt"></span> ${download_dataset}</button>
-				<button id="responses_boxplot" class="btn btn-lg btn-success"><span class="glyphicon glyphicon-picture"></span> ${download_boxplot}</button>
-				<a id="dl" href="#" class="hidden"></a>
-					
-			</p>
-			<h4 id="n"></h4>
-			<svg id="graph" />
-			<div id="txt"></div>
-			
-			
-		</div>
-	</div>
-	
-	<!-- import jQuery for AJAX calls (must) -->
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-	
-	<!-- import Bootstrap for responsive UI (must) -->
-	<!--<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>-->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-	
-	<!-- import MobSOS Surveys lib -->
-	<!--<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>-->
-	<script type="text/javascript" src="https://las2peer.dbis.rwth-aachen.de/mobsos-surveys/js/mobsos-surveys.js"></script>
-	
-	<!-- import moment.js for displaying times and dates -->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/moment.min_.js"></script>
-	
-	<!-- import d3s for visualization of survey responses -->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/mobsos-surveys/js/d3.min.js"></script>
-	
-	<!-- import d3s boxplot visualization -->
-	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/mobsos-surveys/js/boxplot.js"></script>
-	
-	<script type="text/javascript">
-		
-		var endpoint_url = "${EP_URL}";
-		var client = new MobSOSSurveysClient(endpoint_url);
-		
-		var csv = "";
-		
-		var labels = true; // show the text labels beside individual boxplots?
-		var margin = {top: 30, right: 50, bottom: 70, left: 50};
-		var width = 800 - margin.left - margin.right;
-		var height = 400 - margin.top - margin.bottom;
-			
-		var min = Infinity,
-			max = -Infinity;
-			
-		
-		
-		// OpenID Connect Button: implement a callback function
-		function signinCallback(result) {
-			if(result === "success"){
-				
-			} else {
-				
-			}
-			
-			$("#responses_download").click(function(){
-					client.getSurveyResponses(${ID},
-						function(d,t){
+            <button id="responses_boxplot" class="btn btn-lg btn-success"><span
+                    class="glyphicon glyphicon-picture"></span> ${download_boxplot}
+            </button>
+            <a id="dl" href="#" class="hidden"></a>
 
-							pd = encodeURIComponent(d);
-							console.log(d);
-							console.log(pd);
-							var a = $("#dl");
-							a.attr("download","survey-responses-${ID}.csv");
-							a.attr("href","data:application/csv;charset=utf-8,"+pd);
-							a[0].click();
-							
-							
-						},
-						function(e){
-							console.log("Error: ");
-							console.log(e);
-						}
-					);
-			});
-			$("#responses_boxplot").click(function(){
-				
-				var css = $("#svg_css").html();
-				
-				//console.log(css);
-				
-				var jsvg = $("#graph");
-				var jse = $("<style id='genstyle' type='text/css'/>");
-				jsvg.append(jse);
-				
-				var svg = document.getElementById("graph");
-				
-				var docu = new DOMParser().parseFromString('<xml></xml>',  "application/xml")
-				var cData = docu.createCDATASection(css);
-				
-				var sty = document.getElementById("genstyle");
-				sty.appendChild(cData);
-				
-				//get svg element.
+        </p>
+        <h4 id="n"></h4>
+        <svg id="graph"/>
+        <div id="txt"></div>
+    </div>
+</div>
 
-				//get svg source.
-				var serializer = new XMLSerializer();
-				var source = serializer.serializeToString(svg);
+<!-- import jQuery for AJAX calls (must) -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
-				//add name spaces.
-				if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
-					source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-				}
-				if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
-					source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-				}
+<!-- import Bootstrap for responsive UI (must) -->
+<!--<script type="text/javascript" src="${SC_URL}bootstrap-3.0.1/js/bootstrap.min.js"></script>-->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
 
-				//add xml declaration
-				source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+<!-- import MobSOS Surveys lib -->
+<script type="text/javascript" src="${SC_URL}js/mobsos-surveys.js"></script>
+<!--<script type="text/javascript" src="https://las2peer.dbis.rwth-aachen.de/mobsos-surveys/js/mobsos-surveys.js"></script>-->
 
-				//convert svg source to URI data scheme.
-				var url = "data:image/svg+xml;charset=utf-8,"+decodeURIComponent(source);
-				
-				var a = $("#dl");
-							a.attr("download","survey-responses-${ID}.boxplot.svg");
-							a.attr("href",url);
-							a[0].click();
-				
-				
+<!-- import moment.js for displaying times and dates -->
+<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>
 
-			});
-			update();
-		}
-		
-		function update(){
-			
-			client.getSurvey(${ID},
-				function(data,type){
-					$("#s_name").html(decodeURIComponent(data.name));
-				},
-				function(error){
-					console.log(error);
-				}
-			);
-			
-			client.getSurveyResponses(${ID},
-				function(d,type){
-				
-					csvd = parseCSV(d);
-					csvd = csvd.sort(function(a,b){
-					var aVal = parseInt(a[0].replace ( /[^\d]/g, '' ),10);
-					//console.log(a[0].replace ( /[^\d]/g, '' ));
-					var bVal = parseInt(b[0].replace ( /[^\d]/g, '' ),10);
-					  if(aVal == bVal){
-					    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
-					  }
+<!-- import d3s for visualization of survey responses -->
+<script type="text/javascript" src="${SC_URL}js/d3.min.js"></script>
 
-					  return aVal > bVal ? 1 : -1;
-					});
-					var res = separateData(csvd);
-					renderBoxplot(res.num);
-					renderText(res.txt);
-					
-				},
-				function(error){
-					console.log(error);
-				}
-			);
-				
-		}
-		
-		function renderText(data){
-			
-			var html = "<ul>";
-			for(i in data){
-				html += "<li>";
-				html += "<b>" + data[i][0] + "</b>: <ul>";
+<!-- import d3s boxplot visualization -->
+<script type="text/javascript" src="${SC_URL}js/boxplot.js"></script>
 
-				for(k in data[i][1]){
-					html += "<li><i><div id=\"comment"+i+"-"+k+"\"></div></i></li>";
-				}
-				html += "</ul></li>";
-			}
-			html += "</ul>";
-			$("#txt").html(html);
-			for(i in data){
-				for(k in data[i][1]){
-					$("#comment"+i+"-"+k).text(data[i][1][k]);
-				}
-			}
-		}
-		
-		function renderBoxplot(data){
-			
-			var chart = d3.box()
-				.whiskers(iqr(1.5))
-				.height(height)	
-				.domain([min,max])
-				.showLabels(labels);
-			
-			var svg = d3.select("svg")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom + 40)
-				.attr("class", "box")
-				//.attr("viewbox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom + 40))
-				//.attr("preserveAspectRatio","xMidyMid")
-				.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-			
-			var aspect = (width + margin.left + margin.right)/(height + margin.top + margin.bottom + 40);
-			
-			d3.select(window).on('resize', function() {
-				
-				var swidth = parseInt(d3.select('#vis').style("width").replace("px","")) - margin.left - margin.right;
-				var sheight = parseInt(d3.select('#vis').style("height").replace("px","")) - margin.top - margin.bottom;
-	
-				
-				var scale = (swidth)/(width+margin.left + margin.right);
-				
-				var targetWidth = swidth;
-				
-				d3.select('#graph')
-					.attr("width", targetWidth + margin.left + margin.right)
-					.attr("height", targetWidth/aspect)
-					.select("g")
-					.attr("transform","scale(" + scale + "),translate(" + margin.left + "," + margin.top + ")");
-			});
-			
-			// the x-axis
-			var x = d3.scale.ordinal()	   
-				.domain( data.map(function(d) {return d[0] } ) )	    
-				.rangeRoundBands([0 , width], 0.7, 0.3); 		
+<script type="text/javascript">
 
-			var xAxis = d3.svg.axis()
-				.scale(x)
-				.orient("bottom");
+    var endpoint_url = "${EP_URL}";
+    var las2peer_url = "${L2P_URL}";
+    var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 
-			// the y-axis
-			var y = d3.scale.linear()
-				.domain([min,max])
-				.range([height + margin.top, 0 + margin.top]);
-			
-			var yAxis = d3.svg.axis()
-			.scale(y)
-			.orient("left");
-			
-			// draw the boxplots	
-			svg.selectAll(".box")	   
-			  .data(data)
-			  .enter().append("g")
-				.attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + margin.top + ")"; } )
-			  .call(function(gs){ 
-			  	var v = chart.width(x.rangeBand());
-			  	return v.call(this, gs); 
-			   }); //chart.width(x.rangeBand()));
+    var csv = "";
 
-			/*
-			// add a title
-			svg.append("text")
-				.attr("x", (width / 2))             
-				.attr("y", 0 + (margin.top / 2))
-				.attr("text-anchor", "middle")  
-				.style("font-size", "18px") 
-				//.style("text-decoration", "underline")  
-				.text("Responses Survey " + ${ID});
-		    */
-			 // draw y axis
-			svg.append("g")
-				.attr("class", "y axis")
-				.call(yAxis);
-				
-			
-			// draw x axis	
-			svg.append("g")
-			  .attr("class", "x axis")
-			  .attr("transform", "translate(0," + (height  + margin.top + 10) + ")")
-			  .call(xAxis)
-			  .selectAll("text")  
-					.style("text-anchor", "end")
-					.attr("dx", "-.8em")
-					.attr("dy", ".15em")
-					.attr("transform", function(d) {
-						return "rotate(-45)" 
-						});
-			
-		}
-		
-		function separateData(csv){
-			var result = {"num":[],"txt":[]};
-			for(i in csv){
-				row = csv[i];
-				var include = true;
-				
-				for(k in row[1]){
-					
-					if(row[1][k] !== '' && !parseInt(row[1][k])){
-						//console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
-						include = false;
-					}
-				}
-				if(include){
-					result.num.push(row);
-				} else {
-					result.txt.push(row);
-				}
-			}
-			
-			return result;
-		}
-		
-		function parseCSV(instr){
-			var csv = d3.csv.parseRows(instr.replace(/\s*;\s*/g, ","));
-					
-			var data = [];
-			
-			// first extract field names and prepare data cells
-			
-			$("#n").html("N=" + (csv.length-1));
-			
-			for(var i=3; i<csv[0].length;i++){
-				var fname = csv[0][i];
-				
-				//console.log(fname);
-				data[i-3] = [];
-				data[i-3][0] = fname;
-				data[i-3][1] = [];
-				
-				for(var j=1;j<csv.length;j++){
-					//console.log(csv[i][j]);
-					
-					var val = csv[j][i];
-					
-					if( val !== ""){
-					data[i-3][1].push(val);
-					
-					if(parseInt(val) && val < min){
-						min = val;
-					} 
-					if(parseInt(val) && val > max){
-						max = val;
-					}}
-					
-				}
-			
-			}
-			
-			return data;
-		}
+    var labels = true; // show the text labels beside individual boxplots?
+    var margin = {top: 30, right: 50, bottom: 70, left: 50};
+    var width = 800 - margin.left - margin.right;
+    var height = 400 - margin.top - margin.bottom;
 
-		// Returns a function to compute the interquartile range.
-		function iqr(k) {
-		  return function(d, i) {
-			var q1 = d.quartiles[0],
-				q3 = d.quartiles[2],
-				iqr = (q3 - q1) * k,
-				i = -1,
-				j = d.length;
-			while (d[++i] < q1 - iqr);
-			while (d[--j] > q3 + iqr);
-			return [i, j];
-		  };
-		}
-		
-	</script>
-	  
-	<!-- add this script element right before closing tag </body> -->
-	<script type="text/javascript">
-      (function() {
-       var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-       po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
-       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-     })();
-    </script>
-</body>
-</html>
+    var min = Infinity,
+        max = -Infinity;
+
+    $("#responses_download").click(function () {
+        client.getSurveyResponses(${ID},
+            function (d, t) {
+
+                pd = encodeURIComponent(d);
+                console.log(d);
+                console.log(pd);
+                var a = $("#dl");
+                a.attr("download", "survey-responses-${ID}.csv");
+                a.attr("href", "data:application/csv;charset=utf-8," + pd);
+                a[0].click();
+
+
+            },
+            function (e) {
+                console.log("Error: ");
+                console.log(e);
+            }
+        );
+    });
+    $("#responses_boxplot").click(function () {
+
+        var css = $("#svg_css").html();
+
+        //console.log(css);
+
+        var jsvg = $("#graph");
+        var jse = $("<style id='genstyle' type='text/css'/>");
+        jsvg.append(jse);
+
+        var svg = document.getElementById("graph");
+
+        var docu = new DOMParser().parseFromString('<xml></xml>', "application/xml")
+        var cData = docu.createCDATASection(css);
+
+        var sty = document.getElementById("genstyle");
+        sty.appendChild(cData);
+
+        //get svg element.
+
+        //get svg source.
+        var serializer = new XMLSerializer();
+        var source = serializer.serializeToString(svg);
+
+        //add name spaces.
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        if (!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+            source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+        }
+
+        //add xml declaration
+        source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+
+        //convert svg source to URI data scheme.
+        var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+
+        var a = $("#dl");
+        a.attr("download", "survey-responses-${ID}.boxplot.svg");
+        a.attr("href", url);
+        a[0].click();
+    });
+    update();
+
+
+    function update() {
+
+        client.getSurvey(${ID},
+            function (data, type) {
+                $("#s_name_reponses").html(decodeURIComponent(data.name));
+            },
+            function (error) {
+                console.log(error);
+            }
+        );
+
+        client.getSurveyResponses(${ID},
+            function (d, type) {
+
+                csvd = parseCSV(d);
+                csvd = csvd.sort(function (a, b) {
+                    var aVal = parseInt(a[0].replace(/[^\d]/g, ''), 10);
+                    //console.log(a[0].replace ( /[^\d]/g, '' ));
+                    var bVal = parseInt(b[0].replace(/[^\d]/g, ''), 10);
+                    if (aVal == bVal) {
+                        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                    }
+
+                    return aVal > bVal ? 1 : -1;
+                });
+                var res = separateData(csvd);
+                renderBoxplot(res.num);
+                renderText(res.txt);
+
+            },
+            function (error) {
+                console.log(error);
+            }
+        );
+
+    }
+
+    function renderText(data) {
+
+        var html = "<ul>";
+        for (i in data) {
+            html += "<li>";
+            html += "<b>" + data[i][0] + "</b>: <ul>";
+
+            for (k in data[i][1]) {
+                html += "<li><i><div id=\"comment" + i + "-" + k + "\"></div></i></li>";
+            }
+            html += "</ul></li>";
+        }
+        html += "</ul>";
+        $("#txt").html(html);
+        for (i in data) {
+            for (k in data[i][1]) {
+                $("#comment" + i + "-" + k).text(data[i][1][k]);
+            }
+        }
+    }
+
+    function renderBoxplot(data) {
+
+        var chart = d3.box()
+            .whiskers(iqr(1.5))
+            .height(height)
+            .domain([min, max])
+            .showLabels(labels);
+
+        var svg = d3.select("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom + 40)
+            .attr("class", "box")
+            //.attr("viewbox", "0 0 " + (width + margin.left + margin.right) + " " + (height + margin.top + margin.bottom + 40))
+            //.attr("preserveAspectRatio","xMidyMid")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var aspect = (width + margin.left + margin.right) / (height + margin.top + margin.bottom + 40);
+
+        d3.select(window).on('resize', function () {
+
+            var swidth = parseInt(d3.select('#vis').style("width").replace("px", "")) - margin.left - margin.right;
+            var sheight = parseInt(d3.select('#vis').style("height").replace("px", "")) - margin.top - margin.bottom;
+
+
+            var scale = (swidth) / (width + margin.left + margin.right);
+
+            var targetWidth = swidth;
+
+            d3.select('#graph')
+                .attr("width", targetWidth + margin.left + margin.right)
+                .attr("height", targetWidth / aspect)
+                .select("g")
+                .attr("transform", "scale(" + scale + "),translate(" + margin.left + "," + margin.top + ")");
+        });
+
+        // the x-axis
+        var x = d3.scale.ordinal()
+            .domain(data.map(function (d) {
+                return d[0]
+            }))
+            .rangeRoundBands([0, width], 0.7, 0.3);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        // the y-axis
+        var y = d3.scale.linear()
+            .domain([min, max])
+            .range([height + margin.top, 0 + margin.top]);
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+        // draw the boxplots
+        svg.selectAll(".box")
+            .data(data)
+            .enter().append("g")
+            .attr("transform", function (d) {
+                return "translate(" + x(d[0]) + "," + margin.top + ")";
+            })
+            .call(function (gs) {
+                var v = chart.width(x.rangeBand());
+                return v.call(this, gs);
+            }); //chart.width(x.rangeBand()));
+
+        /*
+        // add a title
+        svg.append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 + (margin.top / 2))
+            .attr("text-anchor", "middle")
+            .style("font-size", "18px")
+            //.style("text-decoration", "underline")
+            .text("Responses Survey " + ${ID});
+        */
+        // draw y axis
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+
+        // draw x axis
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + (height + margin.top + 10) + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", function (d) {
+                return "rotate(-45)"
+            });
+
+    }
+
+    function separateData(csv) {
+        var result = {"num": [], "txt": []};
+        for (i in csv) {
+            row = csv[i];
+            var include = true;
+
+            for (k in row[1]) {
+
+                if (row[1][k] !== '' && !parseInt(row[1][k])) {
+                    //console.log("Detected NaN field " + row[0][k] + " with value " + row[1][k]);
+                    include = false;
+                }
+            }
+            if (include) {
+                result.num.push(row);
+            } else {
+                result.txt.push(row);
+            }
+        }
+
+        return result;
+    }
+
+    function parseCSV(instr) {
+        var csv = d3.csv.parseRows(instr.replace(/\s*;\s*/g, ","));
+
+        var data = [];
+
+        // first extract field names and prepare data cells
+
+        $("#n").html("N=" + (csv.length - 1));
+
+        for (var i = 3; i < csv[0].length; i++) {
+            var fname = csv[0][i];
+
+            //console.log(fname);
+            data[i - 3] = [];
+            data[i - 3][0] = fname;
+            data[i - 3][1] = [];
+
+            for (var j = 1; j < csv.length; j++) {
+                //console.log(csv[i][j]);
+
+                var val = csv[j][i];
+
+                if (val !== "") {
+                    data[i - 3][1].push(val);
+
+                    if (parseInt(val) && val < min) {
+                        min = val;
+                    }
+                    if (parseInt(val) && val > max) {
+                        max = val;
+                    }
+                }
+
+            }
+
+        }
+
+        return data;
+    }
+
+    // Returns a function to compute the interquartile range.
+    function iqr(k) {
+        return function (d, i) {
+            var q1 = d.quartiles[0],
+                q3 = d.quartiles[2],
+                iqr = (q3 - q1) * k,
+                i = -1,
+                j = d.length;
+            while (d[++i] < q1 - iqr) ;
+            while (d[--j] > q3 + iqr) ;
+            return [i, j];
+        };
+    }
+
+</script>
+
+<!-- add this script element right before closing tag </body> -->
+<script type="text/javascript">
+    (function () {
+        var po = document.createElement('script');
+        po.type = 'text/javascript';
+        po.async = true;
+        po.src = '${SC_URL}js/oidc-button.js';
+        // po.src = 'https://las2peer.org/wp-content/uploads/mobsos-surveys/js/oidc-button.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(po, s);
+    })();
+</script>

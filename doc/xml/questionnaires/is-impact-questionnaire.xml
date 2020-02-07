@@ -28,6 +28,7 @@
 		<qu:Instructions>
 			I have learnt much through the presence of ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Personal Skills"/>
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
@@ -41,6 +42,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} enhances my awareness and recall of job related information.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Personal Skills"/>
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
@@ -54,6 +56,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} enhances my effectiveness in the job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Personal Skills"/>
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
@@ -67,6 +70,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} increases my productivity.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Personal Skills"/>
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
@@ -80,6 +84,7 @@
 		<qu:Instructions>
 			Overall, the impact of ${SURVEY.RESOURCE} on me has been positive.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Individual Impact" 
@@ -89,6 +94,7 @@
 		<qu:Instructions>
 			Comments
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Individual Impact" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -109,6 +115,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is cost effective.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Cost"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -122,6 +129,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in reduced staff costs.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Cost"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -135,6 +143,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in cost reductions (e.g. inventory holding costs, administration expenses, etc.).
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Cost"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -148,6 +157,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in overall productivity improvement.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Productivity"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -161,6 +171,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in improved outcomes or outputs.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Productivity"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -174,6 +185,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in an increased capacity to manage a growing volume of activity (e.g. transactions, population growth, etc.).
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Productivity"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -187,6 +199,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in a better positioning for business.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Productivity"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -200,6 +213,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} has resulted in improved business processes.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Productivity"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -213,6 +227,7 @@
 		<qu:Instructions>
 			Overall, the impact of ${SURVEY.RESOURCE} on my organization has been positive.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Organizational Impact" 
@@ -222,6 +237,7 @@
 		<qu:Instructions>
 			Comments
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Community Impact" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -242,6 +258,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} provides output that seems to be exactly what is needed.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -255,6 +272,7 @@
 		<qu:Instructions>
 			Information needed from ${SURVEY.RESOURCE} is always available.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Availability"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -268,6 +286,7 @@
 		<qu:Instructions>
 			Information from ${SURVEY.RESOURCE} is in a form that is readily usable.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -281,6 +300,7 @@
 		<qu:Instructions>
 			Information from ${SURVEY.RESOURCE} is easy to understand.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -294,6 +314,7 @@
 		<qu:Instructions>
 			Information from ${SURVEY.RESOURCE} appears readable, clear, and well-formatted.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -307,6 +328,7 @@
 		<qu:Instructions>
 			Information from ${SURVEY.RESOURCE} is concise.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -320,6 +342,7 @@
 		<qu:Instructions>
 			Overall, the ${SURVEY.RESOURCE} Information Quality is satisfactory.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="Information Quality" 
@@ -329,6 +352,7 @@
 		<qu:Instructions>
 			Comments
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="Information Quality" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -349,6 +373,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is easy to use.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -362,6 +387,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} is easy to learn.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<!-- here, [the Unit's] was replaced by "my community's" -->
@@ -376,6 +402,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} meets my community's requirements.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -389,6 +416,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} includes necessary features and functions.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -402,6 +430,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} always does what it should.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -415,6 +444,7 @@
 		<qu:Instructions>
 			The ${SURVEY.RESOURCE} user interface can be easily adapted to one's personal approach.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -428,6 +458,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} requires only the minimum number of fields and screens to achieve a task.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -441,6 +472,7 @@
 		<qu:Instructions>
 			All data within ${SURVEY.RESOURCE} is fully integrated and consistent.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Accessibility"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -454,6 +486,7 @@
 		<qu:Instructions>
 			${SURVEY.RESOURCE} can be easily modified, corrected or improved.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -467,6 +500,7 @@
 		<qu:Instructions>
 			Overall, the ${SURVEY.RESOURCE} System Quality is satisfactory.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Overall"/>
 	</qu:Page>
 	
 	<qu:Page name="System Quality" 
@@ -476,6 +510,7 @@
 		<qu:Instructions>
 			Comments
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="System Quality" factor="Overall"/>
 	</qu:Page>
 	
 </qu:Questionnaire>

@@ -31,62 +31,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 package i5.las2peer.services.mobsos.surveys;
 
-import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.ResourceBundle;
-import java.util.Scanner;
-import java.util.TimeZone;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.sql.DataSource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.XMLConstants;
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-
+import i5.las2peer.api.Context;
+import i5.las2peer.api.ManualDeployment;
+import i5.las2peer.api.logging.MonitoringEvent;
+import i5.las2peer.api.security.AnonymousAgent;
+import i5.las2peer.api.security.GroupAgent;
+import i5.las2peer.api.security.UserAgent;
+import i5.las2peer.restMapper.RESTService;
+import i5.las2peer.restMapper.annotations.ServicePath;
+import io.swagger.annotations.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -100,21 +53,33 @@ import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
-import i5.las2peer.api.Context;
-import i5.las2peer.api.ManualDeployment;
-import i5.las2peer.api.security.AnonymousAgent;
-import i5.las2peer.api.security.GroupAgent;
-import i5.las2peer.api.security.UserAgent;
-import i5.las2peer.restMapper.RESTService;
-import i5.las2peer.restMapper.annotations.ServicePath;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Contact;
-import io.swagger.annotations.Info;
-import io.swagger.annotations.License;
-import io.swagger.annotations.SwaggerDefinition;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.XMLConstants;
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 /**
  * 
@@ -155,7 +120,7 @@ public class SurveyService extends RESTService {
 	private Validator validator;
 
 	// fields read from service configuration file
-	private String epUrl, questionnaireSchemaPath;
+	private String epUrl, las2peerUrl, questionnaireSchemaPath;
 	private String jdbcDriverClassName, jdbcUrl, jdbcSchema, jdbcLogin, jdbcPass;
 	private String oidcSchema, oidcProviderName, oidcProviderLogo, oidcProviderUrl, oidcClientId;
 
@@ -165,10 +130,11 @@ public class SurveyService extends RESTService {
 		// set values from configuration file
 		this.setFieldValues();
 
-		// make sure epUrl and staticContentUrl have trailing slash
-		if (!epUrl.endsWith("/")) {
-			epUrl += "/";
+		// make sure las2peerUrl and staticContentUrl have trailing slash
+		if (!las2peerUrl.endsWith("/")) {
+			las2peerUrl += "/";
 		}
+		this.epUrl = las2peerUrl + "mobsos-surveys/";
 
 		if (staticContentUrl == null || staticContentUrl.isEmpty()) {
 			staticContentUrl = epUrl;
@@ -177,6 +143,8 @@ public class SurveyService extends RESTService {
 				staticContentUrl += "/";
 			}
 		}
+
+
 
 		// include this service into las2peer monitoring
 		// this.monitor = true;
@@ -281,6 +249,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
@@ -669,6 +638,7 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1156,6 +1126,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1550,6 +1521,7 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with concrete values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -1924,6 +1896,7 @@ public class SurveyService extends RESTService {
 
 				// fill in placeholders
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2306,6 +2279,41 @@ public class SurveyService extends RESTService {
 				// fill in placeholders with concrete values
 				html = fillPlaceHolder(html, "ID", "" + id);
 				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
+				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
+				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
+				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
+				html = fillPlaceHolder(html, "OIDC_PROV_URL", service.oidcProviderUrl);
+				html = fillPlaceHolder(html, "OIDC_CLNT_ID", service.oidcClientId);
+
+				// finally return resulting HTML
+				return Response.status(Status.OK).entity(html).header("Access-Control-Allow-Origin", "*")
+						.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+						.build();
+			} catch (FileNotFoundException e) {
+				return internalError(onAction);
+			}
+		}
+
+		@GET
+		@Produces(MediaType.TEXT_HTML)
+		@Path("xml-generator")
+		public Response getXmlGeneratorHTML(@HeaderParam("accept-language") @DefaultValue("en-US") String lang) {
+
+			String onAction = "retrieving XML generator HTML";
+
+			// adapt template to specific survey
+			try {
+				Scanner scanner = new Scanner(new File("./etc/html/xml-generator.html"));
+				String html = scanner.useDelimiter("\\A").next();
+				scanner.close();
+
+				// localize template
+				html = i18n(html, lang);
+
+				// fill in placeholders with concrete values
+				html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+				html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 				html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 				html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 				html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2543,6 +2551,8 @@ public class SurveyService extends RESTService {
 				PreparedStatement stmt = null;
 				ResultSet rset = null;
 
+				this.logAnswersToMobSOS(surveyId, form, answerFieldTable);
+
 				try {
 					conn = dataSource.getConnection();
 					stmt = conn.prepareStatement("insert into " + service.jdbcSchema
@@ -2602,6 +2612,27 @@ public class SurveyService extends RESTService {
 			} catch (Exception e) {
 				e.printStackTrace();
 				return internalError(onAction);
+			}
+		}
+
+		private void logAnswersToMobSOS(int surveyId, Document form, JSONObject answerFieldTable) {
+			JSONObject questions = extractQuestionInformation(form);
+			Iterator<String> it = answerFieldTable.keySet().iterator();
+			while (it.hasNext()) {
+				String qkey = it.next();
+				String qval = "" + answerFieldTable.get(qkey);
+				if(qval.equals("NaN")){
+					// comment fields may return NaN if empty and must be disregarded
+					continue;
+				}
+				JSONObject question = (JSONObject) questions.get(qkey);
+
+				JSONObject message = new JSONObject();
+				message.put("sid", surveyId);
+				message.put("qkey", qkey);
+				message.put("qval", qval);
+				message.put("instructions", question.get("instructions"));
+				Context.get().monitorEvent(MonitoringEvent.SERVICE_CUSTOM_MESSAGE_1, message.toJSONString() );
 			}
 		}
 
@@ -2744,6 +2775,7 @@ public class SurveyService extends RESTService {
 			html = i18n(html, lang);
 
 			html = fillPlaceHolder(html, "EP_URL", service.staticContentUrl);
+			html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 			html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 			html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
 			html = fillPlaceHolder(html, "OIDC_PROV_LOGO", service.oidcProviderLogo);
@@ -2772,6 +2804,7 @@ public class SurveyService extends RESTService {
 
 			// fill in placeholders with concrete values
 			html = fillPlaceHolder(html, "EP_URL", service.epUrl);
+			html = fillPlaceHolder(html, "L2P_URL", service.las2peerUrl);
 			html = fillPlaceHolder(html, "SC_URL", service.staticContentUrl);
 
 			html = fillPlaceHolder(html, "OIDC_PROV_NAME", service.oidcProviderName);
@@ -2819,8 +2852,7 @@ public class SurveyService extends RESTService {
 		// should not be used with productive installations due to performance issues!
 
 		@GET
-		@Produces(MediaType.TEXT_PLAIN)
-		@Path("/js/{filename}")
+		@Path("/js/{filename:.+}")
 		public Response serveJS(@PathParam("filename") String filename) {
 
 			// String onAction = "serving JavaScript";
@@ -2829,7 +2861,11 @@ public class SurveyService extends RESTService {
 				Scanner scanner = new Scanner(new File("./etc/webapp/js/" + filename));
 				String js = scanner.useDelimiter("\\A").next();
 				scanner.close();
-				return Response.status(Status.OK).entity(js).build();
+				String responseType = MediaType.TEXT_PLAIN;
+				if (filename.contains(".html")) {
+					responseType = MediaType.TEXT_HTML;
+				}
+				return Response.ok(js, responseType).build();
 
 			} catch (FileNotFoundException e) {
 				return Response.status(Status.NOT_FOUND).entity(filename + " not found!").build();
@@ -3093,7 +3129,7 @@ public class SurveyService extends RESTService {
 
 			try {
 				// authentication required for submitting response
-				if (!(Context.get().getMainAgent() instanceof AnonymousAgent)) {
+				if (Context.get().getMainAgent() instanceof AnonymousAgent) {
 					return Response.status(Status.UNAUTHORIZED)
 							.entity("Client feedback retrieval requires authentication.").build();
 				} else {
@@ -3807,7 +3843,7 @@ public class SurveyService extends RESTService {
 						} else if (tag.endsWith("DESCRIPTION")) {
 							value = (String) survey.get("description");
 						} else if (tag.endsWith("RESOURCE")) {
-							String id = (String) survey.get("resource");
+							String id = (String) survey.get("resource-label");
 							Response r = getClientMetadata(id);
 							if (r.getStatus() == 200) {
 								JSONObject meta = (JSONObject) JSONValue.parse((String) r.getEntity());
@@ -4061,6 +4097,7 @@ public class SurveyService extends RESTService {
 			o.put("organization", rs.getString("organization"));
 			o.put("logo", rs.getString("logo"));
 			o.put("resource", rs.getString("resource"));
+			o.put("resource-label", rs.getString("resource_label"));
 			o.put("qid", rs.getInt("qid"));
 
 			long ts_start = rs.getTimestamp("start").getTime();
@@ -4175,8 +4212,8 @@ public class SurveyService extends RESTService {
 				throw new IllegalArgumentException("Survey data *" + content + "* is not valid JSON!");
 			}
 			// check result for unknown illegal fields. If so, parsing fails.
-			String[] fields = { "id", "owner", "organization", "logo", "name", "description", "resource", "start",
-					"end", "lang", "qid" };
+			String[] fields = { "id", "owner", "organization", "logo", "name", "description", "resource",
+					"resource-label", "start", "end", "lang", "qid" };
 			for (Object key : o.keySet()) {
 				if (!Arrays.asList(fields).contains(key)) {
 
@@ -4228,7 +4265,10 @@ public class SurveyService extends RESTService {
 						} catch (IOException e) {
 							throw new IllegalArgumentException("Illegal value for survey field 'resource'. Should be a valid URL.");
 						}*/
-					} else if (key.equals("start")) {
+					} else if (key.equals("resource-label") && !(o.get(key) instanceof String)) {
+						throw new IllegalArgumentException(
+								"Illegal value for survey field 'resource-label'. Should be a string.");
+					}else if (key.equals("start")) {
 						try {
 							DatatypeConverter.parseDateTime((String) o.get("start"));
 						} catch (IllegalArgumentException e) {
@@ -4267,10 +4307,10 @@ public class SurveyService extends RESTService {
 
 			// check if all necessary fields are specified.
 			if (o.get("name") == null || o.get("organization") == null || o.get("logo") == null
-					|| o.get("description") == null || o.get("resource") == null || o.get("start") == null
-					|| o.get("end") == null || o.get("lang") == null) {
+					|| o.get("description") == null || o.get("resource") == null || o.get("resource-label") == null
+					|| o.get("start") == null || o.get("end") == null || o.get("lang") == null) {
 				throw new IllegalArgumentException(
-						"Survey data incomplete! All fields name, organization, logo, description, resource, start, end, and lang must be defined!");
+						"Survey data incomplete! All fields name, organization, logo, description, resource, resource-label, start, end, and lang must be defined!");
 			}
 
 			// finally check time integrity constraint: start must be before end (possibly not enforced by database;
@@ -4388,7 +4428,7 @@ public class SurveyService extends RESTService {
 				conn = dataSource.getConnection();
 				stmt = conn.prepareStatement(
 						"insert into " + service.jdbcSchema
-								+ ".survey(owner, organization, logo, name, description, resource, start, end, lang ) values (?,?,?,?,?,?,?,?,?)",
+								+ ".survey(owner, organization, logo, name, description, resource, resource_label, start, end, lang ) values (?,?,?,?,?,?,?,?,?,?)",
 						Statement.RETURN_GENERATED_KEYS);
 
 				stmt.clearParameters();
@@ -4398,11 +4438,12 @@ public class SurveyService extends RESTService {
 				stmt.setString(4, (String) survey.get("name"));
 				stmt.setString(5, (String) survey.get("description"));
 				stmt.setString(6, (String) survey.get("resource"));
-				stmt.setTimestamp(7,
-						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("start")).getTimeInMillis()));
+				stmt.setString(7, (String) survey.get("resource-label"));
 				stmt.setTimestamp(8,
+						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("start")).getTimeInMillis()));
+				stmt.setTimestamp(9,
 						new Timestamp(DatatypeConverter.parseDateTime((String) survey.get("end")).getTimeInMillis()));
-				stmt.setString(9, (String) survey.get("lang"));
+				stmt.setString(10, (String) survey.get("lang"));
 
 				stmt.executeUpdate();
 				ResultSet rs = stmt.getGeneratedKeys();
@@ -4778,6 +4819,9 @@ public class SurveyService extends RESTService {
 								question.put("maxval", Integer.parseInt(e.getAttribute("maxval")));
 							}
 						}
+						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
+						question.put("instructions",instructionNode.getTextContent());
+
 						questions.put(e.getAttribute("qid"), question);
 					}
 				}

@@ -85,7 +85,7 @@ public class SurveyServiceTest {
 	private static GroupAgentImpl group1, group2;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
-			SurveyService.class.getCanonicalName(), "0.2");
+			SurveyService.class.getCanonicalName(), "0.3");
 
 	/**
 	 * Called before the tests start.
@@ -1572,6 +1572,7 @@ public class SurveyServiceTest {
 		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description", "A sample survey on Wikipedia.");
 		obj.put("resource", "http://wikipedia.org");
+		obj.put("resource-label", "Wikipedia");
 		obj.put("start", lastyearUTC);
 		obj.put("end", nextyearUTC);
 		obj.put("lang", "en-US");
@@ -1591,6 +1592,7 @@ public class SurveyServiceTest {
 		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description", "Eine schwer auffindbare Umfrage (Needle in the Haystack).");
 		obj.put("resource", "http://wikipedia.org");
+		obj.put("resource-label", "Wikipedia");
 		obj.put("start", "2014-06-06T00:00:00Z");
 		obj.put("end", "2014-08-06T23:59:59Z");
 		obj.put("lang", "de-DE");
@@ -1607,6 +1609,7 @@ public class SurveyServiceTest {
 		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
 		obj.put("description", "Eine schwer auffindbare Umfrage (Needle in the Haystack).");
 		obj.put("resource", "http://wikipedia.org");
+		obj.put("resource-label", "Wikipedia");
 		obj.put("start", start);
 		obj.put("end", end);
 		obj.put("lang", "de-DE");

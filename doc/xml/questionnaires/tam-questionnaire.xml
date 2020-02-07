@@ -21,6 +21,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} in my job would enable me to accomplish tasks more quickly.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -34,6 +35,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} would improve my job performance.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -47,6 +49,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} would increase my productivity.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -60,6 +63,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} would enhance my effectiveness on the job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -73,6 +77,7 @@
 		<qu:Instructions>
 			Using ${SURVEY.RESOURCE} would make it easier to do my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Usefulness" 
@@ -86,6 +91,7 @@
 		<qu:Instructions>
 			I would find ${SURVEY.RESOURCE} useful in my job.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Usefulness"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -99,6 +105,7 @@
 		<qu:Instructions>
 			Learning to operate ${SURVEY.RESOURCE} would be easy for me.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -112,6 +119,7 @@
 		<qu:Instructions>
 			I would find it easy to get ${SURVEY.RESOURCE} to do what I want it to do.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -125,6 +133,7 @@
 		<qu:Instructions>
 			My interaction with ${SURVEY.RESOURCE} would be clear and understandable.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -138,6 +147,7 @@
 		<qu:Instructions>
 			I would find ${SURVEY.RESOURCE} to be flexible to interact with.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -151,6 +161,7 @@
 		<qu:Instructions>
 			It would be easy for me to become skillful at using ${SURVEY.RESOURCE}.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 	<qu:Page name="Perceived Ease-of-Use" 
@@ -164,6 +175,7 @@
 		<qu:Instructions>
 			I would find ${SURVEY.RESOURCE} easy to use.
 		</qu:Instructions>
+		<qu:SuccessModelRecommendation dimension="User Satisfaction" factor="Perceived Ease-of-Use"/>
 	</qu:Page>
 	
 </qu:Questionnaire>
