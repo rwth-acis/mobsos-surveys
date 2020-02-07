@@ -6,7 +6,7 @@ A simple RESTful service for managing, conducting, and evaluating online surveys
 Requirements
 --
 
-  * Installed Java 7 JDK 
+  * Installed Java 8 JDK 
   * Installed [Apache Ant](https://github.com/rwth-acis/LAS2peer)
   * Installed [mySQL 5](http://www.mysql.com/)
   
