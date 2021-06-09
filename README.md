@@ -36,7 +36,7 @@ To start MobSOS Surveys, use one of the available start scripts:
 
 After successful start, MobSOS Surveys is available under
 
-  [http://localhost:8080/mobsos/surveys](http://localhost:8080/mobsos/surveys)
+http://localhost:8080/mobsos-surveys
 
 How to run using Docker
 -------------------
