@@ -2,8 +2,8 @@ drop schema if exists mobsos;
 create schema if not exists mobsos default character set utf8 collate utf8_general_ci;
 use mobsos;
 
-grant usage on *.* to mobsos@localhost identified by 'mobsosrules'; 
-grant all privileges on mobsos.* to mobsos@localhost;
+grant usage on *.* to mobsos@% identified by 'mobsosrules'; 
+grant all privileges on mobsos.* to mobsos@%;
 
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
