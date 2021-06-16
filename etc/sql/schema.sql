@@ -61,7 +61,7 @@ create table response (
     id bigint not null auto_increment,
     uid varchar(128) not null,
     sid mediumint not null,
-    qkey varchar(32) not null,
+    qkey varchar(36) not null,
     qval varchar(512) not null,
     time datetime not null,
     constraint res_pk primary key (id),
