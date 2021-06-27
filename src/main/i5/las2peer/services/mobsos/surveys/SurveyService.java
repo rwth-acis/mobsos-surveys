@@ -134,7 +134,10 @@ public class SurveyService extends RESTService {
 		if (!las2peerUrl.endsWith("/")) {
 			las2peerUrl += "/";
 		}
-		this.epUrl = las2peerUrl + "mobsos-surveys/";
+
+		if (!epUrl.endsWith("/")) {
+			epUrl += "/";
+		}
 
 		if (staticContentUrl == null || staticContentUrl.isEmpty()) {
 			staticContentUrl = epUrl;

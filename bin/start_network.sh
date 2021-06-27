@@ -5,4 +5,4 @@ cd ${SCRIPTDIR}/../
 BASE=${PWD}
 export CLASSPATH="${PWD}/lib/*"
 
-java -cp "${CLASSPATH}" i5.las2peer.tools.L2pNodeLauncher -p 9016 --service-directory service uploadStartupDirectory "startService('i5.las2peer.services.mobsos.surveys.SurveyService@0.3.1','mobsosrules')" "interactive" 
+java -cp "${CLASSPATH}" i5.las2peer.tools.L2pNodeLauncher -p 9016 --service-directory service uploadStartupDirectory "startService('i5.las2peer.services.mobsos.surveys.SurveyService@0.3.1','mobsosrules')" "interactive"
