@@ -310,46 +310,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				function(data,type){
 					
 					qs = data.questionnaires;
-					
+
 					$('#questionnaires').html("");
 					client.getUserInfo(
-							function(d){
-								console.log("User Info from Service");
-								console.log(d);
+							function(user_info){
+								console.log(user_info)
+								for(i=0;i<qs.length;i++){
+
+									var q = qs[i];
+									var lang = q.lang.split("-")[0];
+									var type = "hidden";
+									if(typeof oidc_userinfo !== 'undefined' && q.owner==user_info.sub){
+										type = "owner";
+									}
+									console.log("owner: " + q.owner);
+									console.log("user: " + oidc_userinfo.sub);
+									console.log("type: " + type);
+									$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>   <div id='qid"+i+"' style='display:inline'></div> <img class='flag flag-" + lang + "' /></span><p id='qdesc"+i+"' class='list-group-item-text'></p></a><span class='delete "+type+" glyphicon glyphicon-trash pull-right list-group-item' id='"+q.id+"' style='z-index:50;top:-77px;'></span>");
+									$('#qid'+i).text(decodeURIComponent(q.name));
+									$('#qdesc'+i).text(decodeURIComponent(q.description));
+									$(".owner").click(function(){
+										var id = $(this).attr("id");
+										console.log("Delete questionnaire " + id);
+
+										client.deleteQuestionnaire(id,
+												function(data,type){
+													console.log(data);
+													//reload page
+													window.location.reload();
+												},
+												function(error){
+													console.log(error);
+												}
+										);
+
+									});
+								}
 							},
 							function(e){
 								console.log(e);
 							}
 						);
-						
-					for(i=0;i<qs.length;i++){
-						
-						var q = qs[i];
-						var lang = q.lang.split("-")[0];
-						var type = "hidden";
-						if(typeof oidc_userinfo !== 'undefined' && q.owner==oidc_userinfo.sub){
-							type = "owner";
-						}
-						$('#questionnaires').append("<a href='" + q.url + "' class='list-group-item'><img style='margin: 0px 0px 6px 0px;' class='list-group-item-heading' src='" + q.logo + "' height='32px' alt='Logo for questionnaire " + decodeURIComponent(q.name) + "'/><span class='list-group-item-heading h4'>   <div id='qid"+i+"' style='display:inline'></div> <img class='flag flag-" + lang + "' /></span><p id='qdesc"+i+"' class='list-group-item-text'></p></a><span class='delete "+type+" glyphicon glyphicon-trash pull-right list-group-item' id='"+q.id+"' style='z-index:50;top:-77px;'></span>");
-						$('#qid'+i).text(decodeURIComponent(q.name));
-						$('#qdesc'+i).text(decodeURIComponent(q.description));
-						$(".owner").click(function(){
-							var id = $(this).attr("id");
-							console.log("Delete questionnaire " + id);
-							
-							client.deleteQuestionnaire(id,
-								function(data,type){
-									console.log(data);
-									//reload page
-									window.location.reload();
-								},
-								function(error){
-									console.log(error);
-								}
-							);
-							
-						});
-					}
 				},
 				function(error){
 					console.log(error);
