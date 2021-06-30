@@ -361,6 +361,8 @@ MobSOSSurveysClient.prototype.getResourcesMeta = function (callback, errorCallba
             )
         },
         function () {
+            return;
+
             var servicesFromL2P = [];
             client.sendRequestToLas2peer("GET",
                 "mobsos-success-modeling/apiv2/services",
