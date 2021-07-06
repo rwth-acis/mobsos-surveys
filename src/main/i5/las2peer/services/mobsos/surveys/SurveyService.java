@@ -1607,7 +1607,7 @@ public class SurveyService extends RESTService {
 
 					c = dataSource.getConnection();
 					s = c.prepareStatement("update " + service.jdbcSchema
-							+ ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=?, lang=? where id = ?");
+							+ ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=?, lang=? resource_label=? where id = ?");
 
 					s.setString(1, (String) o.get("organization"));
 					s.setString(2, (String) o.get("logo"));
@@ -1619,7 +1619,8 @@ public class SurveyService extends RESTService {
 					s.setTimestamp(7,
 							new Timestamp(DatatypeConverter.parseDateTime((String) o.get("end")).getTimeInMillis()));
 					s.setString(8, (String) o.get("lang"));
-					s.setInt(9, id);
+					s.setString(9, (String) o.get("resource-label"));
+					s.setInt(10, id);
 
 					s.executeUpdate();
 

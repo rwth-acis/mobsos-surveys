@@ -288,6 +288,26 @@ MobSOSSurveysClient.prototype.setSurveyQuestionnaire = function (id, data, callb
 
 };
 
+MobSOSSurveysClient.prototype.deleteSurvey = function (id, callback, errorCallback) {
+    this.sendRequestToService("DELETE",
+        "surveys/" + id,
+        "",
+        "",
+        {},
+        callback,
+        errorCallback);
+}
+
+MobSOSSurveysClient.prototype.updateSurvey = function (id, metadata, callback, errorCallback) {
+    this.sendRequestToService("PUT",
+        "surveys/" + id,
+        metadata,
+        "application/json",
+        {},
+        callback,
+        errorCallback);
+}
+
 MobSOSSurveysClient.prototype.submitSurveyResponse = function (id, data, callback, errorCallback) {
     this.sendRequestToService("POST",
         "surveys/" + id + "/responses",
