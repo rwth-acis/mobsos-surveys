@@ -1607,7 +1607,7 @@ public class SurveyService extends RESTService {
 
 					c = dataSource.getConnection();
 					s = c.prepareStatement("update " + service.jdbcSchema
-							+ ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=?, lang=? resource_label=? where id = ?");
+							+ ".survey set organization=?, logo=?, name=?, description=?, resource=?, start=?, end=?, lang=?, resource_label=? where id = ?");
 
 					s.setString(1, (String) o.get("organization"));
 					s.setString(2, (String) o.get("logo"));
