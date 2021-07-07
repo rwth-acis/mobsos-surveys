@@ -348,33 +348,9 @@ MobSOSSurveysClient.prototype.getResourcesMeta = function (callback, errorCallba
         "",
         "application/json",
         {"Accept": "application/json"},
-        function (servicesFromL2P) {
-            client.sendRequestToLas2peer("GET",
-                "mobsos-success-modeling/apiv2/services",
-                "",
-                "application/json",
-                {"Accept": "application/json"},
-                function (servicesFromMobSOS, type) {
-                    callback(client._mergeServiceData(servicesFromL2P, servicesFromMobSOS), type);
-                },
-                errorCallback
-            )
-        },
-        function () {
-            return;
-
-            var servicesFromL2P = [];
-            client.sendRequestToLas2peer("GET",
-                "mobsos-success-modeling/apiv2/services",
-                "",
-                "application/json",
-                {"Accept": "application/json"},
-                function (servicesFromMobSOS, type) {
-                    callback(client._mergeServiceData(servicesFromL2P, servicesFromMobSOS), type);
-                },
-                errorCallback
-            )
-        }
+        function (servicesFromL2P, type) {
+            callback(client._mergeServiceData(servicesFromL2P, []), type);
+        }, errorCallback
     );
 };
 
