@@ -291,7 +291,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 						for (i in data) {
 							var resource = data[i];
 							if (resource.name != null)
-								$("#i_survey_clientpick").append("<option value='" + resource.id + "'>" + resource.name + "</option>")
+								$("#i_survey_clientpick").append("<option value='" + resource.name + "'>" + resource.name + "</option>")
 						}
 					},
 					console.log
@@ -313,6 +313,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 				submitEditSurveyForm();
 			});
 
+		}
+
+		function fillDefaultValuesInEditModal(s) {
+			$('#i_survey_name').val(decodeURIComponent(s.name));
+			$('#i_survey_desc').val(decodeURIComponent(s.description));
+			$('#i_survey_org').val(decodeURIComponent(s.organization));
+			$('#i_survey_logo').val(s.logo);
+			$('#i_survey_starttime').val(s.start);
+			$('#i_survey_endtime').val(s.end);
+			$('#i_survey_clientpick').val(s.resource).change();
+			$('#i_survey_resource_label').val(decodeURIComponent(s["resource-label"]));
+			$('#i_survey_lang').val(s.lang).change();
 		}
 
 		function submitEditSurveyForm(){
@@ -338,7 +350,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			$('#i_survey_submit').addClass('disabled')
 			client.updateSurvey(${ID}, JSON.stringify(s),
 					function(){
-						$("#msg").removeClass("alert-danger hidden").html("${ok}");
 						$('#i_survey_submit').removeClass('disabled')
 						$('#survey-edit-modal').modal('hide');
 						updateSurvey()
@@ -354,6 +365,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			client.getSurvey(${ID},
 				function(data,type){
 					console.log(data);
+					fillDefaultValuesInEditModal(data);
+
 					$("#s_name").text(decodeURIComponent(data.name))
 					$("#s_org").html("<img src='" + data.logo + "' height='20'><div id='org' style='display:inline;margin:5px'></div>");
 					$("#org").text(decodeURIComponent(data.organization));
@@ -365,9 +378,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 					//TODO: add result field qurl in service!
 					$("#s_questionnaire").html("<a href='${EP_URL}questionnaires/" + data.qid + "'>Questionnaire</a>");
-					console.log(data);
-
-
 
 					client.getUserInfo(function (user) {
 						if ('sub' in user) {
