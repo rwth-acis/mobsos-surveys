@@ -379,6 +379,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					//TODO: add result field qurl in service!
 					$("#s_questionnaire").html("<a href='${EP_URL}questionnaires/" + data.qid + "'>Questionnaire</a>");
 
+<<<<<<< HEAD
 					client.getUserInfo(function (user) {
 						if ('sub' in user) {
 							// only show participation button, if survey is active (i.e. started, and did not end, yet)
@@ -414,6 +415,53 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 						}
 					}, console.error)
+=======
+					// only show participation button, if survey is active (i.e. started, and did not end, yet)
+					var isParticipationPossibleTimewise;
+					var now = moment();
+					var s_e = moment.utc(data.end);
+					var s_s = moment.utc(data.start);
+
+					if(now > s_e){
+						console.log("Warning: survey over!");
+						isParticipationPossibleTimewise = false;
+					} else if(now < s_s) {
+						console.log("Warning: survey did not yet begin!");
+						isParticipationPossibleTimewise = false;
+					} else {
+						console.log("Participation possible timewise");
+						isParticipationPossibleTimewise = true;
+					}
+
+					client.getUserInfo(function (user) {
+						if ('sub' in user) {
+							client.getSurveyResponses(${ID},
+								function(d,type){
+									console.log(d);
+									let lines = d.split("\r\n");
+									let hasResponded = false;
+									for(let i in lines){
+										if(lines[i].indexOf(user.sub) == 0){
+											$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
+											hasResponded = true;
+											break;
+										}
+									}
+									if (isParticipationPossibleTimewise && !hasResponded)
+										$("#i_survey_part").removeClass("hidden");
+								},console.error);
+							// check if owner
+							if (user.sub === data.owner) {
+								$("#i_survey_edit").removeClass("hidden");
+								$("#i_survey_remove").removeClass("hidden");
+							}
+						} else {
+							// Anonymous User
+							if (isParticipationPossibleTimewise)
+								$("#i_survey_part").removeClass("hidden");
+						}
+					})
+>>>>>>> [frontend] allow anonymous user to participate
 				},
 				console.log
 			);
