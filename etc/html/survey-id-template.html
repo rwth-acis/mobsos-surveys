@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<![endif]-->
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!--	<link href="${SC_URL}css/bootstrap-datetimepicker.min.css" rel="stylesheet">-->
+	<link href="https://las2peer.org/wp-content/uploads/2016/09/bootstrap-datetimepicker.min_.css" rel="stylesheet">
 </head>
 <body>
 
@@ -82,7 +84,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- Container for operations on questionnaires -->
 	<div id="survey" class="container ">
 		<div class="row" style="margin:30px 0px 0px 0px;">
-			<h2 class="page-header"><span id="s_name" class="h2"></span> <button id="i_survey_edit" class="btn btn-default hidden"><span class="glyphicon glyphicon-edit"></span></button></h2>
+			<h2 class="page-header">
+				<span id="s_name" class="h2"></span>
+				<button id="i_survey_edit" class="btn btn-default hidden" data-toggle="modal" data-target="#survey-edit-modal"><span class="glyphicon glyphicon-edit"></span></button>
+				<button id="i_survey_remove" class="btn btn-default hidden"><span class="glyphicon glyphicon-remove-circle"></span></button>
+			</h2>
 			<h4 id="s_org"></h4>
 			<table class="table table-bordered">
 				<tr><td colspan="2" id="s_desc"></td></tr>
@@ -125,6 +131,105 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
     </div>
 
+	<div class="modal fade" id="survey-edit-modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">${edit_survey}</h4>
+				</div>
+				<div class="modal-body">
+					<form role="form" class="form">
+						<div class="form-group">
+							<label for="i_survey_lang">${lang}</label>
+							<select id="i_survey_lang" class="form-control">
+								<option value="en-US">English</option>
+								<option value="de-DE">Deutsch</option>
+								<option value="fr-FR">Fran&ccedil;ais</option>
+								<option value="es-ES">Espag&ntilde;ol</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="i_survey_name">${name}</label>
+							<input type="text" class="form-control" id="i_survey_name" placeholder="Name" value="" />
+						</div>
+						<div class="form-group">
+							<label for="i_survey_org">${org}</label>
+							<input type="text" class="form-control" id="i_survey_org" placeholder="Organization" value="" />
+						</div>
+						<div class="form-group">
+							<label for="i_survey_logo">${logo}</label>
+							<span id="i_survey_lpic"></span><input type="text" class="form-control" id="i_survey_logo" placeholder="Logo Image URL (.jpg, .png)" value="" />
+						</div>
+						<div class="form-group">
+							<label for="i_survey_desc">${desc}</label>
+							<textarea class="form-control" id="i_survey_desc" placeholder="Description" ></textarea>
+						</div>
+
+						<div class="form-group">
+							<label for="i_survey_clientpick">${resource}</label>
+							<div>
+								<select id="i_survey_clientpick" class="form-control">
+									<!-- client options inserted dynamically -->
+								</select>
+							</div>
+							<!-- <input type="text" class="form-control" id="i_survey_resource" placeholder="Resource URI" value="http://achso.aalto.fi" />-->
+						</div>
+
+						<div class="form-group">
+							<label for="i_survey_resource_label">${resource_label}</label>
+							<textarea class="form-control" id="i_survey_resource_label" placeholder="Resource Label" ></textarea>
+						</div>
+
+						<div class="col-md-6 form-group">
+							<label for="i_survey_start">${start_time}</label>
+							<div class='input-group date' id='i_survey_start'>
+								<input type='text' id="i_survey_starttime" class="form-control" placeholder="YYYY-MM-DDTHH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value=""/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="i_survey_end">${end_time}</label>
+							<div class='input-group date' id='i_survey_end'>
+								<input id="i_survey_endtime" type='text' class="form-control" placeholder="YYYY-MM-DD'T'HH:mm:ss" data-date-format="YYYY-MM-DDTHH:mm:ss" value=""/>
+								<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+								</span>
+							</div>
+						</div>
+
+						<div class="col-md12 form-group">
+							<!--
+							<label for="i_survey_quest">${questionnaire}</label>
+                            <div id="i_survey_quest">
+                                <input type="text" id="i_survey_qid" class="form-control" placeholder="${questionnaire} ID">
+                            </div>
+
+                            <div id="custom-templates">
+                              <input id="i_survey_qselect" class="form-control typeahead" type="text" placeholder="${questionnaire}">
+                            </div>
+                            -->
+
+							<div>
+								<select id="i_survey_qpick" disabled class="form-control">
+									<option>TODO</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-4"> </div>
+
+							<div class="col-md-4 form-group">
+								<input id="i_survey_submit" class="form-control btn btn-default" type="button" value="${submit}" />
+							</div>
+							<div class="col-md-4"> </div>
+						</div>
+					</form>
+					<div id="msg" class="row alert alert-danger hidden"/>
+			</div>
+		</div>
+	</div>
+
 	<!-- import jQuery for AJAX calls (must) -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
@@ -139,90 +244,178 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	<!-- import moment.js for displaying times and dates -->
 	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/moment.min_.js"></script>
 
+	<!-- import datetimepicker + deps -->
+<!--	<script type="text/javascript" src="${SC_URL}js/moment.min.js"></script>-->
+<!--	<script type="text/javascript" src="${SC_URL}js/bootstrap-datetimepicker.js"></script>-->
+	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/moment.min_.js"></script>
+	<script type="text/javascript" src="https://las2peer.org/wp-content/uploads/2016/09/bootstrap-datetimepicker.js"></script>
+
+
 	<script type="text/javascript">
 
 		var endpoint_url = "${EP_URL}";
 		var las2peer_url = "${L2P_URL}";
 		var client = new MobSOSSurveysClient(endpoint_url, las2peer_url);
 
+		$('#survey-form-modal').on('show.bs.modal', function (e) {
+			client.getSurveyQuestionnaire(${ID}, function (data) {
+				$('#survey-form-modal').find('.modal-body').html(data);
+			},console.error)
+		});
+
+		$("#survey-results-modal").on('show.bs.modal', function (e) {
+			client.getSurveyResponsesAsHtml(${ID}, function (data) {
+				$('#survey-results-modal').find('.modal-body').html(data);
+			},console.error)
+		});
+
+		$("#i_survey_remove").click(function () {
+			client.deleteSurvey(${ID}, function () {
+				$("#submit-msg").html("Survey Deleted. Redirecting to all surveys...").removeClass("hidden");
+				window.location.replace("${EP_URL}surveys");
+			}, console.error);
+		})
+
 		// OpenID Connect Button: implement a callback function
 		function signinCallback(result) {
-			if(result === "success"){
-				$("#i_survey_edit").removeClass("hidden");
+			updateSurvey();
+
+			if(result === "success") {
+				setupEditSurveyModal();
+			}
+		}
+
+		function setupEditSurveyModal() {
+			client.getResourcesMeta(
+					function (data) {
+						for (i in data) {
+							var resource = data[i];
+							if (resource.name != null)
+								$("#i_survey_clientpick").append("<option value='" + resource.name + "'>" + resource.name + "</option>")
+						}
+					},
+					console.log
+			);
+
+			$('#i_survey_start').datetimepicker({
+				useSeconds: true
+			});
+
+			$('#i_survey_end').datetimepicker({
+				useSeconds: true
+			});
+
+			$('#i_survey_logo').change(function(e){
+				$('#i_survey_lpic').html("<img src='" + $(this).val() + "' height='30' style='margin:10px;'/>");
+			});
+
+			$('#i_survey_submit').click(function(){
+				submitEditSurveyForm();
+			});
+
+		}
+
+		function fillDefaultValuesInEditModal(s) {
+			$('#i_survey_name').val(decodeURIComponent(s.name));
+			$('#i_survey_desc').val(decodeURIComponent(s.description));
+			$('#i_survey_org').val(decodeURIComponent(s.organization));
+			$('#i_survey_logo').val(s.logo);
+			$('#i_survey_starttime').val(s.start);
+			$('#i_survey_endtime').val(s.end);
+			$('#i_survey_clientpick').val(s.resource).change();
+			$('#i_survey_resource_label').val(decodeURIComponent(s["resource-label"]));
+			$('#i_survey_lang').val(s.lang).change();
+		}
+
+		function submitEditSurveyForm(){
+
+			var s = {
+				"name": encodeURIComponent($('#i_survey_name').val()),
+				"description" :encodeURIComponent($('#i_survey_desc').val()),
+				"organization": encodeURIComponent($('#i_survey_org').val()),
+				"logo": $('#i_survey_logo').val(),
+				"start": $("#i_survey_starttime").val(),
+				"end": $("#i_survey_endtime").val(),
+				"resource": $("#i_survey_clientpick").find('option:selected').text(),
+				"resource-label": encodeURIComponent($('#i_survey_resource_label').val()),
+				//"resource": $("#i_survey_resource").val(),
+				"lang": $("#i_survey_lang").val()
+			};
+
+			if(s.name == '' || s.description == '' || s.organization == '' || s.logo == '' || s.resource == '' || s.start == '' || s.end == '' || s.lang == ''){
+				$("#msg").removeClass("hidden").html("${survey_data_incomplete}");
+				return;
 			}
 
-			$('#survey-form-modal').on('show.bs.modal', function (e) {
-				client.getSurveyQuestionnaire(${ID}, function (data) {
-					$('#survey-form-modal').find('.modal-body').html(data);
-				},console.error)
-			});
-
-			$("#survey-results-modal").on('show.bs.modal', function (e) {
-                client.getSurveyResponsesAsHtml(${ID}, function (data) {
-                    $('#survey-results-modal').find('.modal-body').html(data);
-                },console.error)
-			});
-
-			updateSurvey();
-		}
+			$('#i_survey_submit').addClass('disabled')
+			client.updateSurvey(${ID}, JSON.stringify(s),
+					function(){
+						$('#i_survey_submit').removeClass('disabled')
+						$('#survey-edit-modal').modal('hide');
+						updateSurvey()
+					},
+					function(e){
+						$("#msg").removeClass("hidden").html("${survey_update_failed} " + e);
+						$('#i_survey_submit').removeClass('disabled')
+					});
+		};
 
 		function updateSurvey(){
 
 			client.getSurvey(${ID},
 				function(data,type){
+					console.log(data);
+					fillDefaultValuesInEditModal(data);
+
 					$("#s_name").text(decodeURIComponent(data.name))
 					$("#s_org").html("<img src='" + data.logo + "' height='20'><div id='org' style='display:inline;margin:5px'></div>");
 					$("#org").text(decodeURIComponent(data.organization));
 					$("#s_desc").text(""+decodeURIComponent(data.description));
-					$("#s_resource").html(data['resource-label']);
+					$("#s_resource").text(decodeURIComponent(data['resource-label']));
 
 					$("#s_start").html(moment.utc(data.start).format("llll"));
 					$("#s_end").html(moment.utc(data.end).format("llll"));
 
 					//TODO: add result field qurl in service!
 					$("#s_questionnaire").html("<a href='${EP_URL}questionnaires/" + data.qid + "'>Questionnaire</a>");
-					console.log(data);
 
-					// only show participation button, if survey is active (i.e. started, and did not end, yet)
-					var now = moment();
-					var s_e = moment.utc(data.end);
-					var s_s = moment.utc(data.start);
+					client.getUserInfo(function (user) {
+						if ('sub' in user) {
+							// only show participation button, if survey is active (i.e. started, and did not end, yet)
+							var now = moment();
+							var s_e = moment.utc(data.end);
+							var s_s = moment.utc(data.start);
 
-					if(now > s_e){
-						console.log("Warning: survey over!");
-					} else if(now < s_s){
-						console.log("Warning: survey did not yet begin!");
-					} else {
-						console.log("Participation possible timewise");
-
-						if(oidc_userinfo){
-							// check responses, if user already participated.
-							client.getSurveyResponses(${ID},
-								function(d,type){
-									console.log(d);
-									var lines = d.split("\r\n");
-									for(i in lines){
-										if(lines[i].indexOf(oidc_userinfo.sub) == 0){
-											$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
-											return;
-										}
-									}
-									// user does not have participated, yet -> show participate button.
-									$("#i_survey_part").removeClass("hidden");
-								},function(e){
-									console.log(e);
-								}
-							);
+							if(now > s_e){
+								console.log("Warning: survey over!");
+							} else if(now < s_s){
+								console.log("Warning: survey did not yet begin!");
+							} else {
+								console.log("Participation possible timewise");
+								client.getSurveyResponses(${ID},
+										function(d,type){
+											console.log(d);
+											var lines = d.split("\r\n");
+											for(i in lines){
+												if(lines[i].indexOf(user.sub) == 0){
+													$("#submit-msg").html("You already submitted a response. Thank you!").removeClass("hidden");
+													return;
+												}
+											}
+											// user does not have participated, yet -> show participate button.
+											$("#i_survey_part").removeClass("hidden");
+										},console.error);
+							}
+							// check if owner
+							if (user.sub == data.owner) {
+								$("#i_survey_edit").removeClass("hidden");
+								$("#i_survey_remove").removeClass("hidden");
+							}
 
 						}
-
-
-					}
-
+					}, console.error)
 				},
-				function(error){
-					console.log(error);
-				}
+				console.log
 			);
 		}
 
