@@ -4107,14 +4107,11 @@ public class SurveyService extends RESTService {
 			long ts_start = rs.getTimestamp("start").getTime();
 			long ts_end = rs.getTimestamp("end").getTime();
 
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 
 			String d_start = dateFormat.format(new Date(ts_start));
 			String d_end = dateFormat.format(new Date(ts_end));
-
-			// System.out.println(ts_start + " -> " + d_start);
-			// System.out.println(ts_end + " -> " + d_end);
 
 			o.put("start", d_start);
 			o.put("end", d_end);
@@ -4323,6 +4320,7 @@ public class SurveyService extends RESTService {
 				df.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 				Date startDate = df.parse((String) o.get("start"));
 				Date endDate = df.parse((String) o.get("end"));
+				df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 				df.setTimeZone(TimeZone.getTimeZone("UTC"));
 				o.put("start", df.format(startDate));
 				o.put("end", df.format(endDate));
