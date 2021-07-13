@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mobsos-surveys
+  name: mobsos-surveys
+  namespace: mobsos
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: mobsos-surveys
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mobsos-surveys
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - tech4compslave1
+                      - tech4compslave2
+      containers:
+        - env:
+            - name: BOOTSTRAP
+              value: tech4comp.dbis.rwth-aachen.de:31012
+            - name: LAS2PEER_ETH_HOST
+              value: las2peer-ethnet:8545
+            - name: LAS2PEER_PORT
+              value: "31026"
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_HOST
+              value: mobsos-mysql
+            - name: OIDC_CLIENT_ID
+              value: f8622260-875b-499a-82db-db55f89f9deb
+            - name: NODE_ID_SEED
+              value: "5"
+            - name: EP_URL
+              value: https://surveys.tech4comp.dbis.rwth-aachen.de
+            - name: STATIC_CONTENT_URL
+              value: https://surveys.tech4comp.dbis.rwth-aachen.de/static
+            - name: LAS2PEER_URL
+              value: https://las2peer.tech4comp.dbis.rwth-aachen.de/
+            - name: OIDC_PROVIDER_URL
+              value: https://api.learning-layers.eu/auth/realms/main
+            - name: OIDC_PROVIDER_LOGO
+              value: http://results.learning-layers.eu/images/learning-layers.svg
+            - name: WALLET
+              value: "1"
+          image: rwthacis/mobsos-surveys:develop
+          imagePullPolicy: Always
+          name: mobsos-surveys
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /src/etc/i5.las2peer.registry.data.RegistryConfiguration.properties
+              name: registry-config-volume
+              subPath: registry-config.properties
+            - mountPath: /src/etc/nodeInfo.xml
+              name: node-info-volume
+              subPath: nodeInfo.xml
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: registry-config
+          name: registry-config-volume
+        - configMap:
+            defaultMode: 420
+            name: node-info
+          name: node-info-volume

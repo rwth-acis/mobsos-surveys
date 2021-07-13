@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mobsos-surveys-nginx
+  namespace: mobsos
+spec:
+  ports:
+    - name: surveys-nginx
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: mobsos-surveys-nginx
+  type: ClusterIP
