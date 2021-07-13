@@ -4317,6 +4317,19 @@ public class SurveyService extends RESTService {
 						"Survey data incomplete! All fields name, organization, logo, description, resource, resource-label, start, end, and lang must be defined!");
 			}
 
+			try {
+				// Convert times to UTC
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+				df.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+				Date startDate = df.parse((String) o.get("start"));
+				Date endDate = df.parse((String) o.get("end"));
+				df.setTimeZone(TimeZone.getTimeZone("UTC"));
+				o.put("start", df.format(startDate));
+				o.put("end", df.format(endDate));
+			} catch (java.text.ParseException e) {
+				throw new IllegalArgumentException("Error parsing start/end times");
+			}
+
 			// finally check time integrity constraint: start must be before end (possibly not enforced by database;
 			// mySQL
 			// does not support this check)
