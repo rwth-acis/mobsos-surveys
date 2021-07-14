@@ -4107,8 +4107,8 @@ public class SurveyService extends RESTService {
 			long ts_start = rs.getTimestamp("start").getTime();
 			long ts_end = rs.getTimestamp("end").getTime();
 
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			String d_start = dateFormat.format(new Date(ts_start));
 			String d_end = dateFormat.format(new Date(ts_end));
