@@ -1973,7 +1973,7 @@ public class SurveyService extends RESTService {
 							qpage += "\t\t\t<h4><b>" + name + " (" + quid + ")</b></h4>\n";
 
 							String instr = escapeHtml4(e.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Instructions")
-									.item(0).getTextContent().trim());
+									.item(0).getTextContent());
 
 							String cssClass = "question";
 
@@ -1982,7 +1982,7 @@ public class SurveyService extends RESTService {
 								instr += " (<i>" + i18n("${required}", lang) + "</i>)";
 							}
 
-							qpage += "\t\t\t<div class=\"" + cssClass + "\" style='text-align: justify;'>" + instr
+							qpage += "\t\t\t<div class=\"" + cssClass + "\" style='text-align: justify; white-space: pre-line;'>" + instr
 									+ "</div><p/>\n";
 
 							String qtype = e.getAttribute("xsi:type");
