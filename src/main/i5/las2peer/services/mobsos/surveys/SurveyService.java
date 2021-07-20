@@ -4316,14 +4316,10 @@ public class SurveyService extends RESTService {
 
 			try {
 				// Convert times to UTC
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-				df.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
-				Date startDate = df.parse((String) o.get("start"));
-				Date endDate = df.parse((String) o.get("end"));
-				df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-				df.setTimeZone(TimeZone.getTimeZone("UTC"));
-				o.put("start", df.format(startDate));
-				o.put("end", df.format(endDate));
+				String utcStart = Utils.convertTimeToUTC((String) o.get("start"), TimeZone.getTimeZone("Europe/Berlin"));
+				String utcEnd = Utils.convertTimeToUTC((String) o.get("end"), TimeZone.getTimeZone("Europe/Berlin"));
+				o.put("start", utcStart);
+				o.put("end", utcEnd);
 			} catch (java.text.ParseException e) {
 				throw new IllegalArgumentException("Error parsing start/end times");
 			}
