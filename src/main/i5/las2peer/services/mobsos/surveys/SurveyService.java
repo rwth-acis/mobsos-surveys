@@ -34,6 +34,7 @@ package i5.las2peer.services.mobsos.surveys;
 import i5.las2peer.api.Context;
 import i5.las2peer.api.ManualDeployment;
 import i5.las2peer.api.logging.MonitoringEvent;
+import i5.las2peer.api.security.Agent;
 import i5.las2peer.api.security.AnonymousAgent;
 import i5.las2peer.api.security.GroupAgent;
 import i5.las2peer.api.security.UserAgent;
@@ -1873,7 +1874,7 @@ public class SurveyService extends RESTService {
 				}
 
 				// adapt form template to concrete survey and user
-				String adaptedFormXml = adaptForm(formXml, survey, (UserAgent) Context.getCurrent().getMainAgent(),
+				String adaptedFormXml = adaptForm(formXml, survey, Context.getCurrent().getMainAgent(),
 						null);
 
 				// String adaptedFormXml = formXml;
@@ -1908,7 +1909,7 @@ public class SurveyService extends RESTService {
 				html = fillPlaceHolder(html, "OIDC_CLNT_ID", service.oidcClientId);
 
 				// do all adaptation to user and survey
-				String adaptHtml = adaptForm(html, survey, (UserAgent) Context.getCurrent().getMainAgent(), null);
+				String adaptHtml = adaptForm(html, survey, Context.getCurrent().getMainAgent(), null);
 
 				adaptHtml = i18n(adaptHtml, lang);
 
@@ -3809,7 +3810,7 @@ public class SurveyService extends RESTService {
 		 * @param community
 		 * @return
 		 */
-		private String adaptForm(String originalFormXml, JSONObject survey, UserAgent user, GroupAgent community) {
+		private String adaptForm(String originalFormXml, JSONObject survey, Agent user, GroupAgent community) {
 			// detect all tags used by questionnaire author throughout the form
 			// and replace them by the respective values.
 			Pattern p = Pattern.compile("\\$\\{([^\\}])+\\}");
@@ -3827,9 +3828,17 @@ public class SurveyService extends RESTService {
 						if (tag.endsWith("ID")) {
 							value = "" + user.getIdentifier();
 						} else if (tag.endsWith("NAME")) {
-							value = user.getLoginName();
+							if (user instanceof AnonymousAgent) {
+								value = "(?)";
+							} else {
+								value = ((UserAgent) user).getLoginName();
+							}
 						} else if (tag.endsWith("MAIL")) {
-							value = user.getEmail();
+							if (user instanceof AnonymousAgent) {
+								value = "(?)";
+							} else {
+								value = ((UserAgent) user).getEmail();
+							}
 						}
 					} else if (tag.startsWith("COMMUNITY")) {
 						if (tag.endsWith("ID")) {
