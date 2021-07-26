@@ -373,8 +373,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 					$("#s_desc").text(""+decodeURIComponent(data.description));
 					$("#s_resource").text(decodeURIComponent(data['resource-label']));
 
-					$("#s_start").html(moment.utc(data.start).format("llll"));
-					$("#s_end").html(moment.utc(data.end).format("llll"));
+					$("#s_start").html(moment(data.start).format("llll"));
+					$("#s_end").html(moment(data.end).format("llll"));
 
 					//TODO: add result field qurl in service!
 					$("#s_questionnaire").html("<a href='${EP_URL}questionnaires/" + data.qid + "'>Questionnaire</a>");
@@ -398,6 +398,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 					client.getUserInfo(function (user) {
 						if ('sub' in user) {
+							$("#i_survey_part").addClass("hidden");
 							client.getSurveyResponses(${ID},
 								function(d,type){
 									console.log(d);
@@ -423,7 +424,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							if (isParticipationPossibleTimewise)
 								$("#i_survey_part").removeClass("hidden");
 						}
-					})
+					}, console.error)
 				},
 				console.log
 			);
