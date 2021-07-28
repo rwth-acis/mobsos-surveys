@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ master, develop, build-test ]
+    branches: [ master, develop, test-stage ]
 
 jobs:
   test:
