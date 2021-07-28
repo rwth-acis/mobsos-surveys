@@ -14,10 +14,13 @@ jobs:
         java-version: 14
         distribution: 'adopt'
     - name: Set up MySQL
+      uses: actions/checkout@v2
       run: |
         sudo /etc/init.d/mysql start
         .travis.install-mysql-5.7.sh
         mysql -u root -p root < etc/sql/schema.sql
+    - name: Run Tests
+      run: ant all
 
   build:
     needs: test
