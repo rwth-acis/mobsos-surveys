@@ -12,6 +12,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 14
+        distribution: 'adopt'
     - name: Set up MySQL
       run: |
         sudo /etc/init.d/mysql start
