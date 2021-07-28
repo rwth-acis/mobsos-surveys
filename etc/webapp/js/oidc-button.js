@@ -170,7 +170,7 @@ function renderButton(signin){
 	}
 
 	if(signin){
-		$(".oidc-signin").removeClass("btn-default").addClass("btn-success").html("<img style='margin-right:5px' src='" + oidc_logo + "' height='" + size + "px'/> Sign in with <i>" + oidc_name + "</i>");
+		$(".oidc-signin").removeClass("btn-warning").addClass("btn-success").html("<img style='margin-right:5px' src='" + oidc_logo + "' height='" + size + "px'/> Sign in with <i>" + oidc_name + "</i>");
 		$(".oidc-signin").click(function (e){
 			var url = oidc_provider_config.authorization_endpoint + "?redirect_uri=" + encodeURIComponent(oidc_redirect)
 				+ "&response_type=id_token%20token&client_id=" + encodeURIComponent(oidc_clientid) + "&scope="
@@ -179,7 +179,7 @@ function renderButton(signin){
 			window.location.href = url;
 		});
 	} else {
-		$(".oidc-signin").removeClass("btn-success").addClass("btn-default").html("<img style='margin-right:5px;' height='" + size + "px' src='" + oidc_logo + "'/> Sign out [" + oidc_userinfo.preferred_username + "]");
+		$(".oidc-signin").removeClass("btn-success").addClass("btn-warning").html("<img style='margin-right:5px;' height='" + size + "px' src='" + oidc_logo + "'/> Sign out [" + oidc_userinfo.preferred_username + "]");
 		$(".oidc-signin").click(function (e){
 			var url = oidc_provider_config.end_session_endpoint + "?redirect_uri=" + encodeURIComponent(oidc_redirect)
 					+ "&response_type=id_token%20token&client_id=" + encodeURIComponent(oidc_clientid) + "&scope="
