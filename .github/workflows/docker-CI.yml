@@ -17,7 +17,7 @@ jobs:
     - name: Set up MySQL
       run: |
         sudo /etc/init.d/mysql start
-        .travis.install-mysql-5.7.sh
+        bash .travis.install-mysql-5.7.sh
         mysql -u root -p root < etc/sql/schema.sql
     - name: Run Tests
       run: ant all
