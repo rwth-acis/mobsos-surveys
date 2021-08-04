@@ -49,11 +49,13 @@
 			</div>
 		</div>
 		<div class="controls-row">
-			<button id="prev-step" class="btn btn-primary btn-lg pull-left"><span
-					class="glyphicon glyphicon-chevron-left"></button>
+			<button id="prev-step" class="btn btn-primary btn-lg pull-left">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</button>
 			<span id="page" class="text-center"></span>
-			<button id="next-step" class="btn btn-primary btn-lg pull-right"><span
-					class="glyphicon glyphicon-chevron-right"></button>
+			<button id="next-step" class="btn btn-primary btn-lg pull-right">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</button>
 		</div>
 		<!-- QUESTIONPAGES -->
 		<div class="row setup-content" id="submission">
@@ -88,6 +90,25 @@
 		var qid = scale.attr("name");
 		var val = scale.val();
 		$(".scale-response[name='" + qid + "']").html("" + val);
+		answerUpdated();
+	}
+
+	function answerUpdated() {
+		let step = $(".setup-panel li.active a").attr('href');
+		let i = Number.parseInt(step.replace("#step-", ""));
+		if ($("#step-"+i+" .question").hasClass("required")) {
+			$('#next-step').addClass('disabled');
+			let j = i - 1;
+			// collect all input from form elements
+			let scresp = $(".response");
+			if (scresp.eq(j).hasClass("freetext-response") && (scresp.eq(j).val() != "")) {
+				$('#next-step').removeClass('disabled');
+			} else if (scresp.eq(j).hasClass("scale-response") && (scresp.eq(j).html() != "n/a")) {
+				$('#next-step').removeClass('disabled');
+			} else if (scresp.eq(j).hasClass("response") && (scresp.eq(j).val() != "")) {
+				$('#next-step').removeClass('disabled');
+			}
+		}
 	}
 
 	function update() {
@@ -136,11 +157,17 @@
 		$('#prev-step').addClass('disabled');
 
 		$('#prev-step').on('click', function (e) {
-			$('ul.setup-panel li.active').prev().find('a').trigger('click');
+			if (!$("#prev-step").hasClass('disabled')) {
+				$('ul.setup-panel li.active').prev().find('a').trigger('click');
+				answerUpdated();
+			}
 		});
 
 		$('#next-step').on('click', function (e) {
-			$('ul.setup-panel li.active').next().find('a').trigger('click');
+			if (!$("#next-step").hasClass('disabled')) {
+				$('ul.setup-panel li.active').next().find('a').trigger('click');
+				answerUpdated();
+			}
 		});
 
 		$('.scale').change(function () {
@@ -153,6 +180,7 @@
 
 		$('.scale-response').click(function () {
 			$(this).html("n/a");
+			answerUpdated();
 		});
 
 		$(".btn-primary").on("click", function () {
@@ -161,6 +189,7 @@
 				var qid = i.attr("name");
 				var val = i.val();
 				$(".response[name='" + qid + "']").val("" + val);
+				answerUpdated();
 			}
 		});
 
