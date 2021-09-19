@@ -303,11 +303,13 @@ public class SurveyService extends RESTService {
 				ResultSet rs = null;
 
 				// use query for questionnaire id per default
-				String sQuery = "select id from questionnaire where name like ? or description like ? or organization like ?";
+				String sQuery = "select id from " + service.jdbcSchema
+						+ ".questionnaire where name like ? or description like ? or organization like ?";
 
 				// if query param full is provided greater 0, then use query for full questionnaire data set.
 				if (full > 0) {
-					sQuery = "select * from questionnaire where name like ? or description like ? or organization like ? order by name";
+					sQuery = "select * from " + service.jdbcSchema
+							+ ".questionnaire where name like ? or description like ? or organization like ? order by name";
 				}
 
 				// +++ dsi
