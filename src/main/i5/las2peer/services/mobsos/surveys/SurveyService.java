@@ -1298,14 +1298,14 @@ public class SurveyService extends RESTService {
 					o = parseSurvey(data);
 				} catch (IllegalArgumentException e) {
 					// if passed content is invalid for some reason, notify user
-
+					System.out.println("Invalid survey data! ");
 					return Response.status(Status.BAD_REQUEST).entity("Invalid survey data! " + e.getMessage()).build();
 				}
 
 				try {
 					// if passed content is valid, store as new survey
 					int sid = storeNewSurvey(o);
-
+					System.out.println("Stored survey: " + sid);
 					// respond to user with newly generated survey id/URL
 					JSONObject r = new JSONObject();
 					r.put("id", sid);
@@ -1315,6 +1315,7 @@ public class SurveyService extends RESTService {
 				} catch (SQLException e) {
 
 					if (0 <= e.getMessage().indexOf("Duplicate")) {
+						System.out.println("Survey already exists");
 						return Response.status(Status.CONFLICT).entity("Survey already exists").build();
 					} else {
 						e.printStackTrace();
