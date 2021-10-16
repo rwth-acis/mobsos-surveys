@@ -940,6 +940,7 @@ public class SurveyService extends RESTService {
 					// before returning form, make sure it's still valid (TODO: think about removing check after
 					// testing)
 					try {
+						System.out.println("formXML: "+formXml);
 						validateQuestionnaireData(formXml);
 						return Response.status(Status.OK).entity(formXml).build();
 					} catch (IOException e) {
