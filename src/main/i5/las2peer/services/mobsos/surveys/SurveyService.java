@@ -4585,6 +4585,7 @@ public class SurveyService extends RESTService {
 		private Document validateQuestionnaireData(String data) throws SAXException, IOException {
 			// parse and validate.
 			ByteArrayInputStream stringIS = new ByteArrayInputStream(data.getBytes());
+			System.out.println("questionnaire data "+data);
 			Document doc = service.parser.parse(stringIS);
 			service.validator.validate(new DOMSource(doc));
 			return doc;
