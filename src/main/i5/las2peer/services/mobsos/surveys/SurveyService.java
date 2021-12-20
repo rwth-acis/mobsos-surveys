@@ -1767,6 +1767,54 @@ public class SurveyService extends RESTService {
 				return internalError(onAction);
 			}
 		}
+		
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		@Path("surveys/{id}/questions")
+		@ApiOperation(
+				value = "",
+				notes = "returns jsonobject with question information")
+		@ApiResponses(
+				value = { @ApiResponse(
+						code = 200,
+						message = ""),
+						@ApiResponse(
+								code = 404,
+								message = "") })
+		public Response getQuestionPropertiesForSID(@PathParam("id") int id) {
+			// get questionnaire id
+			int qid;
+			try{
+				qid = getQuestionnaireIdForSurvey(id);
+			}catch(Exception e){
+				e.printStackTrace();
+				return Response.ok().build();
+			}
+
+			// extract form
+			Response r = downloadQuestionnaireForm(qid);
+
+			// if questionnaire form does not exist, pass on response containing error status
+			if (200 != r.getStatus()) {
+				return r;
+			}
+
+			// parse form to XML document incl. validation; will later on be necessary to build query for
+			// questionnaire answer table
+			Document form;
+
+			try {
+				form = validateQuestionnaireData((String) r.getEntity());
+			} catch (Exception e) {
+				e.printStackTrace();
+				return Response.status(Status.BAD_REQUEST)
+						.entity("Questionnaire form is invalid! Cause: " + e.getMessage()).build();
+			}
+
+			// use form to get question infos
+			JSONObject questions = extractQuestionInformation(form);
+			return Response.ok().entity(questions).build();
+		}
 
 		/**
 		 * TODO: write documentation
