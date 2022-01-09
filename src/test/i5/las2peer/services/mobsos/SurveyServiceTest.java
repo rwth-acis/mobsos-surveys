@@ -1569,7 +1569,7 @@ public class SurveyServiceTest {
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Wikipedia Survey " + (new Date()).getTime());
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
-		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("logo", "https://avatars.githubusercontent.com/u/4559611?s=200&v=4");
 		obj.put("description", "A sample survey on Wikipedia.");
 		obj.put("resource", "http://wikipedia.org");
 		obj.put("resource-label", "Wikipedia");
@@ -1589,7 +1589,7 @@ public class SurveyServiceTest {
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Nadel im Heuhaufen " + (new Date()).getTime());
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
-		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("logo", "https://avatars.githubusercontent.com/u/4559611?s=200&v=4");
 		obj.put("description", "Eine schwer auffindbare Umfrage (Needle in the Haystack).");
 		obj.put("resource", "http://wikipedia.org");
 		obj.put("resource-label", "Wikipedia");
@@ -1606,7 +1606,7 @@ public class SurveyServiceTest {
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Nadel im Heuhaufen " + start);
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
-		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("logo", "https://avatars.githubusercontent.com/u/4559611?s=200&v=4");
 		obj.put("description", "Eine schwer auffindbare Umfrage (Needle in the Haystack).");
 		obj.put("resource", "http://wikipedia.org");
 		obj.put("resource-label", "Wikipedia");
@@ -1626,7 +1626,7 @@ public class SurveyServiceTest {
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Quality Questionnaire " + (new Date()).getTime());
 		obj.put("organization", "Advanced Community Information Systems Group, RWTH Aachen University");
-		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("logo", "https://avatars.githubusercontent.com/u/4559611?s=200&v=4");
 		obj.put("description", "A questionnaire designed to ask for quality");
 		obj.put("lang", "en-US");
 
@@ -1642,7 +1642,7 @@ public class SurveyServiceTest {
 		JSONObject obj = new JSONObject();
 		obj.put("name", "Nadel im Heuhaufen " + (new Date()).getTime());
 		obj.put("organization", "Sucher der heiligen Nadel");
-		obj.put("logo", "http://dbis.rwth-aachen.de/cms/images/logo.jpg");
+		obj.put("logo", "https://avatars.githubusercontent.com/u/4559611?s=200&v=4");
 		obj.put("description", "Ein Fragebogen wie die Nadel im Heuhaufen (Needle in the Haystack)");
 		obj.put("lang", "de-DE");
 
