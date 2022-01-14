@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
       - run: mkdir  bin
       - name: Run Tests
-        run: ./gradlew test
+        run: ./gradlew test --info
   build:
     needs: test
     runs-on: ubuntu-latest
