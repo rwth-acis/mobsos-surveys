@@ -170,19 +170,33 @@ function renderButton(signin){
 	}
 
 	if(signin){
-		$(".oidc-signin").removeClass("btn-success").addClass("btn-default").html("<img style='margin-right:5px' src='" + oidc_logo + "' height='" + size + "px'/> Sign in with <i>" + oidc_name + "</i>");
+		$(".oidc-signin").removeClass("btn-warning").addClass("btn-success").html("<img style='margin-right:5px' src='" + oidc_logo + "' height='" + size + "px'/> Sign in with <i>" + oidc_name + "</i>");
 		$(".oidc-signin").click(function (e){
 			var url = oidc_provider_config.authorization_endpoint + "?redirect_uri=" + encodeURIComponent(oidc_redirect)
 				+ "&response_type=id_token%20token&client_id=" + encodeURIComponent(oidc_clientid) + "&scope="
-				+ encodeURIComponent(oidc_scope);
+				+ encodeURIComponent(oidc_scope)
+				+'&nonce='+randomNonce(12);
 			window.location.href = url;
 		});
 	} else {
-		$(".oidc-signin").removeClass("btn-default").addClass("btn-success").html("<img style='margin-right:5px;' height='" + size + "px' src='" + oidc_logo + "'/> " + oidc_userinfo.name);
+		$(".oidc-signin").removeClass("btn-success").addClass("btn-warning").html("<img style='margin-right:5px;' height='" + size + "px' src='" + oidc_logo + "'/> Sign out [" + oidc_userinfo.preferred_username + "]");
 		$(".oidc-signin").click(function (e){
-			window.location.href = oidc_server;
+			var url = oidc_provider_config.end_session_endpoint + "?redirect_uri=" + encodeURIComponent(oidc_redirect)
+					+ "&response_type=id_token%20token&client_id=" + encodeURIComponent(oidc_clientid) + "&scope="
+					+ encodeURIComponent(oidc_scope)
+					+'&nonce='+randomNonce(12);
+			window.location.href = url;
 		});
 	}
+}
+
+function randomNonce(length) {
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	for(var i = 0; i < length; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return text;
 }
 
 /**

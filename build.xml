@@ -279,21 +279,7 @@
 	
 	
     <!-- XML Agent Generation (Builds Jar first so that Generator is available)-->
-    <target name="generate_service_agent" depends="jar">
-        <echo message="Writing Service Agent XML to ${service_agent.path}"/>
-        <java classname="i5.las2peer.tools.ServiceAgentGenerator"
-            classpathref="libraries"
-            failonerror="true"
-            fork="true"
-            output="${service_agent.path}"
-            >
-            <arg line="'${service.name}.${service.class}' '${service.password}'"/>
-        </java>
-    </target>
-	
 	<available file="${user_agent1.path}" property="agent1_exists"/>
-	<available file="${anonymous_agent.path}" property="anonymous_exists"/>
-	
     <target name="generate_user_agent1" depends="jar" unless="agent1_exists">
         <echo message="Writing User Agent 1 XML to ${user_agent1.path}"/>
         <java classname="i5.las2peer.tools.UserAgentGenerator"
@@ -306,22 +292,8 @@
         </java>
     </target>
 	
-	<target name="generate_anonymous_agent" depends="jar" unless="anonymous_exists">
-		<echo message="Writing Anonymous Agent XML to ${anonymous_agent.path}"/>
-        <java classname="i5.las2peer.tools.UserAgentGenerator"
-            classpathref="libraries"
-            failonerror="true"
-            fork="true"
-            output="${anonymous_agent.path}"
-            >
-            <arg line="'${las2peer_anonymous.password}' '${las2peer_anonymous.name}' '${las2peer_anonymous.email}'"/>
-        </java>
-    </target>
-	
-    <target name="generate_configs" depends="generate_service_agent, generate_user_agent1">
-<echo file="${passphrases.path}" append="false">agent-service-${service.name}.xml;${service.password}
-agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}
-</echo>
+    <target name="generate_configs" depends="generate_user_agent1">
+        <echo file="${passphrases.path}" append="false">agent-user-${las2peer_user1.name}.xml;${las2peer_user1.password}</echo>
     </target>
 	
 	

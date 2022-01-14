@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                <li><a href="${EP_URL}questionnaires">${questionnaires}</a></li>
 			   <li><a href="${EP_URL}surveys">${surveys}</a></li>
              </ul>    
-              <span class="oidc-signin navbar-btn navbar-right btn-default"
+              <span class="oidc-signin navbar-btn navbar-right"
 					data-callback="signinCallback"
 					data-name="${OIDC_PROV_NAME}"
 					data-size="sm"
@@ -167,27 +167,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 							</span>
 						</div>
 					</div>
-					
-					<body>
+
 					<div class="col-md12 form-group">
+						<!--
 						<label for="i_survey_quest">${questionnaire}</label>
-						<!-- 
 						<div id="i_survey_quest">
 							<input type="text" id="i_survey_qid" class="form-control" placeholder="${questionnaire} ID">
 						</div>
-						
+
 						<div id="custom-templates">
 						  <input id="i_survey_qselect" class="form-control typeahead" type="text" placeholder="${questionnaire}">
 						</div>
 						-->
-						
+
 						<div>
 							<select id="i_survey_qpick" class="form-control">
 								<!-- questionnaire options inserted dynamically -->
 							</select>
 						</div>
 					</div>
-					
+
 					<div class="col-md-3 form-group">
 						<input id="i_survey_submit" class="form-control btn btn-default" type="button" value="${create}" />
 					</div>
