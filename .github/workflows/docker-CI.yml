@@ -18,6 +18,8 @@ jobs:
         run: |
           sudo /etc/init.d/mysql start
           mysql -uroot -proot < etc/sql/schema.sql
+      - name: Grant Gradle permissions
+        run: chmod +x gradlew
       - name: Run Tests
         run: ./gradlew test
   build:
