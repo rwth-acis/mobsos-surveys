@@ -19,7 +19,7 @@ jobs:
           sudo /etc/init.d/mysql start
           mysql -uroot -proot < etc/sql/schema.sql
       - name: Run Tests
-        run: ant all
+        run: ./gradlew test
   build:
     needs: test
     runs-on: ubuntu-latest
