@@ -18,4 +18,5 @@ form.html
 
 # Ignore Gradle build output directory
 build
-bin/
+bin/*
+app/bin/
