@@ -73,10 +73,10 @@ public class SurveyDataFill {
 	private static WebConnector connector;
 	private static MiniClient c1;
 	private static ByteArrayOutputStream logStream;
-	private static UserAgentImpl user;
+	private static UserAgentImpl testAgent;
 
 	private static final ServiceNameVersion testServiceClass = new ServiceNameVersion(
-			SurveyService.class.getCanonicalName(), "0.3");
+			SurveyService.class.getCanonicalName(), "0.4");
 
 	/**
 	 * Called before the tests start.
@@ -90,12 +90,13 @@ public class SurveyDataFill {
 
 		// start node
 		node = new LocalNodeManager().newNode();
-
-		user = MockAgentFactory.getAdam();
-
-		node.storeAgent(user);
-
+		
 		node.launch();
+
+		testAgent = MockAgentFactory.getAdam();
+		testAgent.unlock("adamspass");
+		node.storeAgent(testAgent);
+
 
 		ServiceAgentImpl testService = ServiceAgentImpl.createServiceAgent(testServiceClass, "a pass");
 		testService.unlock("a pass");
@@ -115,7 +116,7 @@ public class SurveyDataFill {
 
 		c1 = new MiniClient();
 		c1.setConnectorEndpoint(connector.getHttpEndpoint());
-		c1.setLogin(user.getIdentifier(), "adamspass");
+		c1.setLogin(testAgent.getIdentifier(), "adamspass");
 
 		// String xml=RESTMapper.mergeXMLs(new String[]{RESTMapper.getMethodsAsXML(SurveyService.class)});
 		// System.out.println(xml);
