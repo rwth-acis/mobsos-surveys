@@ -13,7 +13,7 @@ WORKDIR /src
 
 # run the rest as unprivileged user
 USER las2peer
-
+RUN mkdir bin
 RUN chmod +x ./gradlew && ./gradlew build --exclude-task test
 RUN chmod +x /src/docker-entrypoint.sh
 
