@@ -18,7 +18,6 @@ jobs:
         run: |
           sudo /etc/init.d/mysql start
           mysql -uroot -proot < etc/sql/schema.sql
-          mysql show variables like 'tls_version';
       - name: Grant Gradle permissions
         run: chmod +x gradlew
       - run: mkdir  bin
