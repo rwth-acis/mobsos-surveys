@@ -1398,6 +1398,7 @@ public class SurveyServiceTest {
 			HashMap lang = new HashMap<String, String>();
 			lang.put("accept-language", "de-DE");
 			ClientResponse qsfres = c1.sendRequest("GET", path2 + "/questionnaire", "", "*/*", "text/html", lang);
+			System.out.println(qsfres.getResponse());
 			assertEquals(200, qsfres.getHttpCode());
 
 		} catch (MalformedURLException e) {

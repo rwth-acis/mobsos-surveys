@@ -6,7 +6,7 @@ plugins {
 
 repositories {
     // Use JCenter for resolving dependencies.
-    jcenter()
+    mavenCentral()
 
     // DBIS Archiva
     maven {
@@ -22,7 +22,7 @@ dependencies {
     // compileOnly will be moved into the lib dir afterwards
     implementation "i5:las2peer-bundle:${project.property('core.version')}"
     implementation "com.googlecode.json-simple:json-simple:1.1"
-      implementation "mysql:mysql-connector-java:8.0.13"
+    implementation "mysql:mysql-connector-java:8.0.13"
     implementation "org.apache.commons:commons-pool2:2.2"
     implementation "org.apache.commons:commons-dbcp2:2.0"
     implementation "org.apache.commons:commons-lang3:3.3.2"
@@ -230,6 +230,7 @@ task cleanAll {
 
 test {
     workingDir = file("$rootDir")
+    failFast = true
 }
 
 // Only required when using Eclipse:
