@@ -230,6 +230,7 @@ task cleanAll {
 
 test {
     workingDir = file("$rootDir")
+    failFast = true
 }
 
 // Only required when using Eclipse:
