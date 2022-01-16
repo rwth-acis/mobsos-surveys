@@ -327,6 +327,8 @@ public class SurveyDataFill {
 				"*/*", new HashMap<String, String>());
 		JSONObject o;
 
+		System.out.println(r.getResponse());
+
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
 
 		System.out.println(o.toJSONString());
