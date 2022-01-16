@@ -122,8 +122,8 @@ public class SurveyDataFill {
 		// System.out.println(xml);
 
 		// first delete all surveys & questionnaires
-		c1.sendRequest("DELETE", "mobsos/surveys", "");
-		c1.sendRequest("DELETE", "mobsos/questionnaires", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/surveys", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/questionnaires", "");
 	}
 
 	/**
