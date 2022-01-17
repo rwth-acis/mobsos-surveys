@@ -2,8 +2,8 @@ drop schema if exists mobsos;
 create schema if not exists mobsos default character set utf8 collate utf8_general_ci;
 use mobsos;
 
-grant usage on *.* to mobsos@localhost identified by 'mobsosrules'; 
-grant all privileges on mobsos.* to mobsos@localhost;
+create user 'mobsos'@'%' identified by 'mobsosrules';
+grant all privileges on mobsos.* to 'mobsos'@'%' with grant option;
 
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
@@ -46,7 +46,7 @@ create table survey (
     constraint survey_q_fk foreign key (qid)
         references questionnaire (id)
         on delete cascade on update no action,
-    constraint survey_time check (end_time > start_time)
+    constraint survey_time check (end > start)
 );
 
 create index idx_s_owner on survey(owner);
@@ -61,7 +61,7 @@ create table response (
     id bigint not null auto_increment,
     uid varchar(128) not null,
     sid mediumint not null,
-    qkey varchar(32) not null,
+    qkey varchar(36) not null,
     qval varchar(512) not null,
     time datetime not null,
     constraint res_pk primary key (id),
