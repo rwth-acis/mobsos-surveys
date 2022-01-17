@@ -122,8 +122,8 @@ public class SurveyDataFill {
 		// System.out.println(xml);
 
 		// first delete all surveys & questionnaires
-		c1.sendRequest("DELETE", "mobsos/surveys", "");
-		c1.sendRequest("DELETE", "mobsos/questionnaires", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/surveys", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/questionnaires", "");
 	}
 
 	/**
@@ -326,6 +326,8 @@ public class SurveyDataFill {
 		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", q.toJSONString(), "application/json",
 				"*/*", new HashMap<String, String>());
 		JSONObject o;
+
+		System.out.println(r.getResponse());
 
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
 
