@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop,gradle ]
 
 jobs:
   test:
@@ -18,8 +18,11 @@ jobs:
         run: |
           sudo /etc/init.d/mysql start
           mysql -uroot -proot < etc/sql/schema.sql
+      - name: Grant Gradle permissions
+        run: chmod +x gradlew
+      - run: mkdir  bin
       - name: Run Tests
-        run: ant all
+        run: ./gradlew test --info
   build:
     needs: test
     runs-on: ubuntu-latest
