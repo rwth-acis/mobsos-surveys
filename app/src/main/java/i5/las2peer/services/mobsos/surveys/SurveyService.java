@@ -179,7 +179,7 @@ public class SurveyService extends RESTService {
 		dataSource.setDriverClassName(jdbcDriverClassName);
 		dataSource.setUsername(jdbcLogin);
 		dataSource.setPassword(jdbcPass);
-		dataSource.setUrl(jdbcUrl + jdbcSchema);
+		dataSource.setUrl(jdbcUrl + jdbcSchema + "?autoReconnect=true&useSSL=false");
 		dataSource.setValidationQuery("select 1");
 		dataSource.setDefaultQueryTimeout(1000);
 		dataSource.setMaxConnLifetimeMillis(100000);
