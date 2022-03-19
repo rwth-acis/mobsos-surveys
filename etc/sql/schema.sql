@@ -1,4 +1,3 @@
-drop schema if exists mobsos;
 create schema if not exists mobsos default character set utf8 collate utf8_general_ci;
 use mobsos;
 
@@ -8,7 +7,7 @@ grant all privileges on mobsos.* to 'mobsos'@'%' with grant option;
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
 -- -----------------------------------------------------
-create table questionnaire (
+create table questionnaire if not exists(
     id mediumint not null auto_increment,
     owner varchar(128) not null,
     organization varchar(128) not null,
@@ -28,7 +27,7 @@ create index idx_q_log on questionnaire (logo);
 -- -----------------------------------------------------
 -- Definition table 'survey'
 -- -----------------------------------------------------
-create table survey (
+create table survey if not exists(
     id mediumint not null auto_increment,
     owner varchar(128) not null,
     organization varchar(128) not null,
@@ -57,7 +56,7 @@ create index idx_s_topic on survey(resource);
 -- -----------------------------------------------------
 -- Definition table 'response'
 -- -----------------------------------------------------
-create table response (
+create table response if not exists(
     id bigint not null auto_increment,
     uid varchar(128) not null,
     sid mediumint not null,
@@ -71,7 +70,7 @@ create table response (
         on delete cascade on update no action
 );
 
-create table feedback (
+create table feedback if not exists(
     user_id varchar(128) not null,
     client_id varchar(128) not null,
     rating smallint not null,
