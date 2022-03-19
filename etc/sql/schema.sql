@@ -7,7 +7,7 @@ grant all privileges on mobsos.* to 'mobsos'@'%' with grant option;
 -- -----------------------------------------------------
 -- Definition table 'questionnaire'
 -- -----------------------------------------------------
-create table questionnaire if not exists(
+create table questionnaire (
     id mediumint not null auto_increment,
     owner varchar(128) not null,
     organization varchar(128) not null,
@@ -27,7 +27,7 @@ create index idx_q_log on questionnaire (logo);
 -- -----------------------------------------------------
 -- Definition table 'survey'
 -- -----------------------------------------------------
-create table survey if not exists(
+create table survey (
     id mediumint not null auto_increment,
     owner varchar(128) not null,
     organization varchar(128) not null,
@@ -56,7 +56,7 @@ create index idx_s_topic on survey(resource);
 -- -----------------------------------------------------
 -- Definition table 'response'
 -- -----------------------------------------------------
-create table response if not exists(
+create table response (
     id bigint not null auto_increment,
     uid varchar(128) not null,
     sid mediumint not null,
@@ -70,7 +70,7 @@ create table response if not exists(
         on delete cascade on update no action
 );
 
-create table feedback if not exists(
+create table feedback (
     user_id varchar(128) not null,
     client_id varchar(128) not null,
     rating smallint not null,
