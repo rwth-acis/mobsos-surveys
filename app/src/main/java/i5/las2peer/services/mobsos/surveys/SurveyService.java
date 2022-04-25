@@ -4861,7 +4861,6 @@ public class SurveyService extends RESTService {
 		private JSONObject extractQuestionInformation(Document questionnaireDocument) {
 
 			JSONObject questions = new JSONObject();
-			Map orderedQuestions = new HashMap();
 
 			NodeList nodeList = questionnaireDocument.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
 			for (int i = 0; i < nodeList.getLength(); i++) {
@@ -4895,12 +4894,10 @@ public class SurveyService extends RESTService {
 						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
 						question.put("instructions",instructionNode.getTextContent());
 
-						orderedQuestions.put(e.getAttribute("qid"), question);
+						questions.put(e.getAttribute("qid"), question);
 					}
 				}
 			}
-
-			questions = (JSONObject) orderedQuestions;
 			return questions;
 		}
 
