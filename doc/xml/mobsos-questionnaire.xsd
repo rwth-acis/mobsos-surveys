@@ -60,6 +60,7 @@
 		</xsd:sequence>
 		<xsd:attribute name="url" type="xsd:anyURI" use="optional"/>
 		<xsd:attribute ref="xml:lang"/>
+		<xsd:attribute name="score" type="xsd:string" use="optional"/>
 	</xsd:complexType>
 	<!-- Pages -->
 	<!-- Definition of "PageType" -->
