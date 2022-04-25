@@ -4633,7 +4633,6 @@ public class SurveyService extends RESTService {
 		private Document validateQuestionnaireData(String data) throws SAXException, IOException {
 			// parse and validate.
 			ByteArrayInputStream stringIS = new ByteArrayInputStream(data.getBytes());
-			System.out.println("questionnaire data "+data);
 			Document doc = service.parser.parse(stringIS);
 			service.validator.validate(new DOMSource(doc));
 			return doc;
@@ -4862,7 +4861,7 @@ public class SurveyService extends RESTService {
 		private JSONObject extractQuestionInformation(Document questionnaireDocument) {
 
 			JSONObject questions = new JSONObject();
-			Map orderedQuestions = new LinkedHashMap();
+			Map orderedQuestions = new HashMap();
 
 			NodeList nodeList = questionnaireDocument.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
 			for (int i = 0; i < nodeList.getLength(); i++) {
