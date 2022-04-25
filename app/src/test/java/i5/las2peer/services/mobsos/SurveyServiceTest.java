@@ -288,7 +288,7 @@ public class SurveyServiceTest {
 	public void testBadRequestQuestionnaireCreation() {
 		JSONObject invalidQuestionnaire = generateQuestionnaireJSON(); // until now, questionnaire JSON is ok. Introduce
 																		// problems now...
-		invalidQuestionnaire.put("name", new Integer(2)); // name must be string
+		invalidQuestionnaire.put("name", Integer.valueOf("2")); // name must be string
 
 		ClientResponse result;
 
@@ -748,7 +748,7 @@ public class SurveyServiceTest {
 		// now try creating surveys with invalid data
 
 		JSONObject invalidSurvey = generateSurveyJSON(); // until now, survey JSON is ok. Introduce problems now...
-		invalidSurvey.put("name", new Integer(2)); // name must be string
+		invalidSurvey.put("name", Integer.valueOf("2")); // name must be string
 
 		ClientResponse result = c1.sendRequest("POST", "mobsos-surveys/surveys", invalidSurvey.toJSONString(),
 				"application/json", "*/*", new HashMap<String, String>());
