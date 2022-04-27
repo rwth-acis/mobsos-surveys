@@ -4893,7 +4893,7 @@ public class SurveyService extends RESTService {
 						}
 						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
 						question.put("instructions",instructionNode.getTextContent());
-
+						question.put("order",i);
 						questions.put(e.getAttribute("qid"), question);
 					}
 				}
