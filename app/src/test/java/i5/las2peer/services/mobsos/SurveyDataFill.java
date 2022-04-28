@@ -122,8 +122,8 @@ public class SurveyDataFill {
 		// System.out.println(xml);
 
 		// first delete all surveys & questionnaires
-		c1.sendRequest("DELETE", "mobsos/surveys", "");
-		c1.sendRequest("DELETE", "mobsos/questionnaires", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/surveys", "");
+		c1.sendRequest("DELETE", "mobsos-surveys/questionnaires", "");
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/sus-questionnaire-en.xml";
 
@@ -181,7 +181,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/sumi-questionnaire-en.xml";
 
@@ -202,7 +202,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/use-questionnaire.xml";
 
@@ -223,7 +223,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/ueq-questionnaire-en.xml";
 
@@ -244,7 +244,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/tam-questionnaire.xml";
 
@@ -265,7 +265,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/tam2-questionnaire.xml";
 
@@ -286,7 +286,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/is-impact-questionnaire.xml";
 
@@ -307,7 +307,7 @@ public class SurveyDataFill {
 			q.put("lang", "en-US");
 			q.put("organization",
 					"Advanced Community Information Systems (ACIS) Group, RWTH Aachen University, Germany");
-			q.put("logo", "http://dbis.rwth-aachen.de/cms/research/ACIS/ACIS%20Logo%20Transparent.png");
+
 
 			String qfuri = "./doc/xml/questionnaires/eucs-questionnaire-en.xml";
 
@@ -326,6 +326,8 @@ public class SurveyDataFill {
 		ClientResponse r = c1.sendRequest("POST", "mobsos-surveys/questionnaires", q.toJSONString(), "application/json",
 				"*/*", new HashMap<String, String>());
 		JSONObject o;
+
+		System.out.println(r.getResponse());
 
 		o = (JSONObject) JSONValue.parse(r.getResponse().trim());
 

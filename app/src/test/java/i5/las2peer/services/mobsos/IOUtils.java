@@ -18,11 +18,16 @@ import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 public class IOUtils {
+	@Test
+	public void test() {
+	}
 	// Returns the contents of the file in a byte array.
+
 	public static synchronized byte[] getBytesFromFile(File file) throws FileNotFoundException, IOException {
 		InputStream is = new BufferedInputStream(new FileInputStream(file));
 
@@ -93,24 +98,25 @@ public class IOUtils {
 		}
 
 		/*
-		String file = ""; 
-		try {
-		
-		    InputStream is = new FileInputStream(filename);
-		    String UTF8 = "utf-8";
-		    int BUFFER_SIZE = 8192;
-		
-		    BufferedReader br = new BufferedReader(new InputStreamReader(is,
-		            UTF8), BUFFER_SIZE);
-		    String str;
-		    while ((str = br.readLine()) != null) {
-		        file += str;
-		    }
-		    return file;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "ERRR";
-		}*/
+		 * String file = "";
+		 * try {
+		 * 
+		 * InputStream is = new FileInputStream(filename);
+		 * String UTF8 = "utf-8";
+		 * int BUFFER_SIZE = 8192;
+		 * 
+		 * BufferedReader br = new BufferedReader(new InputStreamReader(is,
+		 * UTF8), BUFFER_SIZE);
+		 * String str;
+		 * while ((str = br.readLine()) != null) {
+		 * file += str;
+		 * }
+		 * return file;
+		 * } catch (Exception e) {
+		 * e.printStackTrace();
+		 * return "ERRR";
+		 * }
+		 */
 	}
 
 	public static synchronized void writeBytesToFile(File destination, byte[] bytes)

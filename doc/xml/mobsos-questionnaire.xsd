@@ -57,6 +57,7 @@
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Page" type="qu:PageType" maxOccurs="unbounded"/>
+			<xsd:element name="Score" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 		</xsd:sequence>
 		<xsd:attribute name="url" type="xsd:anyURI" use="optional"/>
 		<xsd:attribute ref="xml:lang"/>

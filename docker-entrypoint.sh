@@ -92,7 +92,7 @@ echo "${MYSQL_HOST}:${MYSQL_PORT} is available. Continuing..."
 # Create and migrate the database on first run
 if ! mysql -h${MYSQL_HOST} -P${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e "desc ${MYSQL_DATABASE}.questionnaire" > /dev/null 2>&1; then
     echo "Creating database schema..."
-    mysql -h${MYSQL_HOST} -P${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < ${CREATE_DB_SQL}
+    mysql -h${MYSQL_HOST} -P${MYSQL_PORT} -u${MYSQL_USER} -p${MYSQL_PASSWORD}  < ${CREATE_DB_SQL}
 fi
 
 # wait for any bootstrap host to be available
@@ -125,7 +125,7 @@ function selectMnemonic {
 
 # prevent glob expansion in lib/*
 set -f
-LAUNCH_COMMAND='java -cp lib/* i5.las2peer.tools.L2pNodeLauncher -s service -p '"${LAS2PEER_PORT} ${SERVICE_EXTRA_ARGS}"
+LAUNCH_COMMAND='java -cp lib/* --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED i5.las2peer.tools.L2pNodeLauncher -s service -p '"${LAS2PEER_PORT} ${SERVICE_EXTRA_ARGS}"
 if [[ ! -z "${BOOTSTRAP}" ]]; then
     LAUNCH_COMMAND="${LAUNCH_COMMAND} -b ${BOOTSTRAP}"
 fi

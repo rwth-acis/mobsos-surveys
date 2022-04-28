@@ -179,7 +179,7 @@ public class SurveyService extends RESTService {
 		dataSource.setDriverClassName(jdbcDriverClassName);
 		dataSource.setUsername(jdbcLogin);
 		dataSource.setPassword(jdbcPass);
-		dataSource.setUrl(jdbcUrl + jdbcSchema);
+		dataSource.setUrl(jdbcUrl + jdbcSchema + "?autoReconnect=true&useSSL=false");
 		dataSource.setValidationQuery("select 1");
 		dataSource.setDefaultQueryTimeout(1000);
 		dataSource.setMaxConnLifetimeMillis(100000);
@@ -4633,7 +4633,6 @@ public class SurveyService extends RESTService {
 		private Document validateQuestionnaireData(String data) throws SAXException, IOException {
 			// parse and validate.
 			ByteArrayInputStream stringIS = new ByteArrayInputStream(data.getBytes());
-			System.out.println("questionnaire data "+data);
 			Document doc = service.parser.parse(stringIS);
 			service.validator.validate(new DOMSource(doc));
 			return doc;
@@ -4862,7 +4861,6 @@ public class SurveyService extends RESTService {
 		private JSONObject extractQuestionInformation(Document questionnaireDocument) {
 
 			JSONObject questions = new JSONObject();
-			Map orderedQuestions = new LinkedHashMap();
 
 			NodeList nodeList = questionnaireDocument.getElementsByTagNameNS(MOBSOS_QUESTIONNAIRE_NS, "Page");
 			for (int i = 0; i < nodeList.getLength(); i++) {
@@ -4895,13 +4893,11 @@ public class SurveyService extends RESTService {
 						}
 						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
 						question.put("instructions",instructionNode.getTextContent());
-
-						orderedQuestions.put(e.getAttribute("qid"), question);
+						question.put("order",i);
+						questions.put(e.getAttribute("qid"), question);
 					}
 				}
 			}
-
-			questions = (JSONObject) orderedQuestions;
 			return questions;
 		}
 
