@@ -126,6 +126,16 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         document.body.removeChild(link);
       },
 
+      _handleAddQuestion: function () {
+        var rowNode = document.createElement("mobsos-questionnaire-row");
+        rowNode.addEventListener(
+          "delete-question",
+          this._handleDeleteQuestion.bind(this)
+        );
+        var dragHandleNode = document.createElement("iron-icon");
+        dragHandleNode.setAttribute("class", "drag-handle");
+        dragHandleNode.setAttribute("icon", "editor:drag-handle");
+        var questionNode = document.createElement("mobsos-question-editor");
         questionNode.setAttribute(
           "qid",
           `\{\{q.${this.$.questionnaire.children.length}\}\}`
@@ -136,16 +146,18 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         Polymer.dom(rowNode).appendChild(questionNode);
 
         Polymer.dom(this.$.questionnaire).appendChild(rowNode);
-        rowNode.playAnimation('entry');
+        rowNode.playAnimation("entry");
       },
 
-      _handleDeleteQuestion: function(event) {
-        event.target.addEventListener('neon-animation-finish', function() {
-          Polymer.dom(this.$.questionnaire).removeChild(event.target);
-        }.bind(this));
-        event.target.playAnimation('exit');
-      }
-
+      _handleDeleteQuestion: function (event) {
+        event.target.addEventListener(
+          "neon-animation-finish",
+          function () {
+            Polymer.dom(this.$.questionnaire).removeChild(event.target);
+          }.bind(this)
+        );
+        event.target.playAnimation("exit");
+      },
     });
   </script>
 </dom-module>
