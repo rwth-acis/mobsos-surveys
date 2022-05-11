@@ -66,11 +66,10 @@ An editor for editing questios in MobSOS.
 
     <paper-input id="title" value="{{title}}" label="Title"></paper-input>
 
-    <paper-input id="instructions" value="{{instructions}}" label="Question or instructions"></paper-input>
+    <paper-input id="quid" value="{{qid}}" label="Question id"></paper-input>
 
     <div id="ordinal-scale-segment" hidden$="[[_hideOrdinalScaleSegment(pageType)]]">
       <div class="flex-horizontal">
-
         <div class="left-column">
           <paper-input id="ordinal-minval" type="number" value="{{minValue}}" max="{{maxValue}}"></paper-input>
         </div>
@@ -143,6 +142,11 @@ An editor for editing questios in MobSOS.
          */
         title: String,
         /**
+         * The instructions id of the question or information page.
+         * The ids can be used in the score calculation.
+         */
+        qid: String,
+        /**
          * The instructions of the question or information.
          */
         instructions: String,
@@ -182,35 +186,68 @@ An editor for editing questios in MobSOS.
        *
        * @return {string} a MobSOS XML node of the question page.
        */
-      exportXML: function() {
-        var xml = '<qu:Page xsi:type="qu:' + this.pageType + '"\n' +
-                '  name="' + this.title + '"'
+      exportXML: function () {
+        var xml =
+          '<qu:Page xsi:type="qu:' +
+          this.pageType +
+          '"\n' +
+          '  name="' +
+          this.title +
+          '"';
 
         switch (this.pageType) {
-          case 'OrdinalScaleQuestionPageType':
-            xml += '\n  qid="' + uuid.v4() + '"\n' +
-                    '  required="' + this.required + '"\n' +
-                    '  minval="' + this.minValue + '"\n' +
-                    '  maxval="' + this.maxValue + '"\n' +
-                    '  minlabel="' + this.minLabel + '"\n' +
-                    '  maxlabel="' + this.maxLabel + '"';
+          case "OrdinalScaleQuestionPageType":
+            xml +=
+              '\n  qid="' +
+              (quid || uuid.v4()) +
+              '"\n' +
+              '  required="' +
+              this.required +
+              '"\n' +
+              '  minval="' +
+              this.minValue +
+              '"\n' +
+              '  maxval="' +
+              this.maxValue +
+              '"\n' +
+              '  minlabel="' +
+              this.minLabel +
+              '"\n' +
+              '  maxlabel="' +
+              this.maxLabel +
+              '"';
             break;
-          case 'DichotomousQuestionPageType':
-            xml += '\n  qid="' + uuid.v4() + '"\n' +
-                    '  required="' + this.required + '"\n' +
-                    '  minlabel="' + this.minLabel + '"\n' +
-                    '  maxlabel="' + this.maxLabel + '"';
+          case "DichotomousQuestionPageType":
+            xml +=
+              '\n  qid="' +
+              uuid.v4() +
+              '"\n' +
+              '  required="' +
+              this.required +
+              '"\n' +
+              '  minlabel="' +
+              this.minLabel +
+              '"\n' +
+              '  maxlabel="' +
+              this.maxLabel +
+              '"';
             break;
-          case 'FreeTextQuestionPageType':
-            xml += '\n  qid="' + uuid.v4() + '"\n' +
-                    '  required="' + this.required + '"';
+          case "FreeTextQuestionPageType":
+            xml +=
+              '\n  qid="' +
+              uuid.v4() +
+              '"\n' +
+              '  required="' +
+              this.required +
+              '"';
         }
 
-        xml += '>\n' +
-                '  <qu:Instructions>' +
-                this.instructions +
-                '</qu:Instructions>\n' +
-                '</qu:Page>';
+        xml +=
+          ">\n" +
+          "  <qu:Instructions>" +
+          this.instructions +
+          "</qu:Instructions>\n" +
+          "</qu:Page>";
 
         return xml;
       },
