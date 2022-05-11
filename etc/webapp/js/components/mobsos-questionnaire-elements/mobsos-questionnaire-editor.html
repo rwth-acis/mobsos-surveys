@@ -63,9 +63,12 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
       </sortable-js>
 
       <div class="buttonbar">
-        <paper-button on-tap="_handleAddQuestion" raised><iron-icon icon="add"></iron-icon>Add page</paper-button>
+        <paper-button on-tap="_handleAddQuestion" raised
+          ><iron-icon icon="add"></iron-icon>Add page</paper-button
+        >
+        <br />
+        <paper-input id="score" label="Score"></paper-input>
       </div>
-
     </div>
 
   </template>
@@ -94,7 +97,11 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
           xml += questionNode.exportXML() + '\n\n';
         }
 
-        xml += '</qu:Questionnaire>';
+        const scoreNode = this.$.querySelector("#score");
+        if (scoreNode?.value) {
+          xml += `<qu:Score> ${scoreNode.value}</qu:Score>`;
+        }
+        xml += "</qu:Questionnaire>";
 
         return xml;
       },
@@ -119,13 +126,10 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         document.body.removeChild(link);
       },
 
-      _handleAddQuestion: function() {
-        var rowNode = document.createElement('mobsos-questionnaire-row');
-        rowNode.addEventListener('delete-question', this._handleDeleteQuestion.bind(this));
-        var dragHandleNode = document.createElement('iron-icon');
-        dragHandleNode.setAttribute('class', 'drag-handle');
-        dragHandleNode.setAttribute('icon', 'editor:drag-handle');
-        var questionNode = document.createElement('mobsos-question-editor');
+        questionNode.setAttribute(
+          "qid",
+          `\{\{q.${this.$.questionnaire.children.length}\}\}`
+        );
 
         // we need to use the Polymer method here, otherwise the question is not stamped within the local DOM...
         Polymer.dom(rowNode).appendChild(dragHandleNode);
