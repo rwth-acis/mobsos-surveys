@@ -1,11 +1,14 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu-light.html">
-<link rel="import" href="../paper-listbox/paper-listbox.html">
-<link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../polymer/polymer.html" />
+<link rel="import" href="../paper-input/paper-input.html" />
+<link
+  rel="import"
+  href="../paper-dropdown-menu/paper-dropdown-menu-light.html"
+/>
+<link rel="import" href="../paper-listbox/paper-listbox.html" />
+<link rel="import" href="../paper-item/paper-item.html" />
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html" />
+<link rel="import" href="../paper-radio-button/paper-radio-button.html" />
 
 <script src="../node-uuid/uuid.js"></script>
 
@@ -19,7 +22,6 @@ An editor for editing questios in MobSOS.
 <dom-module id="mobsos-question-editor">
   <template>
     <style>
-
       :host {
         display: block;
         max-width: 600px;
@@ -29,15 +31,15 @@ An editor for editing questios in MobSOS.
         --paper-input-container-input: {
           font-size: 24px;
           font-weight: 400;
-        };
+        }
       }
 
       .flex-horizontal {
-        @apply(--layout-horizontal);
+        @apply (--layout-horizontal);
       }
 
       .flexchild {
-        @apply(--layout-flex);
+        @apply (--layout-flex);
       }
 
       .left-column {
@@ -52,81 +54,123 @@ An editor for editing questios in MobSOS.
       paper-toggle-button {
         margin-top: 30px;
       }
-
     </style>
 
     <paper-dropdown-menu-light label="Page type">
-      <paper-listbox class="dropdown-content" attr-for-selected="page-type" selected="{{pageType}}">
+      <paper-listbox
+        class="dropdown-content"
+        attr-for-selected="page-type"
+        selected="{{pageType}}"
+      >
         <paper-item page-type="InformationPageType">Information</paper-item>
-        <paper-item page-type="OrdinalScaleQuestionPageType">Ordinal scale question</paper-item>
-        <paper-item page-type="DichotomousQuestionPageType">Dichotomous question</paper-item>
-        <paper-item page-type="FreeTextQuestionPageType">Free text question</paper-item>
+        <paper-item page-type="OrdinalScaleQuestionPageType"
+          >Ordinal scale question</paper-item
+        >
+        <paper-item page-type="DichotomousQuestionPageType"
+          >Dichotomous question</paper-item
+        >
+        <paper-item page-type="FreeTextQuestionPageType"
+          >Free text question</paper-item
+        >
       </paper-listbox>
     </paper-dropdown-menu-light>
 
     <paper-input id="title" value="{{title}}" label="Title"></paper-input>
 
-    <paper-input id="quid" value="{{qid}}" label="Question id"></paper-input>
+    <paper-input
+      hidden$="[[_hideOrdinalScaleSegment(pageType)]]"
+      id="quid"
+      value="{{qid}}"
+      label="Question id"
+    ></paper-input>
 
-    <div id="ordinal-scale-segment" hidden$="[[_hideOrdinalScaleSegment(pageType)]]">
+    <div
+      id="ordinal-scale-segment"
+      hidden$="[[_hideOrdinalScaleSegment(pageType)]]"
+    >
       <div class="flex-horizontal">
         <div class="left-column">
-          <paper-input id="ordinal-minval" type="number" value="{{minValue}}" max="{{maxValue}}"></paper-input>
+          <paper-input
+            id="ordinal-minval"
+            type="number"
+            value="{{minValue}}"
+            max="{{maxValue}}"
+          ></paper-input>
         </div>
 
         <div class="flexchild">
-          <paper-input id="ordinal-minlabel" value="{{minLabel}}" label="Label for minimal value"></paper-input>
+          <paper-input
+            id="ordinal-minlabel"
+            value="{{minLabel}}"
+            label="Label for minimal value"
+          ></paper-input>
         </div>
-
       </div>
 
       <div class="flex-horizontal">
-
         <div class="left-column">
-          <paper-input id="ordinal-maxval" type="number" value="{{maxValue}}" min="{{minValue}}"></paper-input>
+          <paper-input
+            id="ordinal-maxval"
+            type="number"
+            value="{{maxValue}}"
+            min="{{minValue}}"
+          ></paper-input>
         </div>
 
         <div class="flexchild">
-          <paper-input id="ordinal-maxlabel" value="{{maxLabel}}" label="Label for maximal value"></paper-input>
+          <paper-input
+            id="ordinal-maxlabel"
+            value="{{maxLabel}}"
+            label="Label for maximal value"
+          ></paper-input>
         </div>
-
       </div>
     </div>
 
-    <div id="dichotomous-segment" hidden$="[[_hideDichotomousSegment(pageType)]]">
+    <div
+      id="dichotomous-segment"
+      hidden$="[[_hideDichotomousSegment(pageType)]]"
+    >
       <div class="flex-horizontal">
-
         <div class="left-column">
           <paper-radio-button disabled></paper-radio-button>
         </div>
 
         <div class="flexchild">
-          <paper-input id="dichotomous-minlabel" value="{{minLabel}}" label="Option 1"></paper-input>
+          <paper-input
+            id="dichotomous-minlabel"
+            value="{{minLabel}}"
+            label="Option 1"
+          ></paper-input>
         </div>
-
       </div>
 
       <div class="flex-horizontal">
-
         <div class="left-column">
           <paper-radio-button disabled></paper-radio-button>
         </div>
 
         <div class="flexchild">
-          <paper-input id="dichotomous-maxlabel" value="{{maxLabel}}" label="Option 2"></paper-input>
+          <paper-input
+            id="dichotomous-maxlabel"
+            value="{{maxLabel}}"
+            label="Option 2"
+          ></paper-input>
         </div>
-
       </div>
     </div>
 
-    <paper-toggle-button id="required" checked="{{required}}" hidden$="[[_hideRequired(pageType)]]">Required</paper-toggle-button>
-
+    <paper-toggle-button
+      id="required"
+      checked="{{required}}"
+      hidden$="[[_hideRequired(pageType)]]"
+      >Required</paper-toggle-button
+    >
   </template>
 
   <script>
     Polymer({
-
-      is: 'mobsos-question-editor',
+      is: "mobsos-question-editor",
 
       properties: {
         /**
@@ -135,7 +179,7 @@ An editor for editing questios in MobSOS.
          */
         pageType: {
           type: String,
-          value: 'InformationPageType'
+          value: "InformationPageType",
         },
         /**
          * The title of the question or information page.
@@ -163,22 +207,22 @@ An editor for editing questios in MobSOS.
          */
         minValue: {
           type: Number,
-          value: 0
+          value: 0,
         },
         /**
          * The maximal value for ordinal scale and dichotomous questions.
          */
         maxValue: {
           type: Number,
-          value: 5
+          value: 5,
         },
         /**
          * Defines for a question, whether it needs to be filled out in the questionnaire.
          */
         required: {
           type: Boolean,
-          value: true
-        }
+          value: true,
+        },
       },
 
       /**
@@ -252,18 +296,17 @@ An editor for editing questios in MobSOS.
         return xml;
       },
 
-      _hideRequired: function(pageType) {
-        return (pageType === 'InformationPageType');
+      _hideRequired: function (pageType) {
+        return pageType === "InformationPageType";
       },
 
-      _hideOrdinalScaleSegment: function(pageType) {
-        return (pageType !== 'OrdinalScaleQuestionPageType');
+      _hideOrdinalScaleSegment: function (pageType) {
+        return pageType !== "OrdinalScaleQuestionPageType";
       },
 
-      _hideDichotomousSegment: function(pageType) {
-        return (pageType !== 'DichotomousQuestionPageType');
-      }
-
+      _hideDichotomousSegment: function (pageType) {
+        return pageType !== "DichotomousQuestionPageType";
+      },
     });
   </script>
 </dom-module>
