@@ -1,12 +1,12 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../polymer-sortablejs/polymer-sortablejs.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-icons/editor-icons.html">
-<link rel="import" href="mobsos-question-editor.html">
-<link rel="import" href="mobsos-questionnaire-row.html">
+<link rel="import" href="../polymer/polymer.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html" />
+<link rel="import" href="../polymer-sortablejs/polymer-sortablejs.html" />
+<link rel="import" href="../paper-button/paper-button.html" />
+<link rel="import" href="../iron-icon/iron-icon.html" />
+<link rel="import" href="../iron-icons/iron-icons.html" />
+<link rel="import" href="../iron-icons/editor-icons.html" />
+<link rel="import" href="mobsos-question-editor.html" />
+<link rel="import" href="mobsos-questionnaire-row.html" />
 
 <!--
 `mobsos-questionnaire-editor`
@@ -19,27 +19,25 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
 <dom-module id="mobsos-questionnaire-editor">
   <template>
     <style>
-
       :host {
         display: block;
       }
 
       .container {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+        @apply (--layout-vertical);
+        @apply (--layout-center);
       }
 
       .buttonbar {
-        @apply(--layout-horizontal);
-        @apply(--layout-end-justified);
+        @apply (--layout-horizontal);
         width: 100%;
         max-width: 652px;
         margin-bottom: 25px;
       }
 
       #questionnaire {
-        @apply(--layout-vertical);
-        @apply(--layout-center);
+        @apply (--layout-vertical);
+        @apply (--layout-center);
         width: 100%;
       }
 
@@ -49,34 +47,29 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         padding: 5px 25px 25px 25px;
         margin-bottom: 15px;
       }
-
     </style>
 
     <div class="container">
-
       <div class="buttonbar">
-        <paper-button on-tap="_handleXMLExport" raised><iron-icon icon="file-download"></iron-icon>Export XML</paper-button>
+        <paper-button on-tap="_handleXMLExport" raised
+          ><iron-icon icon="file-download"></iron-icon>Export XML</paper-button
+        >
       </div>
 
-      <sortable-js id="questionnaire" handle=".drag-handle">
-
-      </sortable-js>
+      <sortable-js id="questionnaire" handle=".drag-handle"> </sortable-js>
 
       <div class="buttonbar">
         <paper-button on-tap="_handleAddQuestion" raised
           ><iron-icon icon="add"></iron-icon>Add page</paper-button
         >
-        <br />
-        <paper-input id="score" label="Score"></paper-input>
       </div>
+      <paper-input id="score" label="Score"></paper-input>
     </div>
-
   </template>
 
   <script>
     Polymer({
-
-      is: 'mobsos-questionnaire-editor',
+      is: "mobsos-questionnaire-editor",
 
       properties: {},
 
@@ -85,19 +78,22 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
        *
        * @return {string} a MobSOS XML representation of the questionnaire.
        */
-      exportXML: function() {
-        var xml = '<?xml version="1.0" encoding="utf-8" ?>\n' +
-                '<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n\n';
+      exportXML: function () {
+        var xml =
+          '<?xml version="1.0" encoding="utf-8" ?>\n' +
+          '<qu:Questionnaire xmlns="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:qu="http://dbis.rwth-aachen.de/mobsos/questionnaire.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n\n';
 
         // now add all the question's XML nodes
-        var questionNodes = this.$.questionnaire.querySelectorAll('mobsos-question-editor');
+        var questionNodes = this.$.questionnaire.querySelectorAll(
+          "mobsos-question-editor"
+        );
 
         for (var i = 0; i < questionNodes.length; i++) {
           var questionNode = questionNodes[i];
-          xml += questionNode.exportXML() + '\n\n';
+          xml += questionNode.exportXML() + "\n\n";
         }
 
-        const scoreNode = this.$.querySelector("#score");
+        const scoreNode = this.$.questionnaire.querySelector("#score");
         if (scoreNode?.value) {
           xml += `<qu:Score> ${scoreNode.value}</qu:Score>`;
         }
@@ -106,12 +102,12 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         return xml;
       },
 
-      _handleXMLExport: function() {
+      _handleXMLExport: function () {
         var xml = this.exportXML();
 
         var filename = "questionnaire.xml";
 
-        var uri = 'data:application/xml;charset=utf-8,' + encodeURI(xml);
+        var uri = "data:application/xml;charset=utf-8," + encodeURI(xml);
 
         // now, let's create a fake <a> tag, and click it to trigger the download dialog.
         // @see {@link https://gist.github.com/beders/467a7fccfccb1744607e}
@@ -138,7 +134,7 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         var questionNode = document.createElement("mobsos-question-editor");
         questionNode.setAttribute(
           "qid",
-          `\{\{q.${this.$.questionnaire.children.length}\}\}`
+          `q.${this.$.questionnaire.children.length}`
         );
 
         // we need to use the Polymer method here, otherwise the question is not stamped within the local DOM...
