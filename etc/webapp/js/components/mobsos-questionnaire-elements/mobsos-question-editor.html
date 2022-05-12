@@ -249,7 +249,7 @@ An editor for editing questios in MobSOS.
           case "OrdinalScaleQuestionPageType":
             xml +=
               '\n  qid="' +
-              (qid || uuid.v4()) +
+              (this.qid || uuid.v4()) +
               '"\n' +
               '  required="' +
               this.required +
