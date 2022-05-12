@@ -36,6 +36,10 @@ configurations {
     testImplementation.extendsFrom implementation
 }
 
+test {
+   failFast = true
+}
+
 jar {
     manifest {
         attributes "Main-Class": "${project.property('service.name')}.${project.property('service.class')}"
