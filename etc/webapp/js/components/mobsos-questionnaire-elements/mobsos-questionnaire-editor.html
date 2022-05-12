@@ -94,6 +94,10 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
           xml += questionNode.exportXML() + "\n\n";
         }
 
+        questionNodes.forEach((node) => {
+          console.log(node);
+        });
+
         const scoreNode = this.$.score.$.input;
         if (scoreNode?.value) {
           xml += `<qu:Score>${scoreNode.value.trim()}</qu:Score>`;
@@ -135,7 +139,7 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         var questionNode = document.createElement("mobsos-question-editor");
         questionNode.setAttribute(
           "qid",
-          `q.${this.$.questionnaire.children.length}`
+          `q_${this.$.questionnaire.children.length}`
         );
 
         // we need to use the Polymer method here, otherwise the question is not stamped within the local DOM...
