@@ -30,6 +30,7 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
 
       .buttonbar {
         @apply (--layout-horizontal);
+        @apply (--layout-between-justified);
         width: 100%;
         max-width: 652px;
         margin-bottom: 25px;
@@ -62,8 +63,9 @@ added via a button. Finally, the questionnaire can be exported as an XML in the 
         <paper-button on-tap="_handleAddQuestion" raised
           ><iron-icon icon="add"></iron-icon>Add page</paper-button
         >
+        <br />
+        <paper-input id="score" label="Score"></paper-input>
       </div>
-      <paper-input id="score" label="Score"></paper-input>
     </div>
   </template>
 

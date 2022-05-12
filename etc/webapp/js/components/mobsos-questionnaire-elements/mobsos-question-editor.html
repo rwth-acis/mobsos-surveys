@@ -84,6 +84,12 @@ An editor for editing questios in MobSOS.
       label="Question id"
     ></paper-input>
 
+    <paper-input
+      id="instructions"
+      value="{{instructions}}"
+      label="Question or instructions"
+    ></paper-input>
+
     <div
       id="ordinal-scale-segment"
       hidden$="[[_hideOrdinalScaleSegment(pageType)]]"
@@ -243,7 +249,7 @@ An editor for editing questios in MobSOS.
           case "OrdinalScaleQuestionPageType":
             xml +=
               '\n  qid="' +
-              (quid || uuid.v4()) +
+              (qid || uuid.v4()) +
               '"\n' +
               '  required="' +
               this.required +
