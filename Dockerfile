@@ -12,8 +12,10 @@ COPY --chown=las2peer:las2peer . /src
 WORKDIR /src
 
 # run the rest as unprivileged user
+RUN dos2unix ./gradlew
+RUN dos2unix /src/gradle.properties
 USER las2peer
-RUN mkdir bin
+RUN mkdir -p bin
 RUN chmod +x ./gradlew && ./gradlew build --exclude-task test
 RUN chmod +x /src/docker-entrypoint.sh
 

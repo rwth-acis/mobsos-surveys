@@ -179,7 +179,8 @@ public class SurveyService extends RESTService {
 		dataSource.setDriverClassName(jdbcDriverClassName);
 		dataSource.setUsername(jdbcLogin);
 		dataSource.setPassword(jdbcPass);
-		dataSource.setUrl(jdbcUrl + jdbcSchema + "?autoReconnect=true&useSSL=false");
+		dataSource.setUrl(jdbcUrl + jdbcSchema
+				+ "?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
 		dataSource.setValidationQuery("select 1");
 		dataSource.setDefaultQueryTimeout(1000);
 		dataSource.setMaxConnLifetimeMillis(100000);
@@ -4633,7 +4634,6 @@ public class SurveyService extends RESTService {
 		private Document validateQuestionnaireData(String data) throws SAXException, IOException {
 			// parse and validate.
 			ByteArrayInputStream stringIS = new ByteArrayInputStream(data.getBytes());
-			System.out.println("questionnaire data "+data);
 			Document doc = service.parser.parse(stringIS);
 			service.validator.validate(new DOMSource(doc));
 			return doc;
@@ -4894,7 +4894,7 @@ public class SurveyService extends RESTService {
 						}
 						Node instructionNode = e.getElementsByTagName("qu:Instructions").item(0);
 						question.put("instructions",instructionNode.getTextContent());
-
+						question.put("order",i);
 						questions.put(e.getAttribute("qid"), question);
 					}
 				}
