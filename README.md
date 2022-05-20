@@ -122,6 +122,10 @@ The following places should be persisted in volumes in productive scenarios:
 
 *Do not forget to persist you database data*
 
+Dependencies
+---
+The service uses [MobSOS questionnaire elements](https://github.com/rwth-acis/mobsos-questionnaire-elements) for some components
+
 License
 --
 MobSOS Surveys is freely distributable under the [MIT License](https://github.com/rwth-acis/mobsos-survey/blob/master/LICENSE).

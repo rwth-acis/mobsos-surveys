@@ -1,5 +1,4 @@
-drop schema if exists mobsos;
-create schema if not exists mobsos default character set utf8 collate utf8_general_ci;
+create database if not exists `mobsos` default character set utf8 collate utf8_general_ci;
 use mobsos;
 
 create user 'mobsos'@'%' identified by 'mobsosrules';
