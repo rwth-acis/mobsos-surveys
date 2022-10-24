@@ -7,8 +7,8 @@ A simple RESTful service for managing, conducting, and evaluating online surveys
 Requirements
 --
 
-  * Installed Java 8 JDK 
-  * Installed [Apache Ant](https://github.com/rwth-acis/LAS2peer)
+  * Installed Java 8 JDK
+  * Installed Gradle 7.3
   * Installed [mySQL 5](http://www.mysql.com/)
   
 Build
@@ -23,7 +23,7 @@ mysql -u <ADMINUSER> -p < etc/sql/schema.sql
 Then, build MobSOS Surveys:
 
 ```
-ant all
+gradle build
 ```
 
 Start
