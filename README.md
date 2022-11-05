@@ -58,6 +58,8 @@ The Web UI will be available via *http://localhost:8080/mobsos-surveys* and the 
 
 In order to customize your setup you can set further environment variables.
 
+Docker has a known [issue for mac with Apple chip](https://docs.docker.com/desktop/mac/apple-silicon/). Some images do not support the ARM64 architecture. We can add `--platform Linux/amd64` to run (or build) an Intel image using emulation.
+
 ### Node Launcher Variables
 
 Set [las2peer node launcher options](https://github.com/rwth-acis/las2peer-Template-Project/wiki/L2pNodeLauncher-Commands#at-start-up) with these variables.
