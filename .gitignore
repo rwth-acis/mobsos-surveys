@@ -20,3 +20,4 @@ form.html
 build
 bin/*
 app/bin/
+.vscode/settings.json

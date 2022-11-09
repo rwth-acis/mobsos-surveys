@@ -941,7 +941,7 @@ public class SurveyService extends RESTService {
 					// before returning form, make sure it's still valid (TODO: think about removing check after
 					// testing)
 					try {
-						System.out.println("formXML: "+formXml);
+						// System.out.println("formXML: "+formXml);
 						validateQuestionnaireData(formXml);
 						return Response.status(Status.OK).entity(formXml).build();
 					} catch (IOException e) {
@@ -5040,7 +5040,8 @@ public class SurveyService extends RESTService {
 				sql += " from " + service.jdbcSchema + ".response r join " + service.jdbcSchema
 						+ ".survey s on (s.id = r.sid) where sid = " + sid + " group by uid, cid;";
 
-				System.out.println("SQL for creating survey response view for survey " + sid + ": \n" + sql);
+				// System.out.println("SQL for creating survey response view for survey " + sid
+				// + ": \n" + sql);
 
 				Connection c = null;
 				PreparedStatement s = null;
